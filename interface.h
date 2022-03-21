@@ -13,11 +13,6 @@
 enum
 {
 	CONTROL_TEXTURE,
-	TUTORIAL_NOW,
-	STOP_TUTORIAL,
-	CLONE001,
-	CLONE002,
-	CLONE003
 };
 
 
@@ -27,4 +22,4 @@ enum
 HRESULT InitInterface(void);
 void UninitInterface(void);
 void UpdateInterface(void);
-void DrawInterface(void);
+//void DrawInterface(void);

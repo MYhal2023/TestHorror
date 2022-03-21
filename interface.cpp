@@ -17,7 +17,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(1830 * 0.20)	// テクスチャサイズ
 #define TEXTURE_HEIGHT				(920 * 0.20)	// 
-#define TEXTURE_MAX					(6)				// テクスチャの数
+#define TEXTURE_MAX					(1)				// テクスチャの数
 #define UI_CLONE_WIDTH				(325 * 0.25f)	// テクスチャサイズ
 #define UI_CLONE_HEIGHT				(215 * 0.25f)	// 
 #define UI_CLONE_X					(SCREEN_WIDTH * 0.3f)	// テクスチャ座標
@@ -36,12 +36,6 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/KeyExplain.png",
-	"data/TEXTURE/t_TUTORIAL_MODE.png",
-	"data/TEXTURE/STOP_TUTORIAL.png",
-	"data/TEXTURE/clone001.png",
-	"data/TEXTURE/clone002.png",
-	"data/TEXTURE/clone003.png",
 };
 
 
