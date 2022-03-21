@@ -5,19 +5,31 @@
 //
 //=============================================================================
 #include "main.h"
+#include "input.h"
 #include "renderer.h"
-#include "score.h"
+#include "interface.h"
+#include "lighter.h"
 #include "sprite.h"
 #include "player.h"
 #include "time.h"
 #include "game.h"
+#include "debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_WIDTH				(25)	// テクスチャサイズ
-#define TEXTURE_HEIGHT				(50)	// 
+#define TEXTURE_WIDTH				(160)	// テクスチャサイズ
+#define TEXTURE_HEIGHT				(200)	// 
 #define TEXTURE_MAX					(1)		// テクスチャの数
+
+#define SCREEN_WIDTH	(960)			// ウインドウの幅
+#define SCREEN_HEIGHT	(540)			// ウインドウの高さ
+#define SCREEN_CENTER_X	(SCREEN_WIDTH / 2)	// ウインドウの中心Ｘ座標
+#define SCREEN_CENTER_Y	(SCREEN_HEIGHT / 2)	// ウインドウの中心Ｙ座標
+
+#define LIGHTER_POS_X	(SCREEN_CENTER_X + 250)
+#define LIGHTER_POS_Y	(SCREEN_CENTER_Y + 100)
+
 
 
 //*****************************************************************************
@@ -32,18 +44,11 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/number16x32.png",
+	"data/TEXTURE/lighter.png",
 };
 
-
-static BOOL						g_Use;						// TRUE:使っている  FALSE:未使用
-static float					g_w, g_h;					// 幅と高さ
-static XMFLOAT3					g_Pos;						// ポリゴンの座標
 static int						g_TexNo;					// テクスチャ番号
-
-static int						g_Lighter;
-static int						g_LighterSave[SCORE_SAVE];					// スコア
-static int						g_HighLighter;				// ハイスコア
+static LIGHTER					g_Lighter;					
 
 static BOOL						g_Load = FALSE;
 
@@ -78,18 +83,16 @@ HRESULT InitLighter(void)
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
 
-	// プレイヤーの初期化
-	g_Use   = TRUE;
-	g_w     = TEXTURE_WIDTH;
-	g_h     = TEXTURE_HEIGHT;
-	g_Pos   = { 0.0f + TEXTURE_WIDTH * SCORE_DIGIT, SCREEN_HEIGHT - (TEXTURE_HEIGHT * 0.5f), 0.0f };
+	// 初期化
+	g_Lighter.w     = TEXTURE_WIDTH;
+	g_Lighter.h     = TEXTURE_HEIGHT;
+	g_Lighter.pos   = { LIGHTER_POS_X, LIGHTER_POS_Y, 0.0f };
 	g_TexNo = 0;
-	g_Lighter = 0;
-	for (int i = 0; i < SCORE_SAVE; i++)
-	{
-		g_LighterSave[i] = 0;	// スコアの初期化
-	}
-	g_HighLighter = 0;
+
+	g_Lighter.use = TRUE;
+	g_Lighter.oil = LIGHTER_OIL_MAX;
+	g_Lighter.out = FALSE;
+
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -124,12 +127,31 @@ void UninitLighter(void)
 //=============================================================================
 void UpdateLighter(void)
 {
+#ifdef _DEBUG	// デバッグ情報を表示する
 
+	if (GetKeyboardTrigger(DIK_L))
+	{
+		SetLighterOn(TRUE);
+	}
+	if (GetKeyboardTrigger(DIK_J))
+	{
+		SetLighterOff();
+	}
+	if (GetKeyboardTrigger(DIK_I))
+	{
+		AddOil(10.0f);
+	}
+#endif
+
+	CheckOil();
+	if (!g_Lighter.use || !g_Lighter.out)
+		return;
+	ReduceOil();
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 	//char *str = GetDebugStr();
 	//sprintf(&str[strlen(str)], " PX:%.2f PY:%.2f", g_Pos.x, g_Pos.y);
-	
+	PrintDebugProc("残るオイル量：%f / 100", g_Lighter.oil);
 #endif
 
 }
@@ -139,6 +161,9 @@ void UpdateLighter(void)
 //=============================================================================
 void DrawLighter(void)
 {
+	if (!g_Lighter.out)
+		return;
+
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
@@ -160,10 +185,10 @@ void DrawLighter(void)
 	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
 
 	// スコアの位置やテクスチャー座標を反映
-	float px = g_Pos.x;	// スコアの表示位置X
-	float py = g_Pos.y;			// スコアの表示位置Y
-	float pw = g_w;				// スコアの表示幅
-	float ph = g_h;				// スコアの表示高さ
+	float px = g_Lighter.pos.x;	// スコアの表示位置X
+	float py = g_Lighter.pos.y;			// スコアの表示位置Y
+	float pw = g_Lighter.w;				// スコアの表示幅
+	float ph = g_Lighter.h;				// スコアの表示高さ
 
 	float tw = 1.0f;		// テクスチャの幅
 	float th = 1.0f;		// テクスチャの高さ
@@ -177,4 +202,63 @@ void DrawLighter(void)
 	// ポリゴン描画
 	GetDeviceContext()->Draw(4, 0);
 
+}
+
+//=============================================================================
+// ライターON
+//=============================================================================
+
+void SetLighterOn(BOOL flag)
+{
+	//CheckOil();
+	if (!g_Lighter.use)		return;
+	g_Lighter.out = flag;
+}
+
+//=============================================================================
+// ライターOFF
+//=============================================================================
+void SetLighterOff()
+{
+	if (!g_Lighter.use)	return;
+	g_Lighter.out = FALSE;
+}
+
+//=============================================================================
+// オイル量を追加
+//=============================================================================
+void AddOil(float n)
+{
+	if (g_Lighter.oil + n > LIGHTER_OIL_MAX)
+	{
+		g_Lighter.oil = LIGHTER_OIL_MAX;
+	}
+	else
+	{
+		g_Lighter.oil += n;
+
+	}
+	if (g_Lighter.use == FALSE)
+	{
+		g_Lighter.use = TRUE;
+	}
+}
+
+//=============================================================================
+// オイル量チェック
+//=============================================================================
+void CheckOil()
+{
+	if (g_Lighter.oil >= LIGHTER_OIL_MIN || g_Lighter.use == FALSE)
+		return;
+	SetLighterOff();
+	g_Lighter.use = FALSE;
+}
+
+//=============================================================================
+// オイル量減らす
+//=============================================================================
+void ReduceOil()
+{
+	g_Lighter.oil -= LIGHTER_OIL_REDUCE;
 }
