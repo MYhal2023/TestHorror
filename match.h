@@ -16,6 +16,18 @@
 #define SCORE_SAVE			(10)		// スコアの保存数
 
 
+struct MATCH
+{
+	BOOL					Use;					// TRUE:使っている  FALSE:未使用
+	float					w, h;					// 幅と高さ
+	XMFLOAT3				Pos;					// ポリゴンの座標
+	int						TexNo;					// テクスチャ番号
+	int						StandbyTime;			// 構え始めてからの時間
+	int						AblazeTime;				// 燃焼時間
+	int						force;					// マッチを擦った速さ
+	int						num;					// マッチの本数
+
+};
 
 
 //*****************************************************************************
@@ -25,3 +37,6 @@ HRESULT InitMatch(void);
 void UninitMatch(void);
 void UpdateMatch(void);
 void DrawMatch(void);
+
+void StandbyMatch(void);
+void SetMatchForce(int force);
