@@ -42,7 +42,7 @@ void InitCamera(void)
 {
 	g_Camera.pos = { GAME_X_CAM, GAME_Y_CAM, GAME_Z_CAM };
 	g_Camera.at = { 0.0f, 0.0f, 0.0f };
-	g_Camera.atPos = { 0.0f, 50.0f, 0.0f };
+	g_Camera.atPos = { 0.0f, GAME_Y_CAM, 0.0f };
 	g_Camera.up  = { 0.0f, 1.0f, 0.0f };
 	g_Camera.rot = { 0.0f, 0.0f, 0.0f };
 
@@ -77,43 +77,6 @@ void UpdateCamera(void)
 {
 	PLAYER *player = GetPlayer();
 
-	//if (GetKeyboardPress(DIK_RIGHT) || IsButtonPressed(0, DIK_R) && (GetTime() > 0 && player->life > 0))
-	//{// 視点旋回「左」
-	//	g_Camera.rot.y += VALUE_ROTATE_CAMERA;
-	//	if (g_Camera.rot.y > XM_PI)
-	//	{
-	//		g_Camera.rot.y -= XM_PI * 2.0f;
-	//	}
-
-	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	//}
-
-	//if (GetKeyboardPress(DIK_LEFT) || IsButtonPressed(0, DIK_L) && (GetTime() > 0 && player->life > 0))
-	//{// 視点旋回「右」
-	//	g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
-	//	if (g_Camera.rot.y < -XM_PI)
-	//	{
-	//		g_Camera.rot.y += XM_PI * 2.0f;
-	//	}
-
-	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	//}
-
-
-#ifdef _DEBUG
-
-	if (GetKeyboardPress(DIK_Y))
-	{// 視点移動「上」
-		g_Camera.pos.y += VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_N))
-	{// 視点移動「下」
-		g_Camera.pos.y -= VALUE_MOVE_CAMERA;
-	}
-
 	if (GetKeyboardPress(DIK_Q))
 	{// 注視点旋回「左」
 		g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
@@ -136,6 +99,19 @@ void UpdateCamera(void)
 
 		g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
 		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+	}
+
+
+#ifdef _DEBUG
+
+	if (GetKeyboardPress(DIK_Y))
+	{// 視点移動「上」
+		g_Camera.pos.y += VALUE_MOVE_CAMERA;
+	}
+
+	if (GetKeyboardPress(DIK_N))
+	{// 視点移動「下」
+		g_Camera.pos.y -= VALUE_MOVE_CAMERA;
 	}
 
 	if (GetKeyboardPress(DIK_T))
@@ -331,7 +307,6 @@ void SetCameraAT(XMFLOAT3 pos)
 	pos.z += g_Camera.atPos.z;
 	// カメラの注視点をセット
 	g_Camera.at = pos;
-
 
 	// カメラの視点をカメラのY軸回転に対応させている
 	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
