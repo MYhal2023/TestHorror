@@ -202,24 +202,31 @@ void UpdatePlayer(void)
 		g_Player.rot.y = g_Player.dir = 0.0f;
 		g_Player.spd = 0.0f;
 	}
+	//体力の調整
 	if (GetKeyboardPress(DIK_1))
 	{
 		g_Player.life = 100;
 	}
 	if (GetKeyboardPress(DIK_2))
 	{
-		g_Player.life = 49;
+		g_Player.life = 70;
 	}
 	if (GetKeyboardPress(DIK_3))
 	{
+		g_Player.life = 49;
+	}
+	if (GetKeyboardPress(DIK_4))
+	{
 		g_Player.life = 1;
 	}
+
+	//マッチの燃焼時間を設定
 	MATCH *match = GetMatch();
-	if (GetKeyboardPress(DIK_4))
+	if (GetKeyboardPress(DIK_5))
 	{
 		match->AblazeTime = 5000;
 	}
-	if (GetKeyboardPress(DIK_5))
+	if (GetKeyboardPress(DIK_6))
 	{
 		match->AblazeTime = 0;
 	}
@@ -427,30 +434,41 @@ void HeartBeat(void)
 	MATCH *match = GetMatch();
 	if (match->AblazeTime==0)//ここにライターがOFFの時も&&で追加する
 	{
+		//暗く、瀕死ではないとき
 		Volume = 0.7f;
 		g_Player.BeatSpeed = 30;
 
-		if (g_Player.life < PLAYER_FEAR_LIFE)
+		if (g_Player.life < PLAYER_FEAR_LIFE)			//暗く、瀕死のとき
+
 		{
 			Volume = 0.8f;
 			g_Player.BeatSpeed = 20;
 		}
 
 	}
-	else if (g_Player.life < PLAYER_FEAR_LIFE)
+	else if (g_Player.life < PLAYER_FEAR_LIFE)		//瀕死のとき
+
 	{
 		Volume = 0.5f;
 		g_Player.BeatSpeed = 50;
 	}
-	else if (g_Player.life < PLAYER_ANXIE_LIFE)
+	else if (g_Player.life < PLAYER_ANXIE_LIFE)		//体力が半分以下の時
+
 	{
 		Volume = 0.3f;
 		g_Player.BeatSpeed = 70;
 	}
-	else
+	else if (g_Player.life < PLAYER_PEACE_LIFE)		//体力が80%以下の時
+
 	{
 		Volume = 0.3f;
 		g_Player.BeatSpeed = 90;
+	}
+	else		//体力が80%以上の時
+
+	{
+		Volume = 0.1f;
+		g_Player.BeatSpeed = 110;
 	}
 
 
