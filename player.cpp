@@ -16,6 +16,7 @@
 #include "meshfield.h"
 #include "collision.h"
 #include "time.h"
+#include "sound.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -27,7 +28,7 @@
 #define PLAYER_SHADOW_SIZE	(1.0f)							// 影の大きさ
 #define PLAYER_OFFSET_Y		(0.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
-#define PLAYER_LIFE			(4)								// プレイヤーのライフ
+#define PLAYER_LIFE			(100)								// プレイヤーのライフ
 
 #define PLAYER_PARTS_MAX	(1)								// プレイヤーのパーツの数
 #define PLAYER_AT_FLAME		(30.0f)							// プレイヤーの攻撃フレーム
@@ -38,6 +39,9 @@
 #define PLAYER_MAX_X	(-(FIELD_X / 2.0f) * BLOCK_SIZE + (FIELD_X - DEFER) * BLOCK_SIZE )	// 
 #define PLAYER_MAX_Z	((FIELD_Z / 2.0f) * BLOCK_SIZE - DEFER * BLOCK_SIZE)				// 
 
+#define PLAYER_PEACE_LIFE (PLAYER_LIFE * 0.8)
+#define PLAYER_ANXIE_LIFE (PLAYER_LIFE * 0.5)
+#define PLAYER_FEAR_LIFE  (PLAYER_LIFE * 0.25)
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -83,9 +87,6 @@ HRESULT InitPlayer(void)
 	g_Player.spd = 0.0f;			// 移動スピードクリア
 	g_Player.size = PLAYER_SIZE;	// 当たり判定の大きさ
 	g_Player.life = PLAYER_LIFE;
-#ifdef DEBUG
-	g_Player.life = 10;
-#endif
 	g_Player.lifeMax = g_Player.life;
 	g_Player.use = TRUE;
 	g_Player.attack = FALSE;
@@ -131,15 +132,11 @@ void UpdatePlayer(void)
 {
 	//SettingPlayer();	//レイキャストとクォータニオン処理
 
-	// モデルの色を変更
-	for (int i = 0; i < g_Player.model.SubsetNum; i++)
-	{
-		SetModelDiffuse(&g_Player.model, i, XMFLOAT4(1.0f, 1.0f - g_Player.blink, 1.0f - g_Player.blink, 1.0f));
-	}
-
-	//ここからプレイヤー操作に関する処理
-	if (GetPlayMode() <= TUTORIAL)
-		return;
+	//// モデルの色を変更
+	//for (int i = 0; i < g_Player.model.SubsetNum; i++)
+	//{
+	//	SetModelDiffuse(&g_Player.model, i, XMFLOAT4(1.0f, 1.0f - g_Player.blink, 1.0f - g_Player.blink, 1.0f));
+	//}
 
 	//プレイヤーの旧座標を保存
 	float old_x = g_Player.pos.x;
@@ -147,17 +144,6 @@ void UpdatePlayer(void)
 
 	CAMERA *cam = GetCamera();
 	PlayerMoveControl();
-
-
-
-#ifdef _DEBUG
-	if (GetKeyboardPress(DIK_R))
-	{
-		g_Player.pos.z = g_Player.pos.x = 0.0f;
-		g_Player.rot.y = g_Player.dir = 0.0f;
-		g_Player.spd = 0.0f;
-	}
-#endif
 
 
 	// Key入力があったら移動処理する
@@ -201,6 +187,14 @@ void UpdatePlayer(void)
 	g_Player.moveVec.x *= 0.8f;
 	g_Player.moveVec.z *= 0.8f;
 
+#ifdef _DEBUG
+	if (GetKeyboardPress(DIK_R))
+	{
+		g_Player.pos.z = g_Player.pos.x = 0.0f;
+		g_Player.rot.y = g_Player.dir = 0.0f;
+		g_Player.spd = 0.0f;
+	}
+#endif
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
@@ -355,4 +349,15 @@ void PlayerMoveControl(void)
 		g_Player.moveVec.x -= sinf(cam->rot.y) * changeRotCamera;
 		g_Player.moveVec.z -= cosf(cam->rot.y) * changeRotCamera;
 	}
+}
+
+void HeartBeat(void)
+{
+	if (g_Player.life >= PLAYER_PEACE_LIFE)return;
+
+	if (g_Player.life >= PLAYER_ANXIE_LIFE)
+	{
+		SetSourceVolume(SOUND_LABEL_SE_HeartBeat, 1.0f);
+	}
+
 }

@@ -64,7 +64,6 @@ void InitLight(void)
 	g_Fog.FogColor = XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f );		// フォグの色
 	SetFog(&g_Fog);
 	SetFogEnable(TRUE);		// 他の場所もチェックする shadow
-
 }
 
 

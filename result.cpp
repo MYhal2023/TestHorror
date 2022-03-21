@@ -93,8 +93,6 @@ HRESULT InitResult(void)
 	g_DiffuseB = 1.0f;
 	g_TexNo = 0;
 	g_ResultScore = 0;
-	// BGMçƒê∂
-	PlaySound(SOUND_LABEL_BGM_result);
 
 	g_Load = TRUE;
 	g_LoadData = FALSE;
