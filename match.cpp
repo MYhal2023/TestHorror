@@ -28,6 +28,10 @@
 #define STANDBYTIME					(10)		// マッチを構えるまでの時間
 #define STANDBY_MOVE_FRAME			((STANDBYMATCH_POS_Y-DEFAULTMATCH_POS_Y)/STANDBYTIME)//構える時の1フレームあたりの移動量
 #define MATCH_NUM					(10)			// マッチの本数(初期)
+
+#define MATCH_SLOW					(300)
+#define MATCH_MIDDLE				(600)
+#define MATCH_FAST					(100)
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -213,15 +217,15 @@ void StandbyMatch(void)
 			break;
 		case FORCE_SLOW:
 			g_Match.num--;
-			g_Match.AblazeTime = 300;
+			g_Match.AblazeTime = MATCH_SLOW;
 			break;
 		case FORCE_MIDDLE:
 			g_Match.num--;
-			g_Match.AblazeTime = 600;
+			g_Match.AblazeTime = MATCH_MIDDLE;
 			break;
 		case FORCE_FAST:
 			g_Match.num--;
-			g_Match.AblazeTime = 100;
+			g_Match.AblazeTime = MATCH_FAST;
 			break;
 		}
 
@@ -243,4 +247,9 @@ void StandbyMatch(void)
 void SetMatchForce(int force)
 {
 	g_Match.force = force;
+}
+
+MATCH *GetMatch(void)
+{
+	return &g_Match;
 }
