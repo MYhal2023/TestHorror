@@ -187,7 +187,7 @@ void DrawShadow(void)
 	SetDepthEnable(TRUE);
 
 	// フォグ有効
-	SetFogEnable(FALSE);
+	SetFogEnable(TRUE);
 }
 
 //=============================================================================

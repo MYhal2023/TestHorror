@@ -51,7 +51,7 @@ void InitLight(void)
 	// 光源の設定（世界を照らす光）
 	g_Light[0].Position = XMFLOAT3(500.0f, 500.0f, 500.0f);
 	g_Light[0].Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
-	g_Light[0].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	g_Light[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
 	g_Light[0].Type = LIGHT_TYPE_DIRECTIONAL;					// 並行光源
 	g_Light[0].Enable = TRUE;									// このライトをON
 	SetLight(0, &g_Light[0]);									// これで設定している
@@ -59,11 +59,11 @@ void InitLight(void)
 
 
 	// フォグの初期化（霧の効果）
-	g_Fog.FogStart = 200.0f;									// 視点からこの距離離れるとフォグがかかり始める
-	g_Fog.FogEnd   = 600.0f;									// ここまで離れるとフォグの色で見えなくなる
-	g_Fog.FogColor = XMFLOAT4( 0.9f, 0.9f, 0.9f, 1.0f );		// フォグの色
+	g_Fog.FogStart = 50.0f;									// 視点からこの距離離れるとフォグがかかり始める
+	g_Fog.FogEnd   = 100.0f;									// ここまで離れるとフォグの色で見えなくなる
+	g_Fog.FogColor = XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f );		// フォグの色
 	SetFog(&g_Fog);
-	SetFogEnable(FALSE);		// 他の場所もチェックする shadow
+	SetFogEnable(TRUE);		// 他の場所もチェックする shadow
 
 }
 

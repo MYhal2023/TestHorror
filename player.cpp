@@ -20,7 +20,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	VALUE_MOVE			(2.0f)							// 移動量
+#define	VALUE_MOVE			(1.0f)							// 移動量
 #define	VALUE_AT_MOVE		(4.0f)							// 移動量
 #define	VALUE_ROTATE		(XM_PI * 0.02f)					// 回転量
 
@@ -214,45 +214,45 @@ void UpdatePlayer(void)
 //=============================================================================
 void DrawPlayer(void)
 {
-	// カリング無効
-	SetCullingMode(CULL_MODE_NONE);
+	//// カリング無効
+	//SetCullingMode(CULL_MODE_NONE);
 
-	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
-	// ワールドマトリックスの初期化
-	mtxWorld = XMMatrixIdentity();
+	//// ワールドマトリックスの初期化
+	//mtxWorld = XMMatrixIdentity();
 
-	// スケールを反映
-	mtxScl = XMMatrixScaling(g_Player.scl.x, g_Player.scl.y, g_Player.scl.z);
-	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+	//// スケールを反映
+	//mtxScl = XMMatrixScaling(g_Player.scl.x, g_Player.scl.y, g_Player.scl.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
-	// 回転を反映
-	mtxRot = XMMatrixRotationRollPitchYaw(g_Player.rot.x, g_Player.rot.y, g_Player.rot.z);
-	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+	//// 回転を反映
+	//mtxRot = XMMatrixRotationRollPitchYaw(g_Player.rot.x, g_Player.rot.y, g_Player.rot.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-	//// クォータニオンを反映
-	XMMATRIX quatMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&g_Player.quaternion));
-	mtxWorld = XMMatrixMultiply(mtxWorld, quatMatrix);
-	
-	// 移動を反映
-	mtxTranslate = XMMatrixTranslation(g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
-	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+	////// クォータニオンを反映
+	//XMMATRIX quatMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&g_Player.quaternion));
+	//mtxWorld = XMMatrixMultiply(mtxWorld, quatMatrix);
+	//
+	//// 移動を反映
+	//mtxTranslate = XMMatrixTranslation(g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	// ワールドマトリックスの設定
-	SetWorldMatrix(&mtxWorld);
+	//// ワールドマトリックスの設定
+	//SetWorldMatrix(&mtxWorld);
 
-	XMStoreFloat4x4(&g_Player.mtxWorld, mtxWorld);
+	//XMStoreFloat4x4(&g_Player.mtxWorld, mtxWorld);
 
-	SetFuchi(1);
+	//SetFuchi(1);
 
-	// モデル描画
-	DrawModel(&g_Player.model);
+	//// モデル描画
+	//DrawModel(&g_Player.model);
 
 
-	SetFuchi(0);
+	//SetFuchi(0);
 
-	// カリング設定を戻す
-	SetCullingMode(CULL_MODE_BACK);
+	//// カリング設定を戻す
+	//SetCullingMode(CULL_MODE_BACK);
 }
 
 
