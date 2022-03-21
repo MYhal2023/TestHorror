@@ -71,7 +71,7 @@ struct PLAYER
 	float			blinking;
 	float			blinkingMax;
 	float			blinkingCount;
-
+	int				BeatSpeed;				//ŒÛ“®‚Ì‘¬‚³
 };
 
 //*****************************************************************************
@@ -87,3 +87,5 @@ void IncibleEffect(void);
 void PlayerMoveControl(void);
 void PlayerDashControl(void);
 void PlayerDashProcess(void);
+
+void HeartBeat(void);
