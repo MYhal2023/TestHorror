@@ -40,3 +40,4 @@ void DrawMatch(void);
 
 void StandbyMatch(void);
 void SetMatchForce(int force);
+MATCH *GetMatch(void);
