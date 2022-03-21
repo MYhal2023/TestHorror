@@ -590,10 +590,10 @@ void SetModelDiffuse(DX11_MODEL *Model, int mno, XMFLOAT4 diffuse)
 //3Dモデルデータを一括で読み込む
 void InitLoadModel(void)
 {
-	PLAYER *player = GetPlayer();
-	LoadModel(MODEL_PLAYER, &player->model);
-	// モデルのディフューズを保存しておく。色変え対応の為。
-	GetModelDiffuse(&player->model, &player->diffuse[0]);
+	//PLAYER *player = GetPlayer();
+	//LoadModel(MODEL_PLAYER, &player->model);
+	//// モデルのディフューズを保存しておく。色変え対応の為。
+	//GetModelDiffuse(&player->model, &player->diffuse[0]);
 
 
 }
@@ -601,7 +601,7 @@ void InitLoadModel(void)
 void UninitModel(void)
 {
 
-	// プレイヤーの終了処理
-	UninitPlayer();
+	//// プレイヤーの終了処理
+	//UninitPlayer();
 
 }

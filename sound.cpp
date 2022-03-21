@@ -69,16 +69,9 @@ float g_RMSLevels[2];			//RMSレベルの受信場所
 // 各音素材のパラメータ
 SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 {
-	{ (char*)"data/BGM/title.wav", -1 },		// タイトルBGM
-	{ (char*)"data/BGM/game.wav", -1 },			// ゲームBGM1
-	{ (char*)"data/BGM/result.wav", -1 },		// リザルトBGM2
-	{ (char*)"data/SE/button.wav", 0 },			// ボタン音
-	{ (char*)"data/SE/clock.wav", 0 },			// プレイヤー版時計音
-	{ (char*)"data/SE/clock_enemy.wav", 0 },	// エネミー版時計音
-	{ (char*)"data/SE/coin.wav", 0 },			// プレイヤー版コイン音
-	{ (char*)"data/SE/coin_enemy.wav", 0 },		// エネミー版コイン音
-	{ (char*)"data/SE/enemydown.wav", 0 },		// エネミー討伐音
-	{ (char*)"data/SE/hit000.wav", 0 },			// ヒット音
+	{ (char*)"data/SE/HeartBeat.wav", 0 },		// 心拍音
+	{ (char*)"data/SE/Lighter_ON.wav", 0 },		// ライターオン
+	{ (char*)"data/SE/Match_ON.wav", 0 },		// マッチオン
 };
 
 //Fade関連
