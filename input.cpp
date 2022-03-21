@@ -481,7 +481,7 @@ void UpdatePad(void)
 		DWORD lastPadState;
 		LONG	oldStickY[GAMEPADMAX];
 		LONG	forceStickY = 0;
-		oldStickY[i] = dijs.lY;
+		oldStickY[i] = dijs.lRy;
 		lastPadState = padState[i];
 		padState[i] = 0x00000000l;	// 初期化
 
@@ -499,9 +499,9 @@ void UpdatePad(void)
 				result = pGamePad[i]->Acquire();
 		}
 		//Y方向のスティックに下変化があるなら速度計測
-		if (oldStickY[i] - DIFFERZONE < dijs.lY)
+		if (oldStickY[i] - DIFFERZONE < dijs.lRy)
 		{
-			countY[i] += (dijs.lY - oldStickY[i]);  //差分を加算
+			countY[i] += (dijs.lRy - oldStickY[i]);  //差分を加算
 			countTime[i] += 1;					//1フレーム単位で計測していく
 			padForceY[i] = FORCE_NON;
 		}

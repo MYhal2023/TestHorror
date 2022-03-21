@@ -26,5 +26,4 @@ void UpdateLight(void);
 void SetLightData(int index, LIGHT *light);
 void SetFogData(FOG *fog);
 LIGHT *GetLightData(int index);
-void SetLight(void);
-void ChangeLightType(XMFLOAT4 light1, XMFLOAT4 light2);
+void UpdateFog(void);

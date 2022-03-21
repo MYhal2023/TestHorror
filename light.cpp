@@ -102,3 +102,7 @@ void UpdateLight(void)
 	SetLight(0, &g_Light[0]);									// Ç±ÇÍÇ≈ê›íËÇµÇƒÇ¢ÇÈ
 }
 
+void UpdateFog(void)
+{
+
+}
