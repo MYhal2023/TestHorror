@@ -42,6 +42,7 @@ struct PLAYER
 	float				size;		// 当たり判定の大きさ
 	int					shadowIdx;	// 影のIndex
 	BOOL				use;
+	BOOL				dash;		//ダッシュしているか
 
 	// 階層アニメーション用のメンバー変数
 	INTERPOLATION_DATA	*tbl_adr;	// アニメデータのテーブル先頭アドレス
@@ -61,6 +62,8 @@ struct PLAYER
 
 	int				life;			//プレイヤーHP
 	int				lifeMax;		//プレイヤー最大HP
+	int				stamina;		//プレイヤーのスタミナ
+	int				staminaMax;		//プレイヤーの最大スタミナ
 
 	BOOL			atInvinc;				//無敵時間中か否か
 	float			atInvincTime;			//時間計測用
@@ -80,6 +83,7 @@ void UpdatePlayer(void);
 void DrawPlayer(void);
 
 PLAYER *GetPlayer(void);
-void SettingPlayer(void);
 void IncibleEffect(void);
 void PlayerMoveControl(void);
+void PlayerDashControl(void);
+void PlayerDashProcess(void);

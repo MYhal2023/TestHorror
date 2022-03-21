@@ -17,18 +17,20 @@
 #include "collision.h"
 #include "time.h"
 #include "sound.h"
+#include "lighter.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define	VALUE_MOVE			(1.0f)							// 移動量
-#define	VALUE_AT_MOVE		(4.0f)							// 移動量
+#define	VALUE_DASH_MOVE		(2.0f)							// 移動量
 #define	VALUE_ROTATE		(XM_PI * 0.02f)					// 回転量
 
 #define PLAYER_SHADOW_SIZE	(1.0f)							// 影の大きさ
 #define PLAYER_OFFSET_Y		(0.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_LIFE			(100)								// プレイヤーのライフ
+#define PLAYER_STAMINA		(100)								// プレイヤーのスタミナ
 
 #define PLAYER_PARTS_MAX	(1)								// プレイヤーのパーツの数
 #define PLAYER_AT_FLAME		(30.0f)							// プレイヤーの攻撃フレーム
@@ -88,7 +90,10 @@ HRESULT InitPlayer(void)
 	g_Player.size = PLAYER_SIZE;	// 当たり判定の大きさ
 	g_Player.life = PLAYER_LIFE;
 	g_Player.lifeMax = g_Player.life;
+	g_Player.stamina = PLAYER_LIFE;
+	g_Player.staminaMax = g_Player.stamina;
 	g_Player.use = TRUE;
+	g_Player.dash = FALSE;
 	g_Player.attack = FALSE;
 	g_Player.attackUse = FALSE;
 
@@ -143,8 +148,9 @@ void UpdatePlayer(void)
 	float old_z = g_Player.pos.z;
 
 	CAMERA *cam = GetCamera();
-	PlayerMoveControl();
-
+	PlayerMoveControl();	//プレイヤーの移動操作	
+	PlayerDashControl();	//ダッシュ操作
+	PlayerDashProcess();	//ダッシュの処理
 
 	// Key入力があったら移動処理する
 	if (g_Player.spd > 0.0f)
@@ -183,7 +189,7 @@ void UpdatePlayer(void)
 	}
 
 
-	g_Player.spd *= 0.8f;
+	g_Player.spd *= 0.7f;
 	g_Player.moveVec.x *= 0.8f;
 	g_Player.moveVec.z *= 0.8f;
 
@@ -200,6 +206,7 @@ void UpdatePlayer(void)
 #ifdef _DEBUG	// デバッグ情報を表示する
 	PrintDebugProc("Player:↑ → ↓ ←　Space\n");
 	PrintDebugProc("Player:X:%f Y:%f Z:%f\n", g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
+	PrintDebugProc("Player:Stamina %d Player:spd %f\n", g_Player.stamina, g_Player.spd);
 #endif
 }
 
@@ -351,6 +358,40 @@ void PlayerMoveControl(void)
 	}
 }
 
+void PlayerDashControl(void)
+{
+	//スタミナ0以下はダッシュできない
+	if (g_Player.stamina <= 0)return;	
+
+	if (IsButtonPressed(0, BUTTON_B) || GetKeyboardPress(DIK_Z))
+		g_Player.dash = TRUE;
+	else
+		g_Player.dash = FALSE;
+}
+
+void PlayerLighterControl(void)
+{
+	if (GetKeyboardTrigger(DIK_L))
+	{
+		SetLighterOn(TRUE);
+	}
+	if (GetKeyboardTrigger(DIK_J))
+	{
+		SetLighterOn(FALSE);
+	}
+}
+
+void PlayerDashProcess(void)
+{
+	if (g_Player.dash == FALSE)return;
+
+	g_Player.spd = VALUE_DASH_MOVE;
+	g_Player.stamina--;
+
+	if (g_Player.stamina <= 0)
+		g_Player.dash = FALSE;
+}
+
 void HeartBeat(void)
 {
 	if (g_Player.life >= PLAYER_PEACE_LIFE)return;
@@ -359,5 +400,4 @@ void HeartBeat(void)
 	{
 		SetSourceVolume(SOUND_LABEL_SE_HeartBeat, 1.0f);
 	}
-
 }
