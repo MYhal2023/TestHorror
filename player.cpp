@@ -18,6 +18,8 @@
 #include "time.h"
 #include "sound.h"
 #include "lighter.h"
+#include "match.h"
+#include "lighter.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -103,7 +105,7 @@ HRESULT InitPlayer(void)
 	g_Player.blinking = 10.0f;
 	g_Player.blinkingMax = 20.0f;
 	g_Player.blinkingCount = 2.0f;
-
+	g_Player.BeatSpeed = 1;
 
 	// 階層アニメーション用の初期化処理
 	g_Player.parent = NULL;			// 本体（親）なのでNULLを入れる
@@ -163,7 +165,7 @@ void UpdatePlayer(void)
 	XMVECTOR now = XMLoadFloat3(&g_Player.pos);								// 現在の場所
 	XMStoreFloat3(&g_Player.pos, now + XMVector3Normalize(moveVec) * g_Player.spd);	//単位ベクトルを元に移動
 
-
+	HeartBeat();	//心音のセット
 
 	//メッシュフィールド範囲外に出ないようにする
 	if (g_Player.pos.x <= PLAYER_MIN_X ||
@@ -200,6 +202,37 @@ void UpdatePlayer(void)
 		g_Player.rot.y = g_Player.dir = 0.0f;
 		g_Player.spd = 0.0f;
 	}
+	//体力の調整
+	if (GetKeyboardPress(DIK_1))
+	{
+		g_Player.life = 100;
+	}
+	if (GetKeyboardPress(DIK_2))
+	{
+		g_Player.life = 70;
+	}
+	if (GetKeyboardPress(DIK_3))
+	{
+		g_Player.life = 49;
+	}
+	if (GetKeyboardPress(DIK_4))
+	{
+		g_Player.life = 1;
+	}
+
+	//マッチの燃焼時間を設定
+	MATCH *match = GetMatch();
+	if (GetKeyboardPress(DIK_5))
+	{
+		match->AblazeTime = 5000;
+	}
+	if (GetKeyboardPress(DIK_6))
+	{
+		match->AblazeTime = 0;
+	}
+
+	PrintDebugProc("g_Player.life %d\n", g_Player.life);
+
 #endif
 
 
@@ -394,10 +427,52 @@ void PlayerDashProcess(void)
 
 void HeartBeat(void)
 {
-	if (g_Player.life >= PLAYER_PEACE_LIFE)return;
-
-	if (g_Player.life >= PLAYER_ANXIE_LIFE)
+	float Volume = 0.0f;
+	g_Player.BeatSpeed--;
+	if (g_Player.BeatSpeed != 0)return;	
+	
+	MATCH *match = GetMatch();
+	if (match->AblazeTime==0)//ここにライターがOFFの時も&&で追加する
 	{
-		SetSourceVolume(SOUND_LABEL_SE_HeartBeat, 1.0f);
+		//暗く、瀕死ではないとき
+		Volume = 0.7f;
+		g_Player.BeatSpeed = 30;
+
+		if (g_Player.life < PLAYER_FEAR_LIFE)			//暗く、瀕死のとき
+
+		{
+			Volume = 0.8f;
+			g_Player.BeatSpeed = 20;
+		}
+
 	}
+	else if (g_Player.life < PLAYER_FEAR_LIFE)		//瀕死のとき
+
+	{
+		Volume = 0.5f;
+		g_Player.BeatSpeed = 50;
+	}
+	else if (g_Player.life < PLAYER_ANXIE_LIFE)		//体力が半分以下の時
+
+	{
+		Volume = 0.3f;
+		g_Player.BeatSpeed = 70;
+	}
+	else if (g_Player.life < PLAYER_PEACE_LIFE)		//体力が80%以下の時
+
+	{
+		Volume = 0.3f;
+		g_Player.BeatSpeed = 90;
+	}
+	else		//体力が80%以上の時
+
+	{
+		Volume = 0.1f;
+		g_Player.BeatSpeed = 110;
+	}
+
+
+	SetSourceVolume(SOUND_LABEL_SE_HeartBeat, Volume);
+	PlaySound(SOUND_LABEL_SE_HeartBeat);
+
 }
