@@ -16,6 +16,7 @@
 #define DEADZONE		2500			// 各軸の25%を無効ゾーンとする
 #define RANGE_MAX		1000			// 有効範囲の最大値
 #define RANGE_MIN		-1000			// 有効範囲の最小値
+#define DIFFERZONE		10				// ステッィク計測時、移動幅の猶予を取る
 
 
 //*****************************************************************************
@@ -61,6 +62,10 @@ static LPDIRECTINPUTDEVICE8	pGamePad[GAMEPADMAX] = {NULL,NULL,NULL,NULL};// パッ
 static DWORD	padState[GAMEPADMAX];	// パッド情報（複数対応）
 static DWORD	padTrigger[GAMEPADMAX];
 static int		padCount = 0;			// 検出したパッドの数
+static DIJOYSTATE2		dijs;
+static LONG		countY[GAMEPADMAX];				//Y方向の変化を測る変数
+static LONG		countTime[GAMEPADMAX];			//変化時間を測る変数
+static int		padForceY[GAMEPADMAX];  //Y方向のスティックの勢いの情報
 
 
 //=============================================================================
@@ -469,12 +474,14 @@ void UninitPad(void)
 void UpdatePad(void)
 {
 	HRESULT			result;
-	DIJOYSTATE2		dijs;
 	int				i;
 
 	for ( i=0 ; i<padCount ; i++ ) 
 	{
 		DWORD lastPadState;
+		LONG	oldStickY[GAMEPADMAX];
+		LONG	forceStickY = 0;
+		oldStickY[i] = dijs.lY;
 		lastPadState = padState[i];
 		padState[i] = 0x00000000l;	// 初期化
 
@@ -490,6 +497,26 @@ void UpdatePad(void)
 			result = pGamePad[i]->Acquire();
 			while ( result == DIERR_INPUTLOST )
 				result = pGamePad[i]->Acquire();
+		}
+		//Y方向のスティックに下変化があるなら速度計測
+		if (oldStickY[i] - DIFFERZONE < dijs.lY)
+		{
+			countY[i] += (dijs.lY - oldStickY[i]);  //差分を加算
+			countTime[i] += 1;					//1フレーム単位で計測していく
+			padForceY[i] = FORCE_NON;
+		}
+		else//変化が無いのなら計測を終了し、初期化
+		{
+			if (countY[i] != 0)
+			{
+				forceStickY = countY[i] / countTime[i];
+				countY[i] = 0;
+				countTime[i] = 0;
+
+				if (forceStickY <= 10)				padForceY[i] = FORCE_SLOW;
+				else if (forceStickY > 25)			padForceY[i] = FORCE_FAST;
+				else if (forceStickY > 10)			padForceY[i] = FORCE_MIDDLE;
+			}
 		}
 
 		// ３２の各ビットに意味を持たせ、ボタン押下に応じてビットをオンにする
@@ -540,5 +567,7 @@ BOOL IsButtonTriggered(int padNo,DWORD button)
 	return (button & padTrigger[padNo]);
 }
 
-
-
+int IsButtonForce(int padNo)
+{
+	return padForceY[padNo];
+}
