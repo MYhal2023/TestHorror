@@ -426,4 +426,18 @@ void PixelShaderSpecularPolygon(	in  float4 inPosition	: SV_POSITION,
 	color.a = inDiffuse.a * Material.Diffuse.a;
 	outDiffuse = color;
 
+	//ÉtÉHÉO
+	if (Fog.Enable == 1)
+	{
+		float z = inPosition.z*inPosition.w;
+		float f = (Fog.Distance.y - z) / (Fog.Distance.y - Fog.Distance.x);
+		f = saturate(f);
+		outDiffuse = f * color + (1 - f)*Fog.FogColor;
+		outDiffuse.a = color.a;
+	}
+	else
+	{
+		outDiffuse = color;
+	}
+
 }
