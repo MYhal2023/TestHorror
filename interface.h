@@ -17,7 +17,7 @@ enum
 	CONTROL_TEXTURE,
 };
 
-enum
+enum UI_TEXTURE
 {
 	HP_RED,
 	HP_BAR,
