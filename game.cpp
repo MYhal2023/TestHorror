@@ -273,7 +273,7 @@ void DrawGame0(void)
 		DrawTime();
 
 		////UI表示描画処理
-		//DrawInterface();
+		DrawInterface();
 	}
 
 	//シェーダー管理

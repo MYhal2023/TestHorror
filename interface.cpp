@@ -5,23 +5,29 @@
 //
 //=============================================================================
 #include "main.h"
+#include "input.h"
 #include "renderer.h"
 #include "interface.h"
 #include "sprite.h"
 #include "game.h"
 #include "time.h"
 #include "player.h"
+#include "lighter.h"
+#include "debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_WIDTH				(1830 * 0.20)	// テクスチャサイズ
-#define TEXTURE_HEIGHT				(920 * 0.20)	// 
-#define TEXTURE_MAX					(1)				// テクスチャの数
-#define UI_CLONE_WIDTH				(325 * 0.25f)	// テクスチャサイズ
-#define UI_CLONE_HEIGHT				(215 * 0.25f)	// 
-#define UI_CLONE_X					(SCREEN_WIDTH * 0.3f)	// テクスチャ座標
-#define UI_CLONE_Y					(SCREEN_HEIGHT)					// 
+#define HP_TEXTURE_WIDTH				(800/5)	// テクスチャサイズ
+#define HP_TEXTURE_HEIGHT				(200/5)	// 
+#define TEXTURE_MAX					(4)				// テクスチャの数
+#define	HP_X						(80)			// テクスチャ座標
+#define HP_Y						(200)
+#define OIL_X						(SCREEN_WIDTH-100)	// テクスチャ座標
+#define OIL_Y						(SCREEN_HEIGHT-150)					// 
+
+#define HUNDRED						(100.0f)				//フロート型100
+#define	DEVIATION					(0.8f)					//ライターのゲージの移動を訂正するため
 
 
 //*****************************************************************************
@@ -36,14 +42,14 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TEXTURE_MAX] = {
+	"data/TEXTURE/hpbarred.png",
+	"data/TEXTURE/hpbar.png",
+	"data/TEXTURE/oilbarred.png",
+	"data/TEXTURE/oilbar.png",
 };
 
 
-static BOOL						g_Use;						// TRUE:使っている  FALSE:未使用
-static float					g_w, g_h;					// 幅と高さ
-static XMFLOAT3					g_Pos;						// ポリゴンの座標
-static int						g_TexNo;					// テクスチャ番号
-
+UI_ELEMENT	g_UI[TEXTURE_MAX];
 
 static BOOL						g_Load = FALSE;
 
@@ -77,13 +83,34 @@ HRESULT InitInterface(void)
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
+	for (int i = 0; i < TEXTURE_MAX; i++)
+	{
+		g_UI[i].use = TRUE;
+		g_UI[i].TexNo = i;
+		g_UI[i].tw = 1.0f;		// テクスチャの幅
+		g_UI[i].th = 1.0f;		// テクスチャの高さ
+		g_UI[i].tx = 0.0f;			// テクスチャの左上X座標
+		g_UI[i].ty = 0.0f;			// テクスチャの左上Y座標
+	}
+	g_UI[HP_BAR].pos = { HP_X , HP_Y , 0.0f };
+	g_UI[HP_BAR].w = HP_TEXTURE_WIDTH;
+	g_UI[HP_BAR].h = HP_TEXTURE_HEIGHT;
+
+	g_UI[HP_RED].pos = { HP_X , HP_Y , 0.0f };
+	g_UI[HP_RED].w = HP_TEXTURE_WIDTH;
+	g_UI[HP_RED].h = HP_TEXTURE_HEIGHT;
+
+	g_UI[OIL_BAR].pos = { OIL_X , OIL_Y , 0.0f };
+	g_UI[OIL_BAR].w = HP_TEXTURE_HEIGHT;
+	g_UI[OIL_BAR].h = HP_TEXTURE_WIDTH;
+
+	g_UI[OIL_RED].pos = { OIL_X , OIL_Y , 0.0f };
+	g_UI[OIL_RED].w = HP_TEXTURE_HEIGHT;
+	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH;
+
 
 	// プレイヤーの初期化
-	g_Use   = TRUE;
-	g_w     = TEXTURE_WIDTH;
-	g_h     = TEXTURE_HEIGHT;
-	g_Pos   = { 720.0f, 440.0f, 0.0f };
-	g_TexNo = 0;
+
 
 
 	g_Load = TRUE;
@@ -104,7 +131,7 @@ void UninitInterface(void)
 	}
 
 	for (int i = 0; i < TEXTURE_MAX; i++)
-	{
+	{		
 		if (g_Texture[i])
 		{
 			g_Texture[i]->Release();
@@ -120,159 +147,63 @@ void UninitInterface(void)
 //=============================================================================
 void UpdateInterface(void)
 {
+	float n = 0.001f;
+	PLAYER player = *GetPlayer();
+	//g_UI[HP_RED].w = 
+	LIGHTER lighter = *GetLighter();
+	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH * (lighter.oil/HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
+	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED-lighter.oil)*DEVIATION;			//小さくすれば、下に移動する
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
-	
+
 #endif
 
 }
 
-////=============================================================================
-//// 描画処理
-////=============================================================================
-//void DrawInterface(void)
-//{
-//	// 頂点バッファ設定
-//	UINT stride = sizeof(VERTEX_3D);
-//	UINT offset = 0;
-//	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-//
-//	// マトリクス設定
-//	SetWorldViewProjection2D();
-//
-//	// プリミティブトポロジ設定
-//	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-//
-//	// マテリアル設定
-//	MATERIAL material;
-//	ZeroMemory(&material, sizeof(material));
-//	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-//	SetMaterial(material);
-//	g_TexNo = CONTROL_TEXTURE;
-//	// テクスチャ設定
-//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
-//
-//	g_w = TEXTURE_WIDTH;
-//	g_h = TEXTURE_HEIGHT;
-//	g_Pos = { 720.0f, 440.0f, 0.0f };
-//
-//	// UIの位置やテクスチャー座標を反映
-//	float px = g_Pos.x;	// UIの表示位置X
-//	float py = g_Pos.y;			// UIの表示位置Y
-//	float pw = g_w;				// UIの表示幅
-//	float ph = g_h;				// UIの表示高さ
-//
-//	float tw = 1.0f;		// テクスチャの幅
-//	float th = 1.0f;		// テクスチャの高さ
-//	float tx = 0.0f;			// テクスチャの左上X座標
-//	float ty = 0.0f;			// テクスチャの左上Y座標
-//
-//	// １枚のポリゴンの頂点とテクスチャ座標を設定
-//	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-//		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-//
-//	// ポリゴン描画
-//	GetDeviceContext()->Draw(4, 0);
-//
-//	//クローンセットUIの表示
-//	for (int i = 0; i < CLONE_MAX; i++)
-//	{
-//		g_TexNo = CLONE001 + i;
-//		PLAYER *player = GetPlayer();
-//		if ((g_TexNo == CLONE001 && GetMoney() < CLONE_OFFENSIVE_VALUE) ||
-//			(g_TexNo == CLONE002 && GetMoney() < CLONE_TAKE_TIME_VALUE) ||
-//			(g_TexNo == CLONE003 && GetMoney() < CLONE_CROW_VALUE) ||
-//			(GetTime() <= 0 || player->life <= 0))
-//		{
-//			SwapShader(MODE_MONO);	//購入できない場合、シェーダーをモノクロに
-//		}
-//
-//		// テクスチャ設定
-//		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
-//
-//		g_Pos.x = UI_CLONE_X + (UI_CLONE_WIDTH * i) + i * 8;//隙間を開けつつ描画
-//		g_Pos.y = UI_CLONE_Y - UI_CLONE_HEIGHT * 0.5f;
-//		g_w = UI_CLONE_WIDTH;
-//		g_h = UI_CLONE_HEIGHT;
-//
-//		// UIの位置やテクスチャー座標を反映
-//		px = g_Pos.x;	// UIの表示位置X
-//		py = g_Pos.y;			// UIの表示位置Y
-//		pw = g_w;				// UIの表示幅
-//		ph = g_h;				// UIの表示高さ
-//
-//		tw = 1.0f;		// テクスチャの幅
-//		th = 1.0f;		// テクスチャの高さ
-//		tx = 0.0f;			// テクスチャの左上X座標
-//		ty = 0.0f;			// テクスチャの左上Y座標
-//
-//		// １枚のポリゴンの頂点とテクスチャ座標を設定
-//		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-//			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-//
-//		// ポリゴン描画
-//		GetDeviceContext()->Draw(4, 0);
-//
-//		SwapShader(MODE_PLANE);//シェーダーを元に戻す
-//	}
-//
-//	if (GetPlayMode() != TUTORIAL_GAME)return;	//チュートリアル中ならそれを明示するテクスチャを表示
-//
-//	g_TexNo = TUTORIAL_NOW;
-//
-//	// テクスチャ設定
-//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
-//
-//	g_Pos.x = SCREEN_WIDTH * 0.25f;
-//	g_Pos.y = SENTENCE_HEIGHT * 0.5f;
-//	g_w = SENTENCE_WIDTH;
-//	g_h = SENTENCE_HEIGHT;
-//
-//	// UIの位置やテクスチャー座標を反映
-//	px = g_Pos.x;	// UIの表示位置X
-//	py = g_Pos.y;			// UIの表示位置Y
-//	pw = g_w;				// UIの表示幅
-//	ph = g_h;				// UIの表示高さ
-//
-//	tw = 1.0f;		// テクスチャの幅
-//	th = 1.0f;		// テクスチャの高さ
-//	tx = 0.0f;			// テクスチャの左上X座標
-//	ty = 0.0f;			// テクスチャの左上Y座標
-//
-//	// １枚のポリゴンの頂点とテクスチャ座標を設定
-//	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-//		XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-//
-//	// ポリゴン描画
-//	GetDeviceContext()->Draw(4, 0);
-//
-//	g_TexNo = STOP_TUTORIAL;
-//
-//	// テクスチャ設定
-//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
-//
-//	g_Pos.x = SCREEN_WIDTH * 0.85f;
-//	g_Pos.y = SENTENCE_HEIGHT;
-//	g_w = SENTENCE_WIDTH * 0.5;
-//	g_h = SENTENCE_HEIGHT * 2.0f;
-//
-//	// UIの位置やテクスチャー座標を反映
-//	px = g_Pos.x;	// UIの表示位置X
-//	py = g_Pos.y;			// UIの表示位置Y
-//	pw = g_w;				// UIの表示幅
-//	ph = g_h;				// UIの表示高さ
-//
-//	tw = 1.0f;		// テクスチャの幅
-//	th = 1.0f;		// テクスチャの高さ
-//	tx = 0.0f;			// テクスチャの左上X座標
-//	ty = 0.0f;			// テクスチャの左上Y座標
-//
-//	// １枚のポリゴンの頂点とテクスチャ座標を設定
-//	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-//		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-//
-//	// ポリゴン描画
-//	GetDeviceContext()->Draw(4, 0);
-//
-//}
+//=============================================================================
+// 描画処理
+//=============================================================================
+void DrawInterface(void)
+{
+	for(int i=0;i<TEXTURE_MAX;i++)
+	{
+		// 頂点バッファ設定
+		UINT stride = sizeof(VERTEX_3D);
+		UINT offset = 0;
+		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+		// マトリクス設定
+		SetWorldViewProjection2D();
+
+		// プリミティブトポロジ設定
+		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		// マテリアル設定
+		MATERIAL material;
+		ZeroMemory(&material, sizeof(material));
+		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		SetMaterial(material);
+
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[i].TexNo]);
+
+		// スコアの位置やテクスチャー座標を反映
+		float px = g_UI[i].pos.x;	// 表示位置X
+		float py = g_UI[i].pos.y;			// 表示位置Y
+		float pw = g_UI[i].w;				// 表示幅
+		float ph = g_UI[i].h;				// 表示高さ
+
+		float tw = g_UI[i].tw;		// テクスチャの幅
+		float th = g_UI[i].th;		// テクスチャの高さ
+		float tx = g_UI[i].tx;		// テクスチャの左上X座標
+		float ty = g_UI[i].ty;		// テクスチャの左上Y座標
+
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		// ポリゴン描画
+		GetDeviceContext()->Draw(4, 0);
+	}
+}

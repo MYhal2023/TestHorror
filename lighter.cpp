@@ -262,3 +262,8 @@ void ReduceOil()
 {
 	g_Lighter.oil -= LIGHTER_OIL_REDUCE;
 }
+
+LIGHTER *GetLighter()
+{
+	return &g_Lighter;
+}

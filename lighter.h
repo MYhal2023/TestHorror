@@ -39,5 +39,7 @@ void DrawLighter(void);
 void SetLighterOn(BOOL flag);
 void SetLighterOff(void);
 void AddOil(float n);
-void CheckOil();
-void ReduceOil();
+void CheckOil(void);
+void ReduceOil(void);
+
+LIGHTER *GetLighter(void);
