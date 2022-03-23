@@ -59,7 +59,7 @@ static PLAYER		g_Player;						// プレイヤー
 static BOOL			g_Load = FALSE;
 static int			atCount;
 static float		angle = 0.0f;
-
+static int			g_BeatType;
 // プレイヤーの階層アニメーションデータ
 static INTERPOLATION_DATA move_tbl_right[] = {	// pos, rot, scl, frame
 	{ XMFLOAT3(20.0f, 15.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f),      XMFLOAT3(1.0f, 1.0f, 1.0f), 60 },
@@ -222,11 +222,11 @@ void UpdatePlayer(void)
 
 	//マッチの燃焼時間を設定
 	MATCH *match = GetMatch();
-	if (GetKeyboardPress(DIK_5))
+	if (GetKeyboardTrigger(DIK_5))
 	{
 		match->AblazeTime = 5000;
 	}
-	if (GetKeyboardPress(DIK_6))
+	if (GetKeyboardTrigger(DIK_6))
 	{
 		match->AblazeTime = 0;
 	}
@@ -438,50 +438,71 @@ void HeartBeat(void)
 {
 	float Volume = 0.0f;
 	g_Player.BeatSpeed--;
-	if (g_Player.BeatSpeed != 0)return;	
-	
+	BeatTypeDecision();
+	if (g_BeatType == BEAT_NON || g_Player.BeatSpeed > 0)return;	
 	MATCH *match = GetMatch();
-	if (match->AblazeTime==0)//ここにライターがOFFの時も&&で追加する
+	switch (g_BeatType)
 	{
-		//暗く、瀕死ではないとき
+	case BEAT_SHALLOW:
+		Volume = 0.2f;
+		g_Player.BeatSpeed = 120;
+		break;
+	case BEAT_VSLOW:		
+		Volume = 0.3f;
+		g_Player.BeatSpeed = 100;
+		break;
+	case BEAT_SLOW:
+		Volume = 0.4f;
+		g_Player.BeatSpeed = 90;
+		break;
+	case BEAT_MIDDLE:
+		Volume = 0.4f;
+		g_Player.BeatSpeed = 70;
+		break;
+	case BEAT_FAST:
+		Volume = 0.5f;
+		g_Player.BeatSpeed = 60;
+		break;
+	case BEAT_VFAST:
 		Volume = 0.7f;
 		g_Player.BeatSpeed = 30;
-
-		if (g_Player.life < PLAYER_FEAR_LIFE)			//暗く、瀕死のとき
-
-		{
-			Volume = 0.8f;
-			g_Player.BeatSpeed = 20;
-		}
-
+		break;
 	}
-	else if (g_Player.life < PLAYER_FEAR_LIFE)		//瀕死のとき
-
-	{
-		Volume = 0.5f;
-		g_Player.BeatSpeed = 50;
-	}
-	else if (g_Player.life < PLAYER_ANXIE_LIFE)		//体力が半分以下の時
-
-	{
-		Volume = 0.3f;
-		g_Player.BeatSpeed = 70;
-	}
-	else if (g_Player.life < PLAYER_PEACE_LIFE)		//体力が80%以下の時
-
-	{
-		Volume = 0.3f;
-		g_Player.BeatSpeed = 90;
-	}
-	else		//体力が80%以上の時
-
-	{
-		Volume = 0.1f;
-		g_Player.BeatSpeed = 110;
-	}
-
-
 	SetSourceVolume(SOUND_LABEL_SE_HeartBeat, Volume);
 	PlaySound(SOUND_LABEL_SE_HeartBeat);
+}
 
+void BeatTypeDecision(void)
+{
+	MATCH *match = GetMatch();
+	LIGHTER *lighter = GetLighter();
+	float Volume = 0.0f;
+	if ((match->AblazeTime <= 0 && lighter->out != TRUE) && g_Player.life <= PLAYER_FEAR_LIFE)		//暗く、瀕死のとき
+	{
+		g_BeatType = BEAT_VFAST;	
+	}
+	else if ((match->AblazeTime > 0 || lighter->out == TRUE) && g_Player.life <= PLAYER_FEAR_LIFE)	//明るく、瀕死のとき
+	{
+		g_BeatType = BEAT_FAST;
+	}
+	else if ((match->AblazeTime <= 0 && lighter->out != TRUE) && g_Player.life <= PLAYER_ANXIE_LIFE) //暗く、体力が半分以下の時
+	{
+		g_BeatType = BEAT_MIDDLE;
+	}
+	else if ((match->AblazeTime > 0 || lighter->out == TRUE) && g_Player.life <= PLAYER_ANXIE_LIFE)	//明るく、体力が半分以下の時
+	{
+		g_BeatType = BEAT_SLOW;
+	}
+	else if ((match->AblazeTime <= 0 && lighter->out != TRUE) && g_Player.life < PLAYER_PEACE_LIFE)	//暗く、体力が80%以下の時
+	{
+		g_BeatType = BEAT_VSLOW;
+	}
+	else if((match->AblazeTime > 0 || lighter->out == TRUE) && g_Player.life < PLAYER_PEACE_LIFE)	//明るく、体力が80%以上の時
+	{
+		g_BeatType = BEAT_SHALLOW;
+	}
+	else
+	{
+		g_BeatType = BEAT_NON;																		//上記全てに当てはまらない=全く危険ではない時
+	}
 }
