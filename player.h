@@ -18,9 +18,12 @@
 enum BeatType
 {
 	BEAT_NON,
+	BEAT_SHALLOW,
+	BEAT_VSLOW,
 	BEAT_SLOW,
 	BEAT_MIDDLE,
 	BEAT_FAST,
+	BEAT_VFAST,
 };
 //*****************************************************************************
 // ç\ë¢ëÃíËã`
@@ -89,3 +92,4 @@ void PlayerDashControl(void);
 void PlayerDashProcess(void);
 
 void HeartBeat(void);
+void BeatTypeDecision(void);
