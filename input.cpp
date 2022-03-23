@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "input.h"
+#include "debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -16,7 +17,7 @@
 #define DEADZONE		2500			// 各軸の25%を無効ゾーンとする
 #define RANGE_MAX		1000			// 有効範囲の最大値
 #define RANGE_MIN		-1000			// 有効範囲の最小値
-#define DIFFERZONE		10				// ステッィク計測時、移動幅の猶予を取る
+#define DIFFERZONE		50				// ステッィク計測時、移動幅の猶予を取る
 
 
 //*****************************************************************************
@@ -56,18 +57,24 @@ static DIMOUSESTATE2   mouseState;		// マウスのダイレクトな状態
 static DIMOUSESTATE2   mouseTrigger;	// 押された瞬間だけON
 
 //--------------------------------- game pad
-
-static LPDIRECTINPUTDEVICE8	pGamePad[GAMEPADMAX] = {NULL,NULL,NULL,NULL};// パッドデバイス
-
+static LPDIRECTINPUTDEVICE8	pGamePad[GAMEPADMAX] = { NULL, NULL, NULL, NULL };	// パッドデバイス
+static LPDIRECTINPUTEFFECT pGamePadEf[GAMEPADMAX] = { NULL, NULL, NULL, NULL };//エフェクトオブジェクト
+static DIDEVCAPS pGamePadDevCaps[GAMEPADMAX];
 static DWORD	padState[GAMEPADMAX];	// パッド情報（複数対応）
 static DWORD	padTrigger[GAMEPADMAX];
+static DWORD	padForceFeedbackAxis[GAMEPADMAX] = { NULL, NULL, NULL, NULL };	// パッド振動情報（複数対応）
 static int		padCount = 0;			// 検出したパッドの数
+static int		padFFCount = 0;			// 振動パッドの数
 static DIJOYSTATE2		dijs;
-static LONG		countY[GAMEPADMAX];				//Y方向の変化を測る変数
-static LONG		countTime[GAMEPADMAX];			//変化時間を測る変数
+static DWORD rgdwAxes[2] = { DIJOFS_X , DIJOFS_Y };
+static LONG  rglDirection[2] = { 1 , 1 };	//0にした方は振動しない。{0 , 1}なら右手のみ振動
+
+static LONG		countY[GAMEPADMAX];		//Y方向の変化を測る変数
+static LONG		countTime[GAMEPADMAX];	//変化時間を測る変数
 static int		padForceY[GAMEPADMAX];  //Y方向のスティックの勢いの情報
-
-
+static BOOL		measureST = FALSE;		//ゲーム側が計測を開始するためのスイッチ
+static BOOL		measureCntST = FALSE;	//プレイヤー側が計測を開始する為に押すスイッチ
+static BOOL		effectExist[GAMEPADMAX] = { FALSE,FALSE,FALSE,FALSE };
 //=============================================================================
 // 入力処理の初期化
 //=============================================================================
@@ -387,13 +394,34 @@ long GetMouseZ(void)
 }
 //================================================= game pad
 //---------------------------------------- コールバック関数
-BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID )
+BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID)
 {
 	HRESULT result;
 
 	result = g_pDInput->CreateDevice(lpddi->guidInstance, &pGamePad[padCount++], NULL);
-	return DIENUM_CONTINUE;	// 次のデバイスを列挙
+	if (FAILED(result))return DIENUM_CONTINUE;	// 次のデバイスを列挙
+	return DIENUM_STOP;	
+}
+//---------------------------------------- コールバック関数(振動機能)
+BOOL CALLBACK EnumAxesCallback(const DIDEVICEOBJECTINSTANCE *pdidoi, VOID *pContext)
+{
+	HRESULT     hr;
+	DIPROPRANGE diprg;
 
+	diprg.diph.dwSize = sizeof(DIPROPRANGE);
+	diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+	diprg.diph.dwHow = DIPH_BYID;
+	diprg.diph.dwObj = pdidoi->dwType;
+	diprg.lMin = 0 - 1000;
+	diprg.lMax = 0 + 1000;
+	hr = pGamePad[padFFCount]->SetProperty(DIPROP_RANGE, &diprg.diph);
+
+	if (FAILED(hr)) return DIENUM_STOP;
+
+	DWORD *pdwNumForceFeedbackAxis = (DWORD*)pContext;
+	if ((pdidoi->dwFlags & DIDOI_FFACTUATOR) != 0) (*pdwNumForceFeedbackAxis)++;
+
+	return DIENUM_CONTINUE;
 }
 //---------------------------------------- 初期化
 HRESULT InitializePad(void)			// パッド初期化
@@ -403,7 +431,7 @@ HRESULT InitializePad(void)			// パッド初期化
 
 	padCount = 0;
 	// ジョイパッドを探す
-	g_pDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)SearchGamePadCallback, NULL, DIEDFL_ATTACHEDONLY);
+	g_pDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)SearchGamePadCallback, NULL, /*DIEDFL_FORCEFEEDBACK*/ DIEDFL_ATTACHEDONLY);
 	// セットしたコールバック関数が、パッドを発見した数だけ呼ばれる。
 
 	for ( i=0 ; i<padCount ; i++ ) {
@@ -412,10 +440,10 @@ HRESULT InitializePad(void)			// パッド初期化
 		if ( FAILED(result) )
 			return FALSE; // データフォーマットの設定に失敗
 
-		// モードを設定（フォアグラウンド＆非排他モード）
-//		result = pGamePad[i]->SetCooperativeLevel(hWindow, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-//		if ( FAILED(result) )
-//			return FALSE; // モードの設定に失敗
+		//// モードを設定（フォアグラウンド＆非排他モード）
+		//result = pGamePad[i]->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+		//if ( FAILED(result) )
+		//	return FALSE; // モードの設定に失敗
 
 		// 軸の値の範囲を設定
 		// X軸、Y軸のそれぞれについて、オブジェクトが報告可能な値の範囲をセットする。
@@ -449,7 +477,30 @@ HRESULT InitializePad(void)			// パッド初期化
 		//Y軸の無効ゾーンを設定
 		dipdw.diph.dwObj		= DIJOFS_Y;
 		pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
-			
+		
+		//デバイスの振動プロパティの設定
+		pGamePad[i]->EnumObjects(EnumAxesCallback, (VOID*)&padForceFeedbackAxis[i], DIDFT_AXIS);
+
+		//DIEFFECT構造体に値を設定し、振動エフェクトを利用できるようにする
+		DICONSTANTFORCE cf;
+		DIEFFECT        eff;
+		ZeroMemory(&eff, sizeof(eff));
+		eff.dwSize = sizeof(DIEFFECT);
+		eff.dwFlags = DIEFF_CARTESIAN | DIEFF_OBJECTOFFSETS;
+		eff.dwDuration = INFINITE;
+		eff.dwSamplePeriod = 0;
+		eff.dwGain = DI_FFNOMINALMAX;
+		eff.dwTriggerButton = DIEB_NOTRIGGER;
+		eff.dwTriggerRepeatInterval = 0;
+		eff.cAxes = padForceFeedbackAxis[i];
+		eff.rgdwAxes = rgdwAxes;
+		eff.rglDirection = rglDirection;
+		eff.lpEnvelope = 0;
+		eff.cbTypeSpecificParams = sizeof(DICONSTANTFORCE);
+		eff.lpvTypeSpecificParams = &cf;
+		eff.dwStartDelay = 0;
+		pGamePad[i]->CreateEffect(GUID_ConstantForce, &eff, &pGamePadEf[i], NULL);
+
 		//ジョイスティック入力制御開始
 		pGamePad[i]->Acquire();
 	}
@@ -465,6 +516,7 @@ void UninitPad(void)
 		{
 			pGamePad[i]->Unacquire();
 			pGamePad[i]->Release();
+			if (pGamePadEf[i] != NULL) pGamePadEf[i]->Release();
 		}
 	}
 
@@ -475,13 +527,13 @@ void UpdatePad(void)
 {
 	HRESULT			result;
 	int				i;
-
+	padCount = 1;
 	for ( i=0 ; i<padCount ; i++ ) 
 	{
 		DWORD lastPadState;
 		LONG	oldStickY[GAMEPADMAX];
 		LONG	forceStickY = 0;
-		oldStickY[i] = dijs.lRy;
+		oldStickY[i] = dijs.lRz;//0～65535の数値。(↑:0 ↓:65535)
 		lastPadState = padState[i];
 		padState[i] = 0x00000000l;	// 初期化
 
@@ -498,24 +550,30 @@ void UpdatePad(void)
 			while ( result == DIERR_INPUTLOST )
 				result = pGamePad[i]->Acquire();
 		}
-		//Y方向のスティックに下変化があるなら速度計測
-		if (oldStickY[i] - DIFFERZONE < dijs.lRy)
+
+		if (measureCntST && !measureST && oldStickY[i] + DIFFERZONE < dijs.lRz)//計測開始
 		{
-			countY[i] += (dijs.lRy - oldStickY[i]);  //差分を加算
-			countTime[i] += 1;					//1フレーム単位で計測していく
+			measureST = TRUE;
+		}
+		//Y方向のスティックに下変化があり、計測開始指示が出ているなら速度計測
+		if ((oldStickY[i] < dijs.lRz) && measureST)
+		{
+			countY[i] += (dijs.lRz - oldStickY[i]);  //差分を加算
+			countTime[i] += 1;						 //1フレーム単位で計測していく
 			padForceY[i] = FORCE_NON;
 		}
-		else//変化が無いのなら計測を終了し、初期化
+		else//変化が無いか下にはじき終わっているなら計測を終了し、初期化
 		{
 			if (countY[i] != 0)
 			{
 				forceStickY = countY[i] / countTime[i];
 				countY[i] = 0;
 				countTime[i] = 0;
-
-				if (forceStickY <= 10)				padForceY[i] = FORCE_SLOW;
-				else if (forceStickY > 25)			padForceY[i] = FORCE_FAST;
-				else if (forceStickY > 10)			padForceY[i] = FORCE_MIDDLE;
+				measureST = FALSE;
+				measureCntST = FALSE;
+				if (forceStickY <= 80)			padForceY[i] = FORCE_SLOW;
+				else if (forceStickY > 280)		padForceY[i] = FORCE_FAST;
+				else if (forceStickY > 80)		padForceY[i] = FORCE_MIDDLE;
 			}
 		}
 
@@ -554,6 +612,10 @@ void UpdatePad(void)
 						& padState[i]);					// しかも今ONのやつ
 		
 	}
+#ifdef _DEBUG	// デバッグ情報を表示する
+	float spot = (float)(dijs.lRz);
+	PrintDebugProc("PlayerStick:%f\n", spot);
+#endif
 
 }
 //----------------------------------------------- 検査
@@ -570,4 +632,38 @@ BOOL IsButtonTriggered(int padNo,DWORD button)
 int IsButtonForce(int padNo)
 {
 	return padForceY[padNo];
+}
+
+void SetForceState(BOOL flag)
+{
+	measureCntST = flag;
+}
+
+void InitForce(int padNo)
+{
+	padForceY[padNo] = FORCE_NON;
+}
+
+void padFFAxisStart(int padNo)
+{
+	if (pGamePadEf[padNo] == NULL)return;	//エフェクト作成に失敗しているなら振動させない
+	// 振動設定
+	if (!effectExist)
+	{
+		//第一引数:エフェクトを再生する回数(現在は無限回振動する)
+		//第二引数:エフェクトの再生方法(0:他エフェクトと混合して再生。DIES_SOLO:他のエフェクトを全て停止してから再生)
+		pGamePadEf[padNo]->Start(1, 0);	//振動開始
+		effectExist[padNo] = TRUE;
+	}
+}
+
+void padFFAxisStop(int padNo)
+{
+	if (pGamePadEf[padNo] == NULL)return;	//エフェクト作成に失敗しているなら振動させない
+
+	if (effectExist)
+	{
+		pGamePadEf[padNo]->Stop();		//振動停止
+		effectExist[padNo] = FALSE;
+	}
 }

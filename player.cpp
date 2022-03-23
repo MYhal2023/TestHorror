@@ -231,6 +231,15 @@ void UpdatePlayer(void)
 		match->AblazeTime = 0;
 	}
 
+	if (GetKeyboardPress(DIK_7))
+	{
+		padFFAxisStart(0);
+	}
+	if (GetKeyboardPress(DIK_8))
+	{
+		padFFAxisStop(0);
+	}
+
 	PrintDebugProc("g_Player.life %d\n", g_Player.life);
 
 #endif

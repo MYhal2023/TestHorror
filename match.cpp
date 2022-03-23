@@ -13,6 +13,7 @@
 #include "input.h"
 #include "match.h"
 #include "debugproc.h"
+#include "sound.h"
 
 
 //*****************************************************************************
@@ -132,7 +133,6 @@ void UpdateMatch(void)
 
 	StandbyMatch();
 
-
 #ifdef _DEBUG	// デバッグ情報を表示する
 	//char *str = GetDebugStr();
 	//sprintf(&str[strlen(str)], " PX:%.2f PY:%.2f", g_Pos.x, g_Pos.y);
@@ -195,13 +195,16 @@ void DrawMatch(void)
 //
 void StandbyMatch(void)
 {
+	//マッチが燃えている時の処理
 	if(g_Match.AblazeTime>0)g_Match.AblazeTime--;
-	if (g_Match.AblazeTime != 0)return;
+	if (!IsButtonPressed(0, BUTTON_L))g_Match.AblazeTime = 0;	//捨てる
+
+	if (g_Match.AblazeTime > 0)return;
 	
+	//マッチが燃えていない時の処理
 	//マッチを構える条件
 	if (IsButtonPressed(0, BUTTON_L)&&(0 < g_Match.num))
 	{
-
 		//構えきるまでの時間
 		if (g_Match.StandbyTime < STANDBYTIME)
 		{
@@ -210,7 +213,7 @@ void StandbyMatch(void)
 			return;
 		}
 
-		//switch (g_Match.force)
+		if(IsButtonPressed(0, BUTTON_R)) SetForceState(TRUE);
 		switch (IsButtonForce(0))
 		{
 		case FORCE_NON:
@@ -228,7 +231,6 @@ void StandbyMatch(void)
 			g_Match.AblazeTime = MATCH_FAST;
 			break;
 		}
-
 	}
 	else
 	{
