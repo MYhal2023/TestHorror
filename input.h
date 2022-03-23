@@ -70,3 +70,7 @@ long GetMouseZ(void);               // マウスホイールが動いた相対値
 BOOL IsButtonPressed(int padNo,DWORD button);
 BOOL IsButtonTriggered(int padNo,DWORD button);
 int IsButtonForce(int padNo);
+void SetForceState(BOOL flag);
+void InitForce(int padNo);
+void padFFAxisStart(int padNo);
+void padFFAxisStop(int padNo);

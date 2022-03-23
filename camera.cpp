@@ -124,19 +124,19 @@ void UpdateCamera(void)
 		g_Camera.at.y -= VALUE_MOVE_CAMERA;
 	}
 
-	if (GetKeyboardPress(DIK_U))
-	{// ãﬂÇ√Ç≠
-		g_Camera.len -= VALUE_MOVE_CAMERA;
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	}
+	//if (GetKeyboardPress(DIK_U))
+	//{// ãﬂÇ√Ç≠
+	//	g_Camera.len -= VALUE_MOVE_CAMERA;
+	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
 
-	if (GetKeyboardPress(DIK_M))
-	{// ó£ÇÍÇÈ
-		g_Camera.len += VALUE_MOVE_CAMERA;
-		g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	}
+	//if (GetKeyboardPress(DIK_M))
+	//{// ó£ÇÍÇÈ
+	//	g_Camera.len += VALUE_MOVE_CAMERA;
+	//	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
+	//	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
+	//}
 
 	// ÉJÉÅÉâÇèâä˙Ç…ñﬂÇ∑
 	if (GetKeyboardPress(DIK_R))
