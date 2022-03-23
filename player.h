@@ -25,6 +25,14 @@ enum BeatType
 	BEAT_FAST,
 	BEAT_VFAST,
 };
+
+enum BreathType
+{
+	BREATH_HYPERPNEA,
+	BREATH_HARD,
+	BREATH_SOFT,
+	BREATH_NON
+};
 //*****************************************************************************
 // ç\ë¢ëÃíËã`
 //*****************************************************************************
@@ -75,6 +83,7 @@ struct PLAYER
 	float			blinkingMax;
 	float			blinkingCount;
 	int				BeatSpeed;				//å€ìÆÇÃë¨Ç≥
+	int				BreathInterval;			//ëßå≠Ç¢ÇÃSEä‘äuÇäJÇØÇÈÇΩÇﬂÇ…ê›íË
 };
 
 //*****************************************************************************
@@ -93,3 +102,5 @@ void PlayerDashProcess(void);
 
 void HeartBeat(void);
 void BeatTypeDecision(void);
+void PlayerBreath(void);
+void BreathDicision(void);
