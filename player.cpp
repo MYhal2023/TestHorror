@@ -60,6 +60,7 @@ static BOOL			g_Load = FALSE;
 static int			atCount;
 static float		angle = 0.0f;
 static int			g_BeatType;
+static int			g_BreathType;
 // プレイヤーの階層アニメーションデータ
 static INTERPOLATION_DATA move_tbl_right[] = {	// pos, rot, scl, frame
 	{ XMFLOAT3(20.0f, 15.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f),      XMFLOAT3(1.0f, 1.0f, 1.0f), 60 },
@@ -106,7 +107,7 @@ HRESULT InitPlayer(void)
 	g_Player.blinkingMax = 20.0f;
 	g_Player.blinkingCount = 2.0f;
 	g_Player.BeatSpeed = 1;
-
+	g_Player.BreathInterval = 0;
 	// 階層アニメーション用の初期化処理
 	g_Player.parent = NULL;			// 本体（親）なのでNULLを入れる
 
@@ -166,7 +167,7 @@ void UpdatePlayer(void)
 	XMStoreFloat3(&g_Player.pos, now + XMVector3Normalize(moveVec) * g_Player.spd);	//単位ベクトルを元に移動
 
 	HeartBeat();	//心音のセット
-
+	PlayerBreath(); //息遣いのセット
 	//メッシュフィールド範囲外に出ないようにする
 	if (g_Player.pos.x <= PLAYER_MIN_X ||
 		g_Player.pos.x >= PLAYER_MAX_X ||
@@ -504,5 +505,63 @@ void BeatTypeDecision(void)
 	else
 	{
 		g_BeatType = BEAT_NON;																		//上記全てに当てはまらない=全く危険ではない時
+	}
+}
+
+//プレイヤーの息遣いを鳴らす
+void PlayerBreath(void)
+{
+	g_Player.BreathInterval--;
+	if (g_Player.BreathInterval > 0)return;//インターバルが開き切っていないなら処理しない
+
+	BreathDicision();
+	float Volume = 0.8f;
+	int SetSound = 0;
+	switch (g_BreathType)
+	{
+	case BREATH_HYPERPNEA:
+		SetSound = SOUND_LABEL_SE_Breath003;
+		g_Player.BreathInterval = 70;
+		break;
+	case BREATH_HARD:
+		SetSound = SOUND_LABEL_SE_Breath001;
+		g_Player.BreathInterval = 180;
+		break;
+	case BREATH_SOFT:
+		SetSound = SOUND_LABEL_SE_Breath002;
+		g_Player.BreathInterval = 180;
+		break;
+	case BREATH_NON:
+		g_Player.BreathInterval = 0;
+		return;
+	}
+	SetSourceVolume(SetSound, Volume);
+	PlaySound(SetSound);
+}
+
+//息遣いのタイプを、ダッシュ状態及び心音状態で決める
+void BreathDicision(void)
+{
+	if (g_Player.dash == TRUE)
+	{
+		if (g_BeatType >= BEAT_SHALLOW && g_BeatType < BEAT_SLOW)
+			g_BreathType = BREATH_SOFT;			//ダッシュ中かつ心音が安定しているなら軽いものを
+		else if (g_BeatType >= BEAT_SLOW && g_BeatType < BEAT_FAST)
+			g_BreathType = BREATH_HARD;			//ダッシュ中かつ心音が不安定なら激しいものを
+		else if (g_BeatType >= BEAT_FAST)
+			g_BreathType = BREATH_HYPERPNEA;	//ダッシュ中及び心音が危険なら過呼吸に
+		else
+			g_BreathType = BREATH_NON;			//それ以外の時は鳴らさない
+	}
+	else
+	{
+		if (g_BeatType >= BEAT_VSLOW && g_BeatType < BEAT_MIDDLE)
+			g_BreathType = BREATH_SOFT;			//心音が安定しているなら軽いものを
+		else if (g_BeatType >= BEAT_MIDDLE && g_BeatType < BEAT_VFAST)
+			g_BreathType = BREATH_HARD;			//心音が不安定なら激しいものを
+		else if (g_BeatType >= BEAT_VFAST)
+			g_BreathType = BREATH_HYPERPNEA;	//心音が危険なら過呼吸に
+		else
+			g_BreathType = BREATH_NON;			//それ以外の時は鳴らさない
 	}
 }

@@ -72,6 +72,9 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ (char*)"data/SE/HeartBeat.wav", 0 },		// 心拍音
 	{ (char*)"data/SE/Lighter_ON.wav", 0 },		// ライターオン
 	{ (char*)"data/SE/Match_ON.wav", 0 },		// マッチオン
+	{ (char*)"data/SE/Breath_001.wav", 0 },		// 激しい息遣い
+	{ (char*)"data/SE/Breath_002.wav", 0 },		// 軽い息遣い
+	{ (char*)"data/SE/Breath_003.wav", 0 },		// 過呼吸
 };
 
 //Fade関連
