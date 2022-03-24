@@ -527,7 +527,6 @@ void UpdatePad(void)
 {
 	HRESULT			result;
 	int				i;
-	padCount = 1;
 	for ( i=0 ; i<padCount ; i++ ) 
 	{
 		DWORD lastPadState;

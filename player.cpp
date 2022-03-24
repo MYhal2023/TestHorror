@@ -111,6 +111,8 @@ HRESULT InitPlayer(void)
 	// 階層アニメーション用の初期化処理
 	g_Player.parent = NULL;			// 本体（親）なのでNULLを入れる
 
+	g_BeatType = 0;
+	g_BreathType = 0;
 	g_Load = TRUE;
 	atCount = 0;
 	return S_OK;
@@ -511,12 +513,36 @@ void BeatTypeDecision(void)
 //プレイヤーの息遣いを鳴らす
 void PlayerBreath(void)
 {
-	g_Player.BreathInterval--;
-	if (g_Player.BreathInterval > 0)return;//インターバルが開き切っていないなら処理しない
-
+	//新旧のブレスタイプを判定し、一致しないなら即座にSEを変更
+	int oldType = g_BreathType;
 	BreathDicision();
-	float Volume = 0.8f;
+	int nowType = g_BreathType;
 	int SetSound = 0;
+	if (oldType != nowType)
+	{
+		switch (oldType)
+		{
+		case BREATH_HYPERPNEA:
+			SetSound = SOUND_LABEL_SE_Breath003;
+			break;
+		case BREATH_HARD:
+			SetSound = SOUND_LABEL_SE_Breath001;
+			break;
+		case BREATH_SOFT:
+			SetSound = SOUND_LABEL_SE_Breath002;
+			break;
+		case BREATH_NON:
+			return;
+		}
+		SetSourceVolume(SetSound, 0.0f);	//旧タイプの息遣いSEを消す
+	}
+	else
+	{
+		g_Player.BreathInterval--;
+		if (g_Player.BreathInterval > 0)return;//インターバルが開き切っていないなら処理しない
+	}
+
+	float Volume = 0.8f;
 	switch (g_BreathType)
 	{
 	case BREATH_HYPERPNEA:
