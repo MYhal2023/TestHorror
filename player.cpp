@@ -199,12 +199,6 @@ void UpdatePlayer(void)
 	g_Player.moveVec.z *= 0.8f;
 
 #ifdef _DEBUG
-	if (GetKeyboardPress(DIK_R))
-	{
-		g_Player.pos.z = g_Player.pos.x = 0.0f;
-		g_Player.rot.y = g_Player.dir = 0.0f;
-		g_Player.spd = 0.0f;
-	}
 	//‘Ì—Í‚Ì’²®
 	if (GetKeyboardPress(DIK_1))
 	{
@@ -221,17 +215,6 @@ void UpdatePlayer(void)
 	if (GetKeyboardPress(DIK_4))
 	{
 		g_Player.life = 1;
-	}
-
-	//ƒ}ƒbƒ`‚Ì”RÄŽžŠÔ‚ðÝ’è
-	MATCH *match = GetMatch();
-	if (GetKeyboardTrigger(DIK_5))
-	{
-		match->AblazeTime = 5000;
-	}
-	if (GetKeyboardTrigger(DIK_6))
-	{
-		match->AblazeTime = 0;
 	}
 
 	if (GetKeyboardPress(DIK_7))

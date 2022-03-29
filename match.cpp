@@ -134,8 +134,16 @@ void UpdateMatch(void)
 	StandbyMatch();
 
 #ifdef _DEBUG	// デバッグ情報を表示する
-	//char *str = GetDebugStr();
-	//sprintf(&str[strlen(str)], " PX:%.2f PY:%.2f", g_Pos.x, g_Pos.y);
+	//マッチの燃焼時間を設定
+	if (GetKeyboardTrigger(DIK_M))
+	{
+		g_Match.AblazeTime = 5000;
+	}
+	if (GetKeyboardTrigger(DIK_N))
+	{
+		g_Match.AblazeTime = 0;
+	}
+
 	PrintDebugProc("Match.num %d\n", g_Match.num);
 	PrintDebugProc("Match.AblazeTime %d\n", g_Match.AblazeTime);
 
@@ -196,9 +204,15 @@ void DrawMatch(void)
 void StandbyMatch(void)
 {
 	//マッチが燃えている時の処理
-	if(g_Match.AblazeTime>0)g_Match.AblazeTime--;
-	if (!IsButtonPressed(0, BUTTON_L))g_Match.AblazeTime = 0;	//捨てる
+	int oldBtime = g_Match.AblazeTime;				//過去の残燃焼時間を保存
+	if (g_Match.AblazeTime > 0)g_Match.AblazeTime--;//燃焼時間が残ってるなら減算
+	int nowBtime = g_Match.AblazeTime;				//減算後の残燃焼時間を保存
+	//燃え尽きたらマッチのスタンバイ時間をリセットする
+	if (nowBtime <= 0 && oldBtime > 0) g_Match.StandbyTime = 0;	//過去残が1以上、現在残が0以下→ここが燃え尽きたタイミング！
 
+	g_Match.Pos.y = STANDBY_MOVE_FRAME * g_Match.StandbyTime + DEFAULTMATCH_POS_Y;	//マッチのポジションは常に更新
+
+	//マッチが燃えてないならここで処理を終わる
 	if (g_Match.AblazeTime > 0)return;
 	
 	//マッチが燃えていない時の処理
@@ -209,11 +223,12 @@ void StandbyMatch(void)
 		if (g_Match.StandbyTime < STANDBYTIME)
 		{
 			g_Match.StandbyTime++;
-			g_Match.Pos.y = STANDBY_MOVE_FRAME* g_Match.StandbyTime + DEFAULTMATCH_POS_Y;
 			return;
 		}
 
 		if(IsButtonPressed(0, BUTTON_R)) SetForceState(TRUE);
+		else SetForceState(FALSE);
+
 		switch (IsButtonForce(0))
 		{
 		case FORCE_NON:
@@ -231,6 +246,7 @@ void StandbyMatch(void)
 			g_Match.AblazeTime = MATCH_FAST;
 			break;
 		}
+		InitForce(0);
 	}
 	else
 	{
@@ -238,7 +254,6 @@ void StandbyMatch(void)
 		if (0 < g_Match.StandbyTime)
 		{
 			g_Match.StandbyTime--;
-			g_Match.Pos.y = STANDBY_MOVE_FRAME * g_Match.StandbyTime + DEFAULTMATCH_POS_Y;
 			return;
 		}
 	}
