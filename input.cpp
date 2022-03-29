@@ -550,9 +550,11 @@ void UpdatePad(void)
 				result = pGamePad[i]->Acquire();
 		}
 
-		if (measureCntST && !measureST && oldStickY[i] + DIFFERZONE < dijs.lRz)//計測開始
+		if (measureCntST && !measureST && oldStickY[i] < dijs.lRz)	//計測開始
 		{
 			measureST = TRUE;
+			countY[i] = 0;
+			countTime[i] = 0;
 		}
 		//Y方向のスティックに下変化があり、計測開始指示が出ているなら速度計測
 		if ((oldStickY[i] < dijs.lRz) && measureST)
@@ -563,7 +565,7 @@ void UpdatePad(void)
 		}
 		else//変化が無いか下にはじき終わっているなら計測を終了し、初期化
 		{
-			if (countY[i] != 0)
+			if (countY[i] != 0 && countTime[i] >= 3 && countY[i] >= 30)//計測終了に制限を付ける事で操作性を高める
 			{
 				forceStickY = countY[i] / countTime[i];
 				countY[i] = 0;
@@ -573,6 +575,13 @@ void UpdatePad(void)
 				if (forceStickY <= 80)			padForceY[i] = FORCE_SLOW;
 				else if (forceStickY > 280)		padForceY[i] = FORCE_FAST;
 				else if (forceStickY > 80)		padForceY[i] = FORCE_MIDDLE;
+			}
+			else
+			{
+				countY[i] = 0;
+				countTime[i] = 0;
+				measureST = FALSE;
+				measureCntST = FALSE;
 			}
 		}
 
