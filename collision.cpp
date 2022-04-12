@@ -33,22 +33,22 @@
 // 回転は考慮しない
 // 戻り値：当たってたらTRUE
 //=============================================================================
-BOOL CollisionBB(XMFLOAT3 mpos, float mw, float mh,
-	XMFLOAT3 ypos, float yw, float yh)
+BOOL CollisionBB(XMFLOAT3 mpos, float mw, float mz,
+	XMFLOAT3 ypos, float yw, float yz)
 {
 	BOOL ans = FALSE;	// 外れをセットしておく
 
 	// 座標が中心点なので計算しやすく半分にしている
 	mw /= 2;
-	mh /= 2;
+	mz /= 2;
 	yw /= 2;
-	yh /= 2;
+	yz /= 2;
 
 	// バウンディングボックス(BB)の処理
 	if ((mpos.x + mw > ypos.x - yw) &&
 		(mpos.x - mw < ypos.x + yw) &&
-		(mpos.y + mh > ypos.y - yh) &&
-		(mpos.y - mh < ypos.y + yh))
+		(mpos.z + mz > ypos.z - yz) &&
+		(mpos.z - mz < ypos.z + yz))
 	{
 		// 当たった時の処理
 		ans = TRUE;

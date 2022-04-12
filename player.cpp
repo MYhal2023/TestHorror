@@ -14,6 +14,7 @@
 #include "shadow.h"
 #include "light.h"
 #include "meshfield.h"
+#include "meshwall.h"
 #include "collision.h"
 #include "time.h"
 #include "sound.h"
@@ -140,14 +141,6 @@ void UninitPlayer(void)
 //=============================================================================
 void UpdatePlayer(void)
 {
-	//SettingPlayer();	//レイキャストとクォータニオン処理
-
-	//// モデルの色を変更
-	//for (int i = 0; i < g_Player.model.SubsetNum; i++)
-	//{
-	//	SetModelDiffuse(&g_Player.model, i, XMFLOAT4(1.0f, 1.0f - g_Player.blink, 1.0f - g_Player.blink, 1.0f));
-	//}
-
 	//プレイヤーの旧座標を保存
 	float old_x = g_Player.pos.x;
 	float old_z = g_Player.pos.z;
@@ -170,15 +163,16 @@ void UpdatePlayer(void)
 
 	HeartBeat();	//心音のセット
 	PlayerBreath(); //息遣いのセット
-	//メッシュフィールド範囲外に出ないようにする
-	if (g_Player.pos.x <= PLAYER_MIN_X ||
-		g_Player.pos.x >= PLAYER_MAX_X ||
-		g_Player.pos.z <= PLAYER_MIN_Z ||
-		g_Player.pos.z >= PLAYER_MAX_Z)
-	{
-		g_Player.pos.x = old_x;
-		g_Player.pos.z = old_z;
-	}
+	MeshWallHit(g_Player.pos, g_Player.size, old_x, old_z);
+	////メッシュフィールド範囲外に出ないようにする
+	//if (g_Player.pos.x <= PLAYER_MIN_X ||
+	//	g_Player.pos.x >= PLAYER_MAX_X ||
+	//	g_Player.pos.z <= PLAYER_MIN_Z ||
+	//	g_Player.pos.z >= PLAYER_MAX_Z)
+	//{
+	//	g_Player.pos.x = old_x;
+	//	g_Player.pos.z = old_z;
+	//}
 
 	if (g_Player.atInvinc == TRUE)	//被ダメージによる無敵中にすることは？
 	{
