@@ -8,20 +8,21 @@
 #include "input.h"
 #include "meshwall.h"
 #include "renderer.h"
+#include "player.h"
+#include "collision.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX			(1)						// テクスチャの数
+#define TEXTURE_MAX			(2)						// テクスチャの数
 
-#define	MAX_MESH_WALL		(10)					// 壁の総数
 #define	VALUE_MOVE_WALL		(5.0f)					// 移動速度
 #define	VALUE_ROTATE_WALL	(D3DX_PI * 0.001f)		// 回転速度
 
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
-typedef struct
+struct MESH_WALL
 {
 	ID3D11Buffer	*vertexBuffer;	// 頂点バッファ
 	ID3D11Buffer	*indexBuffer;	// インデックスバッファ
@@ -34,7 +35,8 @@ typedef struct
 	int				nNumVertexIndex;			// 総インデックス数
 	int				nNumPolygon;				// 総ポリゴン数
 	float			fBlockSizeX, fBlockSizeY;	// ブロックサイズ
-} MESH_WALL;
+	int				texNo;						//使用するテクスチャの指定
+};
 
 //*****************************************************************************
 // グローバル変数
@@ -46,17 +48,18 @@ static MESH_WALL g_aMeshWall[MAX_MESH_WALL];		// メッシュ壁ワーク
 static int g_nNumMeshWall = 0;						// メッシュ壁の数
 
 static char* g_TextureName[TEXTURE_MAX] = {
-	"data/TEXTURE/sky001.jpg",
+	"data/TEXTURE/wall_001.png",
+	"data/TEXTURE/wall_002.png",
 };
 
 static BOOL							g_Load = FALSE;
 
 
-//=============================================================================
+//======================================================Po=======================
 // 初期化処理
 //=============================================================================
 HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
-						int nNumBlockX, int nNumBlockY, float fBlockSizeX, float fBlockSizeZ)
+						int nNumBlockX, int nNumBlockY, float fBlockSizeX, float fBlockSizeZ, int texNo)
 {
 	MESH_WALL *pMesh;
 
@@ -79,7 +82,6 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 		}
 	}
 
-	g_TexNo = 0;
 
 	pMesh = &g_aMeshWall[g_nNumMeshWall];
 
@@ -89,6 +91,7 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 	ZeroMemory(&pMesh->material, sizeof(pMesh->material));
 	pMesh->material.Diffuse = col;
 
+	pMesh->texNo = texNo;
 	// ポリゴン表示位置の中心座標を設定
 	pMesh->pos = pos;
 
@@ -269,6 +272,9 @@ void DrawMeshWall(void)
 	// ライティングオフ
 	SetLightEnable(FALSE);
 
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
+
 	for(nCntMeshField = 0; nCntMeshField < g_nNumMeshWall; nCntMeshField++)
 	{
 		pMesh = &g_aMeshWall[nCntMeshField];
@@ -288,9 +294,7 @@ void DrawMeshWall(void)
 		SetMaterial(pMesh->material);
 
 		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
-
-
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[pMesh->texNo]);
 
 		XMMATRIX mtxRot, mtxTranslate, mtxWorld;
 
@@ -313,8 +317,41 @@ void DrawMeshWall(void)
 		GetDeviceContext()->DrawIndexed(pMesh->nNumVertexIndex, 0, 0);
 	}
 
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
 
 	// ライティングオン
 	SetLightEnable(TRUE);
 }
 
+void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
+{
+	MESH_WALL *pMesh;
+	for (int i = 0; i < g_nNumMeshWall; i++)
+	{
+		pMesh = &g_aMeshWall[i];
+
+		//回転量を元にx軸とz軸方向の幅を計算。0にならないように余剰値を追加しておく。
+		float buffer = 1.0f;
+		float rotatew = cosf(pMesh->rot.y);
+		float rotatez = sinf(pMesh->rot.y);
+		float width = pMesh->fBlockSizeX * fabsf(rotatew) + buffer;
+		float thickness = pMesh->fBlockSizeX * fabsf(rotatez) + buffer;
+
+		//壁とプレイヤーの当たり判定。BBで行うため、y座標は現状考慮していない。
+		if (CollisionBB(pos, size, size, pMesh->pos, width, thickness) == TRUE)
+		{
+			PLAYER *player = GetPlayer();
+			//操作感を上げるために、片方の座標のみを元に戻す
+			if (width < pMesh->fBlockSizeX)
+				player->pos.x = old_x;
+			else if (thickness < pMesh->fBlockSizeX)
+				player->pos.z = old_z;
+
+			//両方の座標が戻っているならこれ以上の走査は必要ない
+			if (player->pos.x == old_x && player->pos.z == old_z)
+				return;
+		}
+	}
+
+}

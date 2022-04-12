@@ -13,7 +13,7 @@
 #define	MODEL_PLAYER		"data/MODEL/slime.obj"			// 読み込むモデル名
 #define MAX_PLAYER		(1)					// プレイヤーの数
 
-#define	PLAYER_SIZE		(8.0f)				// 当たり判定の大きさ
+#define	PLAYER_SIZE		(10.0f)				// 当たり判定の大きさ
 
 enum BeatType
 {
