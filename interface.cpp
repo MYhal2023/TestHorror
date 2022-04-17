@@ -13,6 +13,7 @@
 #include "time.h"
 #include "player.h"
 #include "lighter.h"
+#include "match.h"
 #include "debugproc.h"
 
 //*****************************************************************************
@@ -20,11 +21,19 @@
 //*****************************************************************************
 #define HP_TEXTURE_WIDTH				(800/5)	// テクスチャサイズ
 #define HP_TEXTURE_HEIGHT				(200/5)	// 
-#define TEXTURE_MAX					(4)				// テクスチャの数
+#define TEXTURE_MAX					(6)				// テクスチャの数
 #define	HP_X						(80)			// テクスチャ座標
 #define HP_Y						(200)
 #define OIL_X						(SCREEN_WIDTH-100)	// テクスチャ座標
 #define OIL_Y						(SCREEN_HEIGHT-150)					// 
+#define MATCH_X						(50)
+#define MATCH_Y						(SCREEN_HEIGHT-80)
+#define MATCH_TEXTURE_WIDTH			(40*2)
+#define MATCH_TEXTURE_HEIGHT		(20*2)
+#define MATCH_NUM_TEXTURE_WIDTH		(25)	// テクスチャサイズ
+#define MATCH_NUM_TEXTURE_HEIGHT	(50)	// 
+
+#define MATCH_DIGIT			(2)			// 桁数
 
 #define HUNDRED						(100.0f)				//フロート型100
 #define	DEVIATION					(0.8f)					//ライターのゲージの移動を訂正するため
@@ -46,12 +55,15 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/hpbar.png",
 	"data/TEXTURE/oilbarred.png",
 	"data/TEXTURE/oilbar.png",
+	"data/TEXTURE/number16x32.png",
+	"data/TEXTURE/match_ui.png",
 };
 
 
 UI_ELEMENT	g_UI[TEXTURE_MAX];
 
 static BOOL						g_Load = FALSE;
+static int						g_match = 0;
 
 
 //=============================================================================
@@ -108,7 +120,13 @@ HRESULT InitInterface(void)
 	g_UI[OIL_RED].w = HP_TEXTURE_HEIGHT;
 	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH;
 
+	g_UI[MATCH_NUM].pos = { MATCH_X+ MATCH_TEXTURE_WIDTH, MATCH_Y, 0.0f };
+	g_UI[MATCH_NUM].w = MATCH_NUM_TEXTURE_WIDTH;
+	g_UI[MATCH_NUM].h = MATCH_NUM_TEXTURE_HEIGHT;
 
+	g_UI[MATCH_PIC].pos = { MATCH_X, MATCH_Y, 0.0f };
+	g_UI[MATCH_PIC].w = MATCH_TEXTURE_WIDTH;
+	g_UI[MATCH_PIC].h = MATCH_TEXTURE_HEIGHT;
 	// プレイヤーの初期化
 
 
@@ -147,12 +165,13 @@ void UninitInterface(void)
 //=============================================================================
 void UpdateInterface(void)
 {
-	float n = 0.001f;
 	PLAYER player = *GetPlayer();
-	//g_UI[HP_RED].w = 
 	LIGHTER lighter = *GetLighter();
+	MATCH match = *GetMatch();
+
 	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH * (lighter.oil/HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED-lighter.oil)*DEVIATION;			//小さくすれば、下に移動する
+	g_match = match.num;													//マッチの数字を貰う
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
@@ -168,6 +187,8 @@ void DrawInterface(void)
 {
 	for(int i=0;i<TEXTURE_MAX;i++)
 	{
+		if (i == MATCH_NUM)																//マッチの数字を別で印刷
+			continue;
 		// 頂点バッファ設定
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
@@ -205,5 +226,56 @@ void DrawInterface(void)
 
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
+	}
+
+	//マッチの数字
+
+	// 頂点バッファ設定
+	UINT stride = sizeof(VERTEX_3D);
+	UINT offset = 0;
+	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+	// マトリクス設定
+	SetWorldViewProjection2D();
+
+	// プリミティブトポロジ設定
+	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// マテリアル設定
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
+	// テクスチャ設定
+	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[MATCH_NUM].TexNo]);
+
+	// 桁数分処理する
+	int number = g_match;
+	for (int i = 0; i < MATCH_DIGIT; i++)
+	{
+		// 今回表示する桁の数字
+		float x = (float)(number % 10);
+
+		// スコアの位置やテクスチャー座標を反映
+		float px = g_UI[MATCH_NUM].pos.x - g_UI[MATCH_NUM].w * i;	// スコアの表示位置X
+		float py = g_UI[MATCH_NUM].pos.y;			// スコアの表示位置Y
+		float pw = g_UI[MATCH_NUM].w;				// スコアの表示幅
+		float ph = g_UI[MATCH_NUM].h;				// スコアの表示高さ
+
+		float tw = 1.0f / 10;		// テクスチャの幅
+		float th = 1.0f / 1;		// テクスチャの高さ
+		float tx = x * tw;			// テクスチャの左上X座標
+		float ty = 0.0f;			// テクスチャの左上Y座標
+
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		// ポリゴン描画
+		GetDeviceContext()->Draw(4, 0);
+
+		// 次の桁へ
+		number /= 10;
 	}
 }
