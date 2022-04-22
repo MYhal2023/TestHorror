@@ -12,12 +12,13 @@
 #include "camera.h"
 #include "collision.h"
 #include "input.h"
+#include "player.h"
 
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX			(2)			// テクスチャの数
+#define TEXTURE_MAX			(3)			// テクスチャの数
 
 #define	ENEMY_TEXMAG	(0.04f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
@@ -48,6 +49,7 @@ static char *g_TextureName[TEXTURE_MAX] =
 {
 	"data/TEXTURE/enemy.png",
 	"data/TEXTURE/enemy_debug.png",
+	"data/TEXTURE/enemy_back.png",
 };
 
 static BOOL							g_Load = FALSE;
@@ -154,7 +156,10 @@ void DrawEnemy(void)
 	// ライティングを無効
 	SetLightEnable(FALSE);
 
-	XMMATRIX mtxScl, mtxTranslate, mtxWorld;
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
+
+	XMMATRIX mtxScl, mtxTranslate, mtxRot, mtxWorld;
 	CAMERA *cam = GetCamera();
 
 	// 頂点バッファ設定
@@ -162,18 +167,26 @@ void DrawEnemy(void)
 	UINT offset = 0;
 	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
 
+
 	// プリミティブトポロジ設定
 	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
 		if (!g_Enemy[i].use)continue;
+
+		EnemyAngleTex(i);
+
 		// ワールドマトリックスの初期化
 		mtxWorld = XMMatrixIdentity();
 
 		// スケールを反映
 		mtxScl = XMMatrixScaling(g_Enemy[i].scl.x, g_Enemy[i].scl.y, g_Enemy[i].scl.z);
 		mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+
+		// 回転を反映
+		mtxRot = XMMatrixRotationRollPitchYaw(g_Enemy[i].rot.x, g_Enemy[i].rot.y, g_Enemy[i].rot.z);
+		mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
 		// 移動を反映
 		mtxTranslate = XMMatrixTranslation(g_Enemy[i].pos.x, g_Enemy[i].pos.y, g_Enemy[i].pos.z);
@@ -193,6 +206,9 @@ void DrawEnemy(void)
 		// ポリゴンの描画
 		GetDeviceContext()->Draw(4, 0);
 	}
+
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
 
 	// ライティングを有効に
 	SetLightEnable(TRUE);
@@ -265,11 +281,6 @@ int SetEnemy(XMFLOAT3 pos, XMFLOAT3 rot)
 		g_Enemy[i].use = TRUE;
 
 		g_Enemy[i].texNo = ENEMY_WOMAN;
-		//デバッグ中なら最初は怖くないほうに再セット
-#ifdef _DEBUG
-		g_Enemy[i].texNo = ENEMY_DEBUG;
-
-#endif
 		break;
 	}
 
@@ -284,3 +295,26 @@ ENEMY *GetEnemy(void)
 	return &(g_Enemy[0]);
 }
 
+void EnemyAngleTex(int i)
+{
+	CAMERA *cam = GetCamera();
+	PLAYER *player = GetPlayer();
+
+	//角度θを利用してエネミーの方向ベクトルを作成
+	float buffer = 1.0f;
+	XMFLOAT3 pos1 = { g_Enemy[i].pos.x + sinf(g_Enemy[i].rot.y * buffer), 0.0f, g_Enemy[i].pos.z + cosf(g_Enemy[i].rot.y * buffer) };
+	XMFLOAT3 pos2 = { g_Enemy[i].pos.x, 0.0f, g_Enemy[i].pos.z };
+	XMVECTOR v1 = XMVector3Normalize(XMLoadFloat3(&pos1) - XMLoadFloat3(&g_Enemy[i].pos)); //正規化した向きベクトル
+
+	//カメラからエネミーに向かうベクトルを作成
+	XMFLOAT3 playerEdPos = { g_Enemy[i].pos.x, 0.0f, g_Enemy[i].pos.z };
+	XMFLOAT3 playerStPos = { cam->pos.x, 0.0f, cam->pos.z };
+	XMVECTOR v2 = XMVector3Normalize(XMLoadFloat3(&playerEdPos) - XMLoadFloat3(&playerStPos)); //正規化したベクトル
+
+	//2ベクトルの内積を求め、内積の正負によって画像を差し替え(裏表を反映させるため)
+	float ECdot = dotProduct(&v1, &v2);
+	if (ECdot <= 0.0f)
+		g_Enemy[i].texNo = ENEMY_BACK;
+	else
+		g_Enemy[i].texNo = ENEMY_WOMAN;
+}

@@ -475,9 +475,12 @@ HRESULT InitializePad(void)			// パッド初期化
 		dipdw.diph.dwObj		= DIJOFS_X;
 		pGamePad[i]->SetProperty( DIPROP_DEADZONE, &dipdw.diph);
 		//Y軸の無効ゾーンを設定
-		dipdw.diph.dwObj		= DIJOFS_Y;
+		dipdw.diph.dwObj = DIJOFS_Y;
 		pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
-		
+		//右スティックX軸の無効ゾーンを設定
+		dipdw.diph.dwObj = DIJOFS_Z;
+		pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
+
 		//デバイスの振動プロパティの設定
 		pGamePad[i]->EnumObjects(EnumAxesCallback, (VOID*)&padForceFeedbackAxis[i], DIDFT_AXIS);
 
@@ -594,6 +597,10 @@ void UpdatePad(void)
 		if ( dijs.lX < 0 )					padState[i] |= BUTTON_LEFT;
 		//* x-axis (right)
 		if ( dijs.lX > 0 )					padState[i] |= BUTTON_RIGHT;
+		//* x-axis right(Rstick)
+		if (dijs.lZ > 0)					padState[i] |= BUTTON_R_RIGHT;
+		//* x-axis left(Rstick)
+		if (dijs.lZ < 0)					padState[i] |= BUTTON_R_LEFT;
 		//* Ａボタン
 		if ( dijs.rgbButtons[0] & 0x80 )	padState[i] |= BUTTON_A;
 		//* Ｂボタン
@@ -621,7 +628,7 @@ void UpdatePad(void)
 		
 	}
 #ifdef _DEBUG	// デバッグ情報を表示する
-	float spot = (float)(dijs.lRz);
+	float spot = (float)(dijs.lZ);
 	PrintDebugProc("PlayerStick:%f\n", spot);
 #endif
 

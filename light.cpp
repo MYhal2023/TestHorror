@@ -10,6 +10,8 @@
 #include "player.h"
 #include "time.h"
 #include "light.h"
+#include "debugproc.h"
+#include "input.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -59,8 +61,8 @@ void InitLight(void)
 
 
 	// フォグの初期化（霧の効果）
-	g_Fog.FogStart = 50.0f;									// 視点からこの距離離れるとフォグがかかり始める
-	g_Fog.FogEnd   = 100.0f;									// ここまで離れるとフォグの色で見えなくなる
+	g_Fog.FogStart = GAME_FOG_ST;									// 視点からこの距離離れるとフォグがかかり始める
+	g_Fog.FogEnd   = GAME_FOG_ED;									// ここまで離れるとフォグの色で見えなくなる
 	g_Fog.FogColor = XMFLOAT4( 0.0f, 0.0f, 0.0f, 1.0f );		// フォグの色
 	SetFog(&g_Fog);
 	SetFogEnable(TRUE);		// 他の場所もチェックする shadow
@@ -104,5 +106,12 @@ void UpdateLight(void)
 
 void UpdateFog(void)
 {
-
+#ifdef _DEBUG //デバッグ時のみキーボード操作でフォグを遠くへ
+	if (GetKeyboardTrigger(DIK_H))
+	{
+		g_Fog.FogStart = (g_Fog.FogStart == GAME_FOG_ST) ? DEBUG_FOG_ST : GAME_FOG_ST;
+		g_Fog.FogEnd = (g_Fog.FogEnd == GAME_FOG_ED) ? DEBUG_FOG_ED : GAME_FOG_ED;
+		SetFog(&g_Fog);	//フォグをセット
+	}
+#endif
 }

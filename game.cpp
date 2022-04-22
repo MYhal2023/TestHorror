@@ -187,6 +187,7 @@ void UpdateGame(void)
 	// 影の更新処理
 	UpdateShadow();
 
+	UpdateFog();
 
 	if (g_PlayMode <= TUTORIAL)	//タイトルならここまで更新
 		return;
@@ -225,8 +226,6 @@ void DrawGame0(void)
 	// 3Dの物を描画する処理
 	//シェーダー切り替え。水面の描画処理
 	ans = MODE_SPECULAR;
-	if (GetTime() <= 0 || player->life <= 0)
-		ans = MODE_MONO;
 
 	SwapShader(ans);
 	// 地面の描画処理
@@ -234,8 +233,6 @@ void DrawGame0(void)
 
 	//シェーダー切り替え。ノーマルの物に戻す
 	ans = MODE_PLANE;
-	if (GetTime() <= 0 || player->life <= 0)
-		ans = MODE_MONO;
 
 	SwapShader(ans);
 
@@ -281,8 +278,6 @@ void DrawGame0(void)
 	//シェーダーを元に戻す。ポストエフェクトはここまで
 	ans = MODE_PLANE;
 	SwapShader(ans);
-	if (GetTime() <= 0 || player->life <= 0)
-		DrawGameOver();
 
 	// ライティングを有効に
 	SetLightEnable(TRUE);
@@ -405,7 +400,7 @@ float FloatClamp(float x, float a, float b)
 	}
 }
 
-//float型の数値の比較をする。falgがFALSEなら小さい方を、TRUEなら大きい方を返す
+//float型の数値の比較をする。flagがFALSEなら小さい方を、TRUEなら大きい方を返す
 float FloatCompare(BOOL flag, float a, float b)
 {
 	float ans = 0.0f;//一応0.0fをセットしておく
@@ -422,9 +417,4 @@ float FloatCompare(BOOL flag, float a, float b)
 	}
 
 	return ans;
-}
-
-void InitFieldMeshWall(void)
-{
-
 }

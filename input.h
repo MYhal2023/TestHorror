@@ -32,6 +32,9 @@
 #define BUTTON_R		0x00000800l	// Ｒボタン(.rgbButtons[7]&0x80)
 #define BUTTON_START	0x00001000l	// ＳＴＡＲＴボタン(.rgbButtons[8]&0x80)
 #define BUTTON_M		0x00002000l	// Ｍボタン(.rgbButtons[9]&0x80)
+#define BUTTON_R_RIGHT	0x00004000l	// 右スティック右(.lZ<0)
+#define BUTTON_R_LEFT	0x00008000l	// 右スティック左(.lZ<0)
+
 #define GAMEPADMAX		4			// 同時に接続するジョイパッドの最大数をセット
 
 enum ForceState
