@@ -156,6 +156,13 @@ void UpdatePlayer(void)
 		float angle = atan2f(g_Player.moveVec.x, g_Player.moveVec.z);
 		g_Player.rot.y = angle;
 	}
+#ifdef _DEBUG
+
+	if (GetKeyboardPress(DIK_5))
+	{
+		g_Player.spd *= 4.0f;
+	}
+#endif
 	//移動値をベクトル変換して移動させる
 	XMVECTOR moveVec = XMLoadFloat3(&g_Player.moveVec);
 	XMVECTOR now = XMLoadFloat3(&g_Player.pos);								// 現在の場所
@@ -220,6 +227,10 @@ void UpdatePlayer(void)
 		padFFAxisStop(0);
 	}
 
+	if (GetKeyboardPress(DIK_5))
+	{
+		g_Player.spd *= 10.0f;
+	}
 	PrintDebugProc("g_Player.life %d\n", g_Player.life);
 
 #endif

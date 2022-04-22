@@ -77,7 +77,7 @@ void UpdateCamera(void)
 {
 	PLAYER *player = GetPlayer();
 
-	if (GetKeyboardPress(DIK_Q))
+	if (GetKeyboardPress(DIK_Q) || IsButtonPressed(0, BUTTON_R_LEFT))
 	{// 注視点旋回「左」
 		g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
 		if (g_Camera.rot.y < -XM_PI)
@@ -89,7 +89,7 @@ void UpdateCamera(void)
 		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
 	}
 
-	if (GetKeyboardPress(DIK_E))
+	if (GetKeyboardPress(DIK_E) || IsButtonPressed(0, BUTTON_R_RIGHT))
 	{// 注視点旋回「右」
 		g_Camera.rot.y += VALUE_ROTATE_CAMERA;
 		if (g_Camera.rot.y > XM_PI)

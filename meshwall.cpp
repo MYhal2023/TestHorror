@@ -355,3 +355,8 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 	}
 
 }
+
+void InitFieldMeshWall(void)
+{
+
+}

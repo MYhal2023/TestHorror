@@ -18,6 +18,7 @@ enum ENEMT_TEXTURE
 {
 	ENEMY_WOMAN,
 	ENEMY_DEBUG,
+	ENEMY_BACK,
 };
 //*****************************************************************************
 // ç\ë¢ëÃíËã`
@@ -50,4 +51,4 @@ void DrawEnemy(void);
 int SetEnemy(XMFLOAT3 pos, XMFLOAT3 rot);
 
 ENEMY *GetEnemy(void);
-
+void EnemyAngleTex(int i);
