@@ -115,7 +115,7 @@ void crossProduct(XMVECTOR *ret, XMVECTOR *v1, XMVECTOR *v2)
 #endif
 
 }
-//2点の線分と円が交わっているかを調査(戦術位置解析に使用)
+//2点の線分と円が交わっているかを調査
 //pos1:始点	pos2:終点 pos3:円の中心点 r:円の半径
 BOOL GetCrossPoints(XMFLOAT3 pos1, XMFLOAT3 pos2, XMFLOAT3 pos3, float r)
 {
@@ -163,6 +163,47 @@ BOOL GetCrossPoints(XMFLOAT3 pos1, XMFLOAT3 pos2, XMFLOAT3 pos3, float r)
 
 	//全条件に当てはまらない場合、当たっていない判定にする(恐らく上記の条件で全て弾けているとは思う)
 	return ans;
+}
+
+//線分と線分の当たり判定
+//引数には１つ目の線分の始点と終点、２つ目の線分の始点と終点
+BOOL CheckCrossLine(XMFLOAT3 pos1St, XMFLOAT3 pos1Ed, XMFLOAT3 pos2St, XMFLOAT3 pos2Ed)
+{
+	BOOL ans = FALSE;
+
+	//2つの線分グループのベクトル算出
+	//グループ1
+	XMVECTOR tempA = XMLoadFloat3(&pos1Ed) - XMLoadFloat3(&pos1St);
+	XMVECTOR Ato2St = XMLoadFloat3(&pos2St) - XMLoadFloat3(&pos1St);
+	XMVECTOR Ato2Ed = XMLoadFloat3(&pos2Ed) - XMLoadFloat3(&pos1St);
+
+	//グループ2
+	XMVECTOR tempB = XMLoadFloat3(&pos2Ed) - XMLoadFloat3(&pos2St);
+	XMVECTOR Bto1St = XMLoadFloat3(&pos1St) - XMLoadFloat3(&pos2St);
+	XMVECTOR Bto1Ed = XMLoadFloat3(&pos1Ed) - XMLoadFloat3(&pos2St);
+
+	//外積算出
+	XMVECTOR d1;
+	XMVECTOR d2;
+	crossProduct(&d1, &tempA, &Ato2St);
+	crossProduct(&d2, &tempA, &Ato2Ed);
+	XMFLOAT3 f1, f2;
+	XMStoreFloat3(&f1, d1);
+	XMStoreFloat3(&f2, d2);
+
+	//線分はまたがってないためここで返す
+	if (f1.y*f2.y > 0.0f)
+		return ans;
+
+	crossProduct(&d1, &tempB, &Bto1St);
+	crossProduct(&d2, &tempB, &Bto1Ed);
+	XMStoreFloat3(&f1, d1);
+	XMStoreFloat3(&f2, d2);
+
+	if (f1.y*f2.y > 0.0f)
+		return ans;
+
+	return ans = TRUE;
 }
 
 //=============================================================================

@@ -13,6 +13,7 @@
 #include "collision.h"
 #include "input.h"
 #include "player.h"
+#include "amadeus.h"
 
 
 //*****************************************************************************
@@ -23,8 +24,8 @@
 #define	ENEMY_TEXMAG	(0.04f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
-
-#define	ENEMY_SPEED		(1.0f)			// エネミーの移動スピード
+#define ENEMY_SIGHT		(100.0f)		//エネミーの視力
+#define	ENEMY_SPEED		(0.5f)			// エネミーの移動スピード
 
 
 //*****************************************************************************
@@ -54,6 +55,9 @@ static char *g_TextureName[TEXTURE_MAX] =
 
 static BOOL							g_Load = FALSE;
 
+static INTERPOLATION_DATA move_tbl[] = {	// pos, rot, scl, frame
+	{ XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 60 },
+};
 
 //=============================================================================
 // 初期化処理
@@ -88,7 +92,16 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].fHeight = ENEMY_HEIGHT;
 		g_Enemy[i].use = FALSE;
 		g_Enemy[i].texNo = 0;
+
+		g_Enemy[i].move_time = 0.0f;	// 線形補間用のタイマーをクリア
+		g_Enemy[i].tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
+		g_Enemy[i].tbl_size = 0;		// 再生するアニメデータのレコード数をセット
 	}
+
+	//線形補間データセット
+	g_Enemy[0].move_time = 0.0f;		// 線形補間用のタイマーをクリア
+	g_Enemy[0].tbl_adr = move_tbl;		// 再生するアニメデータの先頭アドレスをセット
+	g_Enemy[0].tbl_size = sizeof(move_tbl) / sizeof(INTERPOLATION_DATA);	// 再生するアニメデータのレコード数をセット
 
 	g_Load = TRUE;
 	return S_OK;
@@ -129,6 +142,33 @@ void UpdateEnemy(void)
 	{
 		if (g_Enemy[i].use != TRUE)	//使われてないエネミーは処理をスキップ
 			continue;
+
+		////エネミーのステート処理
+		//int oldState = g_Enemy[i].state;
+		//g_Enemy[i].state = StateCheck(i);
+		//int nowState = g_Enemy[i].state;
+		////ステートが遷移した場合は線形補間データの保存などを行う
+		//if (oldState != nowState)
+		//{
+		//	StateAdjust(i);
+		//}
+		g_Enemy[i].state = Chase;
+		switch (g_Enemy[i].state)
+		{
+		case Patrol:
+			EnemyInterPoration(i);
+			break;
+
+		case Chase:
+			//AI処理の元、移動ベクトルを決定
+			g_Enemy[i].moveVec = TacticalPointSystem(i);
+			break;
+		}
+
+		//移動値をベクトル変換して移動させる
+		XMVECTOR moveVec = g_Enemy[i].moveVec;
+		XMVECTOR now = XMLoadFloat3(&g_Enemy[i].pos);								// 現在の場所
+		XMStoreFloat3(&g_Enemy[i].pos, now + XMVector3Normalize(moveVec) * g_Enemy[i].spd);	//単位ベクトルを元に移動
 
 		//デバッグ中なら画像の入れ替えが可能(怖いやつと怖くないやつに入れ替え可能！)
 #ifdef _DEBUG
@@ -295,6 +335,7 @@ ENEMY *GetEnemy(void)
 	return &(g_Enemy[0]);
 }
 
+//プレイヤーの視点から見たエネミーの前後判別
 void EnemyAngleTex(int i)
 {
 	CAMERA *cam = GetCamera();
@@ -314,7 +355,71 @@ void EnemyAngleTex(int i)
 	//2ベクトルの内積を求め、内積の正負によって画像を差し替え(裏表を反映させるため)
 	float ECdot = dotProduct(&v1, &v2);
 	if (ECdot <= 0.0f)
-		g_Enemy[i].texNo = ENEMY_BACK;
-	else
 		g_Enemy[i].texNo = ENEMY_WOMAN;
+	else
+		g_Enemy[i].texNo = ENEMY_BACK;
+}
+
+int StateCheck(int i)
+{
+	PLAYER *player = GetPlayer();
+	int ans = Patrol;			//デフォルトは巡回モード
+	//プレイヤーを視界に捉えたか
+	if (Visibility(g_Enemy[i].pos, player->pos, g_Enemy[i].rot.y, ENEMY_SIGHT) == TRUE)
+	{
+		ans = Chase;	//追跡開始
+	}
+
+	return ans;
+}
+
+void EnemyInterPoration(int i)
+{
+	if (g_Enemy[i].tbl_adr == NULL)return;	// 線形補間を実行する？
+							// 線形補間の処理
+	// 移動処理
+	int		index = (int)g_Enemy[i].move_time;
+	float	time = g_Enemy[i].move_time - index;
+	int		size = g_Enemy[i].tbl_size;
+
+	float dt = 1.0f / g_Enemy[i].tbl_adr[index].frame;	// 1フレームで進める時間
+	g_Enemy[i].move_time += dt;							// アニメーションの合計時間に足す
+
+	if (index > (size - 2))	// ゴールをオーバーしていたら、最初へ戻す
+	{
+		g_Enemy[i].move_time = 0.0f;
+		index = 0;
+	}
+
+	// 座標を求める	X = StartX + (EndX - StartX) * 今の時間
+	XMVECTOR p1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].pos);	// 次の場所
+	XMVECTOR p0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].pos);	// 現在の場所
+	XMVECTOR vec = p1 - p0;
+	XMStoreFloat3(&g_Enemy[i].pos, p0 + vec * time);
+
+	// 回転を求める	R = StartX + (EndX - StartX) * 今の時間
+	XMVECTOR r1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].rot);	// 次の角度
+	XMVECTOR r0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].rot);	// 現在の角度
+	XMVECTOR rot = r1 - r0;
+	XMStoreFloat3(&g_Enemy[i].rot, r0 + rot * time);
+
+	// scaleを求める S = StartX + (EndX - StartX) * 今の時間
+	XMVECTOR s1 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 1].scl);	// 次のScale
+	XMVECTOR s0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index + 0].scl);	// 現在のScale
+	XMVECTOR scl = s1 - s0;
+	XMStoreFloat3(&g_Enemy[i].scl, s0 + scl * time);
+
+}
+
+//ステート遷移に伴う情報整合を行う
+void StateAdjust(int i)
+{
+	switch (g_Enemy[i].state)
+	{
+	case Patrol:	//追跡から巡回へ
+		break;
+
+	case Chase:		//巡回から追跡へ
+		break;
+	}
 }

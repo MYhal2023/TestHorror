@@ -1,30 +1,34 @@
 //=============================================================================
 //
-// 当たり判定処理 [collision.h]
-// Author : 
+// ゲームシステム処理 [check_game.cpp]
 //
 //=============================================================================
-#pragma once
-
-
+#include "main.h"
+#include "renderer.h"
+#include "game.h"
+#include "player.h"
+#include "enemy.h"
+#include "check_game.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-
-
-//*****************************************************************************
-// 構造体定義
-//*****************************************************************************
-
+//#define 
 
 //*****************************************************************************
-// プロトタイプ宣言
+// グローバル変数
 //*****************************************************************************
-BOOL CollisionBB(XMFLOAT3 mpos, float mw, float mz, XMFLOAT3 ypos, float yw, float yz);
-BOOL CollisionBC(XMFLOAT3 pos1, XMFLOAT3 pos2, float r1, float r2);
 
-float dotProduct(XMVECTOR *v1, XMVECTOR *v2);
-void crossProduct(XMVECTOR *ret, XMVECTOR *v1, XMVECTOR *v2);
-BOOL RayCast(XMFLOAT3 p0, XMFLOAT3 p1, XMFLOAT3 p2, XMFLOAT3 pos0, XMFLOAT3 pos1, XMFLOAT3 *hit, XMFLOAT3 *normal);
-BOOL GetCrossPoints(XMFLOAT3 pos1, XMFLOAT3 pos2, XMFLOAT3 pos3, float r);
-BOOL CheckCrossLine(XMFLOAT3 pos1St, XMFLOAT3 pos1Ed, XMFLOAT3 pos2St, XMFLOAT3 pos2Ed);
+//*****************************************************************************
+// 更新処理
+//*****************************************************************************
+void CheckGame(void)
+{
+
+
+
+
+}
+
+//*****************************************************************************
+// 描画処理
+//*****************************************************************************

@@ -29,6 +29,7 @@
 
 #include "lighter.h"
 #include "match.h"
+#include "check_game.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -183,6 +184,9 @@ void UpdateGame(void)
 	UpdateEnemy();
 
 	UpdateLight();
+
+	//ゲーム内部でのやり取り
+	CheckGame();
 
 	// 影の更新処理
 	UpdateShadow();
@@ -415,6 +419,20 @@ float FloatCompare(BOOL flag, float a, float b)
 		else	  return b;
 		break;
 	}
+
+	return ans;
+}
+
+//ライトが付いているか否か。TRUEで付いてる。FALSEで付いてない。
+BOOL CheckLightOn(void)
+{
+	BOOL ans = FALSE;
+	MATCH *match = GetMatch();
+	LIGHTER *lighter = GetLighter();
+	//マッチ燃焼時間が0以上、またはライターが炎を出している時、光がある扱い
+	if (match->AblazeTime > 0 ||
+		lighter->out == TRUE)
+		ans = TRUE;
 
 	return ans;
 }

@@ -358,5 +358,43 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 
 void InitFieldMeshWall(void)
 {
+}
 
+XMFLOAT3 GetMeshWallStPosition(int i)
+{
+	MESH_WALL *pMesh;
+	XMFLOAT3 pos;
+	pMesh = &g_aMeshWall[i];
+	float rotatew = cosf(pMesh->rot.y);
+	float rotatez = sinf(pMesh->rot.y);
+	float width = pMesh->fBlockSizeX * fabsf(rotatew);
+	float thickness = pMesh->fBlockSizeX * fabsf(rotatez);
+	if (width > thickness)
+		pos = { pMesh->pos.x + width * 0.5f, 0.0f, pMesh->pos.z };
+	else if (thickness > width)
+		pos = { pMesh->pos.x, 0.0f, pMesh->pos.z + thickness * 0.5f };
+
+	return pos;
+}
+
+XMFLOAT3 GetMeshWallEdPosition(int i)
+{
+	MESH_WALL *pMesh;
+	XMFLOAT3 pos;
+	pMesh = &g_aMeshWall[i];
+	float rotatew = cosf(pMesh->rot.y);
+	float rotatez = sinf(pMesh->rot.y);
+	float width = pMesh->fBlockSizeX * fabsf(rotatew);
+	float thickness = pMesh->fBlockSizeX * fabsf(rotatez);
+	if (width > thickness)
+		pos = { pMesh->pos.x - width * 0.5f, 0.0f, pMesh->pos.z };
+	else if (thickness > width)
+		pos = { pMesh->pos.x, 0.0f, pMesh->pos.z - thickness * 0.5f };
+
+	return pos;
+}
+
+int GetMeshWallNum(void)
+{
+	return g_nNumMeshWall;
 }

@@ -20,6 +20,12 @@ enum ENEMT_TEXTURE
 	ENEMY_DEBUG,
 	ENEMY_BACK,
 };
+
+enum ENEMY_STATE
+{
+	Patrol,
+	Chase,
+};
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
@@ -29,13 +35,19 @@ typedef struct
 	XMFLOAT3	pos;			// 位置
 	XMFLOAT3	rot;			// 角度
 	XMFLOAT3	scl;			// スケール
+	XMVECTOR	moveVec;		//移動ベクトル
 	MATERIAL	material;		// マテリアル
 	float		spd;			// 移動量
 	float		fWidth;			// 幅
 	float		fHeight;		// 高さ
 	int			shadowIdx;		// 影ID
-	BOOL		use;			// 使用しているかどうか
 	int			texNo;
+	int			state;			//ステートベースAIに使用
+	BOOL		use;			// 使用しているかどうか
+
+	INTERPOLATION_DATA	*tbl_adr;			// アニメデータのテーブル先頭アドレス
+	int					tbl_size;			// 登録したテーブルのレコード総数
+	float				move_time;			// 実行時間
 
 } ENEMY;
 
@@ -52,3 +64,6 @@ int SetEnemy(XMFLOAT3 pos, XMFLOAT3 rot);
 
 ENEMY *GetEnemy(void);
 void EnemyAngleTex(int i);
+int StateCheck(int i);
+void EnemyInterPoration(int i);
+void StateAdjust(int i);
