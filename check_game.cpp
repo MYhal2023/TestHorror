@@ -8,8 +8,7 @@
 #include "game.h"
 #include "player.h"
 #include "enemy.h"
-#include "match.h"
-#include "lighter.h"
+
 #include "collision.h"
 #include "life.h"
 #include "check_game.h"
@@ -107,7 +106,7 @@ void LifeHeal(void)
 	if (healTime > 0)return;	//回復のCDだったらスルー
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
-		if (enemy[i].state == Chase)continue;
+		if (enemy[i].state == Chase)return;
 	}
 	AddLife(5, PLAYER_LIFE, 0);	//ライフ回復
 	healTime = HEAL_CD;
@@ -116,10 +115,8 @@ void LifeHeal(void)
 //暗いときに正気度が減っていく処理
 void LightCheck(void)
 {
-	MATCH *match = GetMatch();
-	LIGHTER *lighter = GetLighter();
 	if (lightLife > 0)return;	//CD中ならスルー
-	if (lighter->out == FALSE && match->AblazeTime == 0)//明るくないかのチェック
+	if (CheckLightOn() == FALSE)//明るくないかのチェック
 	{
 		if(sanProtect>0)sanProtect--;
 	}
