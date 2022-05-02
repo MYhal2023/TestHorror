@@ -28,36 +28,53 @@
 #define	VALUE_MOVE_CAMERA	(2.0f)										// カメラの移動量
 #define	VALUE_ROTATE_CAMERA	(XM_PI * 0.01f)								// カメラの回転量
 
+typedef enum
+{
+	RUN,
+	BETWEEN,
+	WALK
+}CAMERA_PHASE;
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static CAMERA			g_Camera;		// カメラデータ
+static CAMERA			g_Cam;		// カメラデータ
 
 static int				g_ViewPortType = TYPE_FULL_SCREEN;
+
+static float			g_WalkCamera;	//1fあたりのカメラの変化量
+static float			g_;
+static int				g_Prevrun;
+static float			g_CamBetweenpos;
+static float			g_CamInt;
+static XMFLOAT3			g_oldpos;
+static XMFLOAT3			g_oldat;
 
 //=============================================================================
 // 初期化処理
 //=============================================================================
 void InitCamera(void)
 {
-	g_Camera.pos = { GAME_X_CAM, GAME_Y_CAM, GAME_Z_CAM };
-	g_Camera.at = { 0.0f, 0.0f, 0.0f };
-	g_Camera.atPos = { 0.0f, GAME_Y_CAM, 0.0f };
-	g_Camera.up  = { 0.0f, 1.0f, 0.0f };
-	g_Camera.rot = { 0.0f, 0.0f, 0.0f };
+	g_Cam.pos = { GAME_X_CAM, GAME_Y_CAM, GAME_Z_CAM };
+	g_Cam.at = { 0.0f, 0.0f, 0.0f };
+	g_Cam.atPos = { 0.0f, GAME_Y_CAM, 0.0f };
+	g_Cam.up  = { 0.0f, 1.0f, 0.0f };
+	g_Cam.rot = { 0.0f, 0.0f, 0.0f };
 
 	// 視点と注視点の距離を計算
 	float vx, vz;
-	vx = g_Camera.pos.x - g_Camera.at.x;
-	vz = g_Camera.pos.z - g_Camera.at.z;
-	g_Camera.len = sqrtf(vx * vx + vz * vz);
+	vx = g_Cam.pos.x - g_Cam.at.x;
+	vz = g_Cam.pos.z - g_Cam.at.z;
+	g_Cam.len = sqrtf(vx * vx + vz * vz);
 	
-	g_Camera.tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
-	g_Camera.move_time = 0.0f;	// 線形補間用のタイマーをクリア
-	g_Camera.tbl_size = NULL;		// 再生するアニメデータのレコード数をセット
+	g_Cam.tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
+	g_Cam.move_time = 0.0f;	// 線形補間用のタイマーをクリア
+	g_Cam.tbl_size = NULL;		// 再生するアニメデータのレコード数をセット
 
 	// ビューポートタイプの初期化
 	g_ViewPortType = TYPE_FULL_SCREEN;
+
+	g_CamBetweenpos = 0.0f;
+
 }
 
 
@@ -79,64 +96,63 @@ void UpdateCamera(void)
 
 	if (GetKeyboardPress(DIK_Q) || IsButtonPressed(0, BUTTON_R_LEFT))
 	{// 注視点旋回「左」
-		g_Camera.rot.y -= VALUE_ROTATE_CAMERA;
-		if (g_Camera.rot.y < -XM_PI)
+		g_Cam.rot.y -= VALUE_ROTATE_CAMERA;
+		if (g_Cam.rot.y < -XM_PI)
 		{
-			g_Camera.rot.y += XM_PI * 2.0f;
+			g_Cam.rot.y += XM_PI * 2.0f;
 		}
 
-		g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+		g_Cam.at.x = g_Cam.pos.x + sinf(g_Cam.rot.y) * g_Cam.len;
+		g_Cam.at.z = g_Cam.pos.z + cosf(g_Cam.rot.y) * g_Cam.len;
 	}
 
 	if (GetKeyboardPress(DIK_E) || IsButtonPressed(0, BUTTON_R_RIGHT))
 	{// 注視点旋回「右」
-		g_Camera.rot.y += VALUE_ROTATE_CAMERA;
-		if (g_Camera.rot.y > XM_PI)
+		g_Cam.rot.y += VALUE_ROTATE_CAMERA;
+		if (g_Cam.rot.y > XM_PI)
 		{
-			g_Camera.rot.y -= XM_PI * 2.0f;
+			g_Cam.rot.y -= XM_PI * 2.0f;
 		}
 
-		g_Camera.at.x = g_Camera.pos.x + sinf(g_Camera.rot.y) * g_Camera.len;
-		g_Camera.at.z = g_Camera.pos.z + cosf(g_Camera.rot.y) * g_Camera.len;
+		g_Cam.at.x = g_Cam.pos.x + sinf(g_Cam.rot.y) * g_Cam.len;
+		g_Cam.at.z = g_Cam.pos.z + cosf(g_Cam.rot.y) * g_Cam.len;
 	}
 
-
-	if (g_Camera.tbl_adr != NULL)
+	if (g_Cam.tbl_adr != NULL)
 	{
 		// 移動処理
-		int		index = (int)g_Camera.move_time;
-		float	time = g_Camera.move_time - index;
-		int		size = g_Camera.tbl_size;
+		int		index = (int)g_Cam.move_time;
+		float	time = g_Cam.move_time - index;
+		int		size = g_Cam.tbl_size;
 
-		float dt = 1.0f / g_Camera.tbl_adr[index].frame;	// 1フレームで進める時間
-		g_Camera.move_time += dt;							// アニメーションの合計時間に足す
+		float dt = 1.0f / g_Cam.tbl_adr[index].frame;	// 1フレームで進める時間
+		g_Cam.move_time += dt;							// アニメーションの合計時間に足す
 
 		if (index > (size - 2))	// ゴールをオーバーしていたら、最初へ戻す。線形補間データを消去
 		{
-			g_Camera.move_time = 0.0f;
+			g_Cam.move_time = 0.0f;
 			index = 0;
-			g_Camera.tbl_adr = NULL;
+			g_Cam.tbl_adr = NULL;
 			return;
 		}
 
 		// 座標を求める	X = StartX + (EndX - StartX) * 今の時間
-		XMVECTOR p1 = XMLoadFloat3(&g_Camera.tbl_adr[index + 1].pos);	// 次の場所
-		XMVECTOR p0 = XMLoadFloat3(&g_Camera.tbl_adr[index + 0].pos);	// 現在の場所
+		XMVECTOR p1 = XMLoadFloat3(&g_Cam.tbl_adr[index + 1].pos);	// 次の場所
+		XMVECTOR p0 = XMLoadFloat3(&g_Cam.tbl_adr[index + 0].pos);	// 現在の場所
 		XMVECTOR vec = p1 - p0;
-		XMStoreFloat3(&g_Camera.pos, p0 + vec * time);
+		XMStoreFloat3(&g_Cam.pos, p0 + vec * time);
 
 		// 回転を求める	R = StartX + (EndX - StartX) * 今の時間
-		XMVECTOR r1 = XMLoadFloat3(&g_Camera.tbl_adr[index + 1].rot);	// 次の角度
-		XMVECTOR r0 = XMLoadFloat3(&g_Camera.tbl_adr[index + 0].rot);	// 現在の角度
+		XMVECTOR r1 = XMLoadFloat3(&g_Cam.tbl_adr[index + 1].rot);	// 次の角度
+		XMVECTOR r0 = XMLoadFloat3(&g_Cam.tbl_adr[index + 0].rot);	// 現在の角度
 		XMVECTOR rot = r1 - r0;
-		XMStoreFloat3(&g_Camera.rot, r0 + rot * time);
+		XMStoreFloat3(&g_Cam.rot, r0 + rot * time);
 
 		// 注視点の変更量を求める S = StartX + (EndX - StartX) * 今の時間
-		XMVECTOR s1 = XMLoadFloat3(&g_Camera.tbl_adr[index + 1].scl);	// 次の注視点
-		XMVECTOR s0 = XMLoadFloat3(&g_Camera.tbl_adr[index + 0].scl);	// 現在の注視点
+		XMVECTOR s1 = XMLoadFloat3(&g_Cam.tbl_adr[index + 1].scl);	// 次の注視点
+		XMVECTOR s0 = XMLoadFloat3(&g_Cam.tbl_adr[index + 0].scl);	// 現在の注視点
 		XMVECTOR scl = s1 - s0;
-		XMStoreFloat3(&g_Camera.atPos, s0 + scl * time);
+		XMStoreFloat3(&g_Cam.atPos, s0 + scl * time);
 
 	}
 
@@ -154,13 +170,13 @@ void SetCamera(void)
 {
 	// ビューマトリックス設定
 	XMMATRIX mtxView;
-	mtxView = XMMatrixLookAtLH(XMLoadFloat3(&g_Camera.pos), XMLoadFloat3(&g_Camera.at), XMLoadFloat3(&g_Camera.up));
+	mtxView = XMMatrixLookAtLH(XMLoadFloat3(&g_Cam.pos), XMLoadFloat3(&g_Cam.at), XMLoadFloat3(&g_Cam.up));
 	SetViewMatrix(&mtxView);
-	XMStoreFloat4x4(&g_Camera.mtxView, mtxView);
+	XMStoreFloat4x4(&g_Cam.mtxView, mtxView);
 
 	XMMATRIX mtxInvView;
 	mtxInvView = XMMatrixInverse(nullptr, mtxView);
-	XMStoreFloat4x4(&g_Camera.mtxInvView, mtxInvView);
+	XMStoreFloat4x4(&g_Cam.mtxInvView, mtxInvView);
 
 
 	// プロジェクションマトリックス設定
@@ -168,9 +184,9 @@ void SetCamera(void)
 	mtxProjection = XMMatrixPerspectiveFovLH(VIEW_ANGLE, VIEW_ASPECT, VIEW_NEAR_Z, VIEW_FAR_Z);
 
 	SetProjectionMatrix(&mtxProjection);
-	XMStoreFloat4x4(&g_Camera.mtxProjection, mtxProjection);
+	XMStoreFloat4x4(&g_Cam.mtxProjection, mtxProjection);
 
-	SetShaderCamera(g_Camera.pos);
+	SetShaderCamera(g_Cam.pos);
 }
 
 
@@ -179,7 +195,7 @@ void SetCamera(void)
 //=============================================================================
 CAMERA *GetCamera(void) 
 {
-	return &g_Camera;
+	return &g_Cam;
 }
 
 //=============================================================================
@@ -257,17 +273,61 @@ int GetViewPortType(void)
 // カメラの視点と注視点をセット
 void SetCameraAT(XMFLOAT3 pos)
 {
+	PLAYER *player = GetPlayer();
+#ifdef _DEBUG
+	if (GetKeyboardTrigger(DIK_X))
+		player->stamina = 10000;
+#endif
+
 	//引数の座標に変更量を加算。
-	pos.x += g_Camera.atPos.x;
-	pos.y += g_Camera.atPos.y;
-	pos.z += g_Camera.atPos.z;
+	pos.x += g_Cam.atPos.x;
+	pos.y += g_Cam.atPos.y;
+	pos.z += g_Cam.atPos.z;
 	// カメラの注視点をセット
-	g_Camera.at = pos;
+	g_Cam.at = pos;
 
 	// カメラの視点をカメラのY軸回転に対応させている
-	g_Camera.pos.x = g_Camera.at.x - sinf(g_Camera.rot.y) * g_Camera.len;
-	g_Camera.pos.z = g_Camera.at.z - cosf(g_Camera.rot.y) * g_Camera.len;
-	g_Camera.pos.y = pos.y;
+	g_Cam.pos.x = g_Cam.at.x - sinf(g_Cam.rot.y) * g_Cam.len;
+	g_Cam.pos.z = g_Cam.at.z - cosf(g_Cam.rot.y) * g_Cam.len;
+	g_Cam.pos.y = pos.y;
 
+
+	//走ってる時の画面の揺れ
+	if (player->dash == TRUE)
+	{
+		RunningCamera();
+	}
+	else// if (g_Prevrun==RUN)
+	{
+		//中間補間プログラム
+		CameraBetween();
+	}
 }
 
+//走ってる時のカメラの揺れ
+void RunningCamera(void)
+{
+	//g_Prevrun = RUN;
+	g_WalkCamera+=0.1f;
+	g_CamBetweenpos = 1.0f;
+	g_Cam.pos.y += sinf(g_WalkCamera)*0.025f;
+	g_Cam.at.y  += sinf(g_WalkCamera)*0.2f;
+	g_oldpos = g_Cam.pos;
+	g_oldat = g_Cam.at;
+}
+
+
+void CameraBetween(void)
+{
+	if (g_CamBetweenpos < 0.0f)return;
+	g_CamBetweenpos -= 0.025f;
+	
+	//g_Cam.pos.x = (g_oldpos.x * g_CamBetweenpos + g_Cam.pos.x * (1.0f - g_CamBetweenpos));
+	g_Cam.pos.y = (g_oldpos.y * g_CamBetweenpos + g_Cam.pos.y * (1.0f - g_CamBetweenpos));
+	//g_Cam.pos.z = (g_oldpos.z * g_CamBetweenpos + g_Cam.pos.z * (1.0f - g_CamBetweenpos));
+
+	//g_Cam.at.x = (g_oldat.x * g_CamBetweenpos + g_Cam.at.x * (1.0f - g_CamBetweenpos));
+	g_Cam.at.y = (g_oldat.y * g_CamBetweenpos + g_Cam.at.y * (1.0f - g_CamBetweenpos));
+	//g_Cam.at.z = (g_oldat.z * g_CamBetweenpos + g_Cam.at.z * (1.0f - g_CamBetweenpos));
+
+}
