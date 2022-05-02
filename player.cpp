@@ -34,15 +34,12 @@
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_LIFE			(100)								// プレイヤーのライフ
 #define PLAYER_STAMINA		(100)								// プレイヤーのスタミナ
+#define PLAYER_SANITY		(100)								// プレイヤーの正気度
 
 #define PLAYER_PARTS_MAX	(1)								// プレイヤーのパーツの数
 #define PLAYER_AT_FLAME		(30.0f)							// プレイヤーの攻撃フレーム
 #define PLAYER_INVINC_FLAME	(120.0f)						// プレイヤー無敵フレーム
 #define DEFER				(2.0f)							// プレイヤー移動制限の余剰幅
-#define PLAYER_MIN_X	(-(FIELD_X / 2.0f) * BLOCK_SIZE + DEFER * BLOCK_SIZE)				// プレイヤー移動上限
-#define PLAYER_MIN_Z	((FIELD_Z / 2.0f) * BLOCK_SIZE - (FIELD_Z - DEFER) * BLOCK_SIZE)	// 
-#define PLAYER_MAX_X	(-(FIELD_X / 2.0f) * BLOCK_SIZE + (FIELD_X - DEFER) * BLOCK_SIZE )	// 
-#define PLAYER_MAX_Z	((FIELD_Z / 2.0f) * BLOCK_SIZE - DEFER * BLOCK_SIZE)				// 
 
 #define PLAYER_PEACE_LIFE (PLAYER_LIFE * 0.8)
 #define PLAYER_ANXIE_LIFE (PLAYER_LIFE * 0.5)
@@ -94,8 +91,11 @@ HRESULT InitPlayer(void)
 	g_Player.size = PLAYER_SIZE;	// 当たり判定の大きさ
 	g_Player.life = PLAYER_LIFE;
 	g_Player.lifeMax = g_Player.life;
-	g_Player.stamina = PLAYER_LIFE;
+	g_Player.stamina = PLAYER_STAMINA;
 	g_Player.staminaMax = g_Player.stamina;
+	g_Player.sanity = PLAYER_SANITY;
+	g_Player.sanityMax = g_Player.sanity;
+
 	g_Player.use = TRUE;
 	g_Player.dash = FALSE;
 	g_Player.attack = FALSE;
@@ -171,15 +171,6 @@ void UpdatePlayer(void)
 	HeartBeat();	//心音のセット
 	PlayerBreath(); //息遣いのセット
 	MeshWallHit(g_Player.pos, g_Player.size, old_x, old_z);
-	////メッシュフィールド範囲外に出ないようにする
-	//if (g_Player.pos.x <= PLAYER_MIN_X ||
-	//	g_Player.pos.x >= PLAYER_MAX_X ||
-	//	g_Player.pos.z <= PLAYER_MIN_Z ||
-	//	g_Player.pos.z >= PLAYER_MAX_Z)
-	//{
-	//	g_Player.pos.x = old_x;
-	//	g_Player.pos.z = old_z;
-	//}
 
 	if (g_Player.atInvinc == TRUE)	//被ダメージによる無敵中にすることは？
 	{

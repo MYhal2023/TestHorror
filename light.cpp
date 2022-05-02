@@ -12,6 +12,7 @@
 #include "light.h"
 #include "debugproc.h"
 #include "input.h"
+#include "game.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -106,6 +107,7 @@ void UpdateLight(void)
 
 void UpdateFog(void)
 {
+	BOOL debugSW = FALSE;	//デバッグ判断用変数
 #ifdef _DEBUG //デバッグ時のみキーボード操作でフォグを遠くへ
 	if (GetKeyboardTrigger(DIK_H))
 	{
@@ -114,4 +116,23 @@ void UpdateFog(void)
 		SetFog(&g_Fog);	//フォグをセット
 	}
 #endif
+	//debugSW変数で、デバッグ中か否かを判断。判断はフォグの開始位置で行う
+	(g_Fog.FogStart == DEBUG_FOG_ST) ? debugSW = TRUE : debugSW = FALSE;
+
+	//デバッグ中のフォグを使用しているなら、リリース版のフォグをスルー
+	if (debugSW == TRUE)return;
+
+	//ライト状態に適さないフォグの場合、状態に合うように再セット
+	if (CheckLightOn() == TRUE && g_Fog.FogStart != GAME_LFOG_ST)
+	{
+		g_Fog.FogStart = GAME_LFOG_ST;
+		g_Fog.FogEnd = GAME_LFOG_ED;
+		SetFog(&g_Fog);	//フォグをセット
+	}
+	else if (CheckLightOn() != TRUE && g_Fog.FogStart == GAME_LFOG_ST)
+	{
+		g_Fog.FogStart = GAME_FOG_ST;
+		g_Fog.FogEnd = GAME_FOG_ED;
+		SetFog(&g_Fog);	//フォグをセット
+	}
 }

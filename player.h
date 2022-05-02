@@ -75,6 +75,8 @@ struct PLAYER
 	int				lifeMax;		//プレイヤー最大HP
 	int				stamina;		//プレイヤーのスタミナ
 	int				staminaMax;		//プレイヤーの最大スタミナ
+	int				sanity;			//プレイヤー正気度
+	int				sanityMax;		//プレイヤー最大正気度
 
 	BOOL			atInvinc;				//無敵時間中か否か
 	float			atInvincTime;			//時間計測用

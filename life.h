@@ -44,6 +44,8 @@ struct LIFE
 
 	int				life;		// ライフ
 	int				life_max;	//ライフの最大値
+	int				sanity;		// ライフ
+	int				sanity_max;	//ライフの最大値
 };
 
 
@@ -57,4 +59,5 @@ void DrawLife(void);
 void DrawGameOver(void);
 int GetLife(void);
 void AddLife(int add, int chara, int i);
+void AddSanity(int add, int chara, int i);
 void SetLife(int life);

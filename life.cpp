@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ライフ処理 [life.cpp]
+// ライフ(ステータス)処理 [life.cpp]
 // Author : GP11B132 34 米倉 睦起
 //
 //=============================================================================
@@ -11,6 +11,7 @@
 #include "player.h"
 #include "score.h"
 #include "game.h"
+#include "enemy.h"
 
 
 //*****************************************************************************
@@ -268,11 +269,11 @@ void DrawGameOver(void)
 //=============================================================================
 // ライフを計算する
 // 引数:add :ライフの変化量	chara: ライフを増減させる対象を判別 i:構造体配列の何番目？
-// 戻り値:trueなら生存、falseなら死亡状態としてplayer.cppに返す
 //=============================================================================
 void AddLife(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエネミー)、配列番号
 {
 	PLAYER *player = GetPlayer();
+	ENEMY *enemy = GetEnemy();
 	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルは加算無し
 
 	switch (chara)			//0ならプレイヤーのライフを増減させる。g_Lifeにプレイヤーのライフ情報を格納
@@ -284,38 +285,50 @@ void AddLife(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエネ
 		if (g_Life.life > g_Life.life_max)
 		{
 			g_Life.life = g_Life.life_max;
-			AddScore(1000);					//最大HPを超える回復をしているならスコアを加算させる
 		}
 		player->life = g_Life.life;
 		break;
 
-	//case 1:	//1ならエネミーのライフを増減させる。g_Lifeにエネミーのライフ情報を格納
+	case 1:	//1ならエネミーのライフを増減させる。g_Lifeにエネミーのライフ情報を格納
 
-	//	g_Life.life = enemy[i].life;
-	//	g_Life.life_max = enemy[i].lifeMax;
-	//	g_Life.life += add;
-	//	if (g_Life.life > g_Life.life_max)
-	//	{
-	//		g_Life.life = g_Life.life_max;
-	//	}
-	//	enemy[i].life = g_Life.life;
-	//	break;
-
-	//case 2:	//2ならクローンのライフを増減させる
-
-	//	g_Life.life = clone[i].life;
-	//	g_Life.life_max = clone[i].lifeMax;
-	//	g_Life.life += add;
-	//	if (g_Life.life > g_Life.life_max)
-	//	{
-	//		g_Life.life = g_Life.life_max;
-	//	}
-	//	clone[i].life = g_Life.life;
-	//	break;
+		//g_Life.life = enemy[i].life;
+		//g_Life.life_max = enemy[i].lifeMax;
+		//g_Life.life += add;
+		//if (g_Life.life > g_Life.life_max)
+		//{
+		//	g_Life.life = g_Life.life_max;
+		//}
+		//enemy[i].life = g_Life.life;
+		break;
 
 	}
 }
 
+//=============================================================================
+// 正気度を計算する
+// 引数:add :正気度の変化量	chara: 正気度を増減させる対象を判別 i:構造体配列の何番目？
+//=============================================================================
+void AddSanity(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエネミー)、配列番号
+{
+	PLAYER *player = GetPlayer();
+	ENEMY *enemy = GetEnemy();
+	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルは加算無し
+
+	switch (chara)			//0ならプレイヤーのライフを増減させる。g_Lifeにプレイヤーの正気度情報を格納
+	{
+	case 0:
+		g_Life.sanity = player->sanity;
+		g_Life.sanity_max = player->sanityMax;
+		g_Life.sanity += add;
+		if (g_Life.sanity > g_Life.sanity_max)
+		{
+			g_Life.sanity = g_Life.sanity_max;
+		}
+		player->sanity = g_Life.sanity;
+		break;
+
+	}
+}
 
 int GetLife(void)
 {
