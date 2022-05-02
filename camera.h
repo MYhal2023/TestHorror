@@ -48,3 +48,5 @@ void SetViewPort(int type);
 int GetViewPortType(void);
 
 void SetCameraAT(XMFLOAT3 pos);
+void RunningCamera(void);
+void CameraBetween(void);
