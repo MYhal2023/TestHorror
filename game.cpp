@@ -22,7 +22,6 @@
 #include "score.h"
 #include "interface.h"
 #include "life.h"
-#include "time.h"
 #include "collision.h"
 #include "debugproc.h"
 #include "file.h"
@@ -30,6 +29,7 @@
 #include "lighter.h"
 #include "match.h"
 #include "check_game.h"
+#include "itembox.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -96,13 +96,10 @@ HRESULT InitGame(void)
 		// ライフの初期化
 		InitLife();
 
-		// 制限時間の初期化
-		InitTime();
-
 		//UI表示初期化
 		InitInterface();
 
-
+		InitItembox();
 
 		////BGM再生
 		//PlaySound(SOUND_LABEL_BGM_title);
@@ -123,6 +120,8 @@ void UninitGame(void)
 	//UI表示終了処理
 	UninitInterface();
 
+	UninitItembox();
+
 	UninitMatch();
 
 	UninitLighter();
@@ -132,9 +131,6 @@ void UninitGame(void)
 
 	// ライフの終了処理
 	UninitLife();
-
-	// 制限時間の終了処理
-	UninitTime();
 
 	// 壁の終了処理
 	UninitMeshWall();
@@ -188,6 +184,8 @@ void UpdateGame(void)
 	//ゲーム内部でのやり取り
 	CheckGame();
 
+	UpdateItembox();
+
 	// 影の更新処理
 	UpdateShadow();
 
@@ -209,9 +207,6 @@ void UpdateGame(void)
 
 	// ライフの更新処理
 	UpdateLife();
-
-	// 制限時間の更新処理
-	UpdateTime();
 	
 	CheckModeChange();
 }
@@ -271,8 +266,7 @@ void DrawGame0(void)
 		// ライフの描画処理
 		DrawLife();
 
-		// 制限時間の描画処理
-		DrawTime();
+		DrawItembox();
 
 		////UI表示描画処理
 		DrawInterface();

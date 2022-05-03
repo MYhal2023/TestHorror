@@ -351,7 +351,7 @@ void IncibleEffect(void)
 void PlayerMoveControl(void)
 {
 	CAMERA *cam = GetCamera();
-	if (g_Player.attack == TRUE || GetTime() <= 0 || g_Player.life <= 0)	//攻撃中かゲームオーバーでなければ移動可能
+	if (g_Player.attack == TRUE || g_Player.life <= 0)	//攻撃中かゲームオーバーでなければ移動可能
 		return;
 
 	float changeRotCamera = 0.025f; //傾く速度
