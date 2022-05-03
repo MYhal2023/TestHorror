@@ -143,16 +143,15 @@ void UpdateEnemy(void)
 		if (g_Enemy[i].use != TRUE)	//使われてないエネミーは処理をスキップ
 			continue;
 
-		////エネミーのステート処理
-		//int oldState = g_Enemy[i].state;
-		//g_Enemy[i].state = StateCheck(i);
-		//int nowState = g_Enemy[i].state;
-		////ステートが遷移した場合は線形補間データの保存などを行う
-		//if (oldState != nowState)
-		//{
-		//	StateAdjust(i);
-		//}
-		g_Enemy[i].state = Chase;
+		//エネミーのステート処理
+		int oldState = g_Enemy[i].state;
+		g_Enemy[i].state = StateCheck(i);
+		int nowState = g_Enemy[i].state;
+		//ステートが遷移した場合は線形補間データの保存などを行う
+		if (oldState != nowState)
+		{
+			StateAdjust(i);
+		}
 		switch (g_Enemy[i].state)
 		{
 		case Patrol:
@@ -414,9 +413,17 @@ void EnemyInterPoration(int i)
 //ステート遷移に伴う情報整合を行う
 void StateAdjust(int i)
 {
+	int index = (int)g_Enemy[i].move_time;
+
 	switch (g_Enemy[i].state)
 	{
 	case Patrol:	//追跡から巡回へ
+		if (g_Enemy[i].tbl_adr == NULL)return;	// 線形補間を実行する？
+
+		// 線形補間データから座標情報の抽出
+		XMVECTOR p0 = XMLoadFloat3(&g_Enemy[i].tbl_adr[index].pos);	// 現在の場所
+		XMStoreFloat3(&g_Enemy[i].pos, p0);
+
 		break;
 
 	case Chase:		//巡回から追跡へ

@@ -1,11 +1,12 @@
 //=============================================================================
 //
-// その他UI表示処理処理 [interface.h]
+// その他UI表示処理 [interface.h]
 // Author : 
 //
 //=============================================================================
 #pragma once
-
+#define ITEM_MAX					(6)				//アイテムボックスの数
+#define ITEM_MIN					(2)				//アイテムボックスの最低限
 
 //*****************************************************************************
 // マクロ定義
@@ -19,10 +20,15 @@ enum
 
 enum UI_TEXTURE
 {
+	HP_RED_BG,
 	HP_RED,
 	HP_BAR,
 	OIL_RED,
 	OIL_BAR,
+	MATCH_NUM,
+	MATCH_PIC,
+	MIND,
+	ITEM_BOX,
 };
 
 //*****************************************************************************
@@ -35,6 +41,7 @@ struct UI_ELEMENT
 	int			TexNo;						//テクスチャ番号
 	float		w, h, tw, th, tx, ty;		// 幅と高さ、テクスチャ座標
 	XMFLOAT3	pos;						// ポリゴンの位置
+	XMFLOAT4	color;						//色
 };
 
 //*****************************************************************************
@@ -44,3 +51,8 @@ HRESULT InitInterface(void);
 void UninitInterface(void);
 void UpdateInterface(void);
 void DrawInterface(void);
+void GaugeAnimation(void);
+UI_ELEMENT *GetItemBox(void);
+int GetItemMax(void);
+void IncreaseItemmax(void);
+void DecreaseItemmax(void);

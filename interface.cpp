@@ -8,26 +8,56 @@
 #include "input.h"
 #include "renderer.h"
 #include "interface.h"
+#include "itembox.h"
 #include "sprite.h"
 #include "game.h"
 #include "time.h"
 #include "player.h"
 #include "lighter.h"
+#include "match.h"
 #include "debugproc.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
-#define HP_TEXTURE_WIDTH				(800/5)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
-#define HP_TEXTURE_HEIGHT				(200/5)	// 
-#define TEXTURE_MAX					(4)				// ƒeƒNƒXƒ`ƒƒ‚Ì”
+#define TEXTURE_MAX					(9)				// ƒeƒNƒXƒ`ƒƒ‚Ì”
+
+
+
+#define HP_TEXTURE_WIDTH			(3200/5)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
+#define HP_TEXTURE_HEIGHT			(80/5)	// 
 #define	HP_X						(80)			// ƒeƒNƒXƒ`ƒƒÀ•W
-#define HP_Y						(200)
-#define OIL_X						(SCREEN_WIDTH-100)	// ƒeƒNƒXƒ`ƒƒÀ•W
-#define OIL_Y						(SCREEN_HEIGHT-150)					// 
+#define HP_Y						(50)
+
+#define OIL_TEXTURE_WIDTH			(100/5)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
+#define OIL_TEXTURE_HEIGHT			(600/5)	// 
+#define OIL_X						(SCREEN_WIDTH-50)	// ƒeƒNƒXƒ`ƒƒÀ•W
+#define OIL_Y						(SCREEN_HEIGHT-100)					// 
+
+#define MIND_TEXTURE_WIDTH			(350)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
+#define MIND_TEXTURE_HEIGHT			(20)	// 
+#define	MIND_X						(HP_X)			// ƒeƒNƒXƒ`ƒƒÀ•W
+#define MIND_Y						(HP_Y+50)
+
+#define ITEM_BOX_TEXTURE_WIDTH		(40)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
+#define ITEM_BOX_TEXTURE_HEIGHT		(35)	// 
+#define	ITEM_BOX_X					(SCREEN_WIDTH/2 - 50)			// ƒeƒNƒXƒ`ƒƒÀ•W
+#define ITEM_BOX_Y					(SCREEN_HEIGHT-40)
+
+#define MATCH_X						(50)
+#define MATCH_Y						(SCREEN_HEIGHT-80)
+
+#define MATCH_TEXTURE_WIDTH			(40*2)
+#define MATCH_TEXTURE_HEIGHT		(20*2)
+#define MATCH_NUM_TEXTURE_WIDTH		(25)	// ƒeƒNƒXƒ`ƒƒƒTƒCƒY
+#define MATCH_NUM_TEXTURE_HEIGHT	(50)	// 
+
+#define MATCH_DIGIT					(2)			// Œ…”
 
 #define HUNDRED						(100.0f)				//ƒtƒ[ƒgŒ^100
-#define	DEVIATION					(0.8f)					//ƒ‰ƒCƒ^[‚ÌƒQ[ƒW‚ÌˆÚ“®‚ğ’ù³‚·‚é‚½‚ß
+#define	DEVIATION_HP				(0.8f)					//ƒQ[ƒW‚ÌˆÚ“®‚ğ’ù³‚·‚é‚½‚ß
+#define DEVIATION_OIL				(0.6f)
+#define WAIT_TIME					(50)					//ƒQ[ƒWƒAƒjƒ[ƒVƒ‡ƒ“‚ğ‘Ò‚½‚¹‚éŠÔ
 
 
 //*****************************************************************************
@@ -43,15 +73,24 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/hpbarred.png",
+	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbar.png",
 	"data/TEXTURE/oilbarred.png",
 	"data/TEXTURE/oilbar.png",
+	"data/TEXTURE/number16x32.png",
+	"data/TEXTURE/match_ui.png",
+	"data/TEXTURE/mind.png",
+	"data/TEXTURE/itembox.png",
 };
 
 
-UI_ELEMENT	g_UI[TEXTURE_MAX];
+static UI_ELEMENT	g_UI[TEXTURE_MAX];
+static UI_ELEMENT	g_ItemBox[ITEM_MAX];
 
 static BOOL						g_Load = FALSE;
+static int						g_match = 0;
+static int						g_time = 0;
+static int						g_ItemMax = ITEM_MIN;			//Œ»İƒAƒCƒeƒ€‚ğ‚Ä‚éŒÀŠE
 
 
 //=============================================================================
@@ -83,7 +122,7 @@ HRESULT InitInterface(void)
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
-	for (int i = 0; i < TEXTURE_MAX; i++)
+	for (int i = 0; i < TEXTURE_MAX - 1; i++)
 	{
 		g_UI[i].use = TRUE;
 		g_UI[i].TexNo = i;
@@ -91,25 +130,66 @@ HRESULT InitInterface(void)
 		g_UI[i].th = 1.0f;		// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³
 		g_UI[i].tx = 0.0f;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãXÀ•W
 		g_UI[i].ty = 0.0f;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãYÀ•W
+		g_UI[i].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 	g_UI[HP_BAR].pos = { HP_X , HP_Y , 0.0f };
 	g_UI[HP_BAR].w = HP_TEXTURE_WIDTH;
 	g_UI[HP_BAR].h = HP_TEXTURE_HEIGHT;
 
+	g_UI[HP_RED_BG].pos = { HP_X , HP_Y , 0.0f };
+	g_UI[HP_RED_BG].w = HP_TEXTURE_WIDTH;
+	g_UI[HP_RED_BG].h = HP_TEXTURE_HEIGHT;
+	g_UI[HP_RED_BG].color = { 15.0f,0.7f,1.0f,1.0f };
+
 	g_UI[HP_RED].pos = { HP_X , HP_Y , 0.0f };
 	g_UI[HP_RED].w = HP_TEXTURE_WIDTH;
 	g_UI[HP_RED].h = HP_TEXTURE_HEIGHT;
+	g_UI[HP_RED].color = { 0.0f,5.0f,2.0f,1.0f };
 
 	g_UI[OIL_BAR].pos = { OIL_X , OIL_Y , 0.0f };
-	g_UI[OIL_BAR].w = HP_TEXTURE_HEIGHT;
-	g_UI[OIL_BAR].h = HP_TEXTURE_WIDTH;
+	g_UI[OIL_BAR].w = OIL_TEXTURE_WIDTH;
+	g_UI[OIL_BAR].h = OIL_TEXTURE_HEIGHT;
 
 	g_UI[OIL_RED].pos = { OIL_X , OIL_Y , 0.0f };
-	g_UI[OIL_RED].w = HP_TEXTURE_HEIGHT;
-	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH;
+	g_UI[OIL_RED].w = OIL_TEXTURE_WIDTH;
+	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT;
+
+	g_UI[MATCH_NUM].pos = { MATCH_X + MATCH_TEXTURE_WIDTH, MATCH_Y, 0.0f };
+	g_UI[MATCH_NUM].w = MATCH_NUM_TEXTURE_WIDTH;
+	g_UI[MATCH_NUM].h = MATCH_NUM_TEXTURE_HEIGHT;
+
+	g_UI[MATCH_PIC].pos = { MATCH_X, MATCH_Y, 0.0f };
+	g_UI[MATCH_PIC].w = MATCH_TEXTURE_WIDTH;
+	g_UI[MATCH_PIC].h = MATCH_TEXTURE_HEIGHT;
+
+	g_UI[MIND].pos = { MIND_X, MIND_Y, 0.0f };
+	g_UI[MIND].w = MIND_TEXTURE_WIDTH;
+	g_UI[MIND].h = MIND_TEXTURE_HEIGHT;
 
 
-	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»
+	for (int i = 0; i < ITEM_MAX; i++)
+	{
+		if (i >= g_ItemMax)
+		{
+			g_ItemBox[i].use = FALSE;
+		}
+		else
+		{
+			g_ItemBox[i].use = TRUE;
+		}
+		g_ItemBox[i].TexNo = ITEM_BOX;
+		g_ItemBox[i].tw = 1.0f;		// ƒeƒNƒXƒ`ƒƒ‚Ì•
+		g_ItemBox[i].th = 1.0f;		// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³
+		g_ItemBox[i].tx = 0.0f;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãXÀ•W
+		g_ItemBox[i].ty = 0.0f;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãYÀ•W
+		g_ItemBox[i].pos = { ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * i)*1.0f,ITEM_BOX_Y, 0.0f };
+		g_ItemBox[i].w = ITEM_BOX_TEXTURE_WIDTH;
+		g_ItemBox[i].h = ITEM_BOX_TEXTURE_HEIGHT;
+		g_ItemBox[i].color = { 1.0f,1.0f,1.0f,1.0f };
+	}
+
+
+	// ‰Šú‰»
 
 
 
@@ -131,15 +211,15 @@ void UninitInterface(void)
 	}
 
 	for (int i = 0; i < TEXTURE_MAX; i++)
-	{		
+	{
 		if (g_Texture[i])
 		{
 			g_Texture[i]->Release();
 			g_Texture[i] = NULL;
 		}
 	}
-
 	g_Load = FALSE;
+
 }
 
 //=============================================================================
@@ -147,16 +227,30 @@ void UninitInterface(void)
 //=============================================================================
 void UpdateInterface(void)
 {
-	float n = 0.001f;
 	PLAYER player = *GetPlayer();
-	//g_UI[HP_RED].w = 
 	LIGHTER lighter = *GetLighter();
-	g_UI[OIL_RED].h = HP_TEXTURE_WIDTH * (lighter.oil/HUNDRED);				//ƒIƒCƒ‹‚ª­‚È‚­‚È‚Á‚ÄAƒQ[ƒW‚à¬‚³‚­‚È‚é
-	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED-lighter.oil)*DEVIATION;			//¬‚³‚­‚·‚ê‚ÎA‰º‚ÉˆÚ“®‚·‚é
+	MATCH match = *GetMatch();
 
+	g_UI[HP_RED].w = HP_TEXTURE_WIDTH * (player.life / HUNDRED);
+	g_UI[HP_RED].pos.x = HP_X - (HUNDRED - player.life)*DEVIATION_HP;
+	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//ƒIƒCƒ‹‚ª­‚È‚­‚È‚Á‚ÄAƒQ[ƒW‚à¬‚³‚­‚È‚é
+	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//¬‚³‚­‚·‚ê‚ÎA‰º‚ÉˆÚ“®‚·‚é
+	g_match = match.num;													//ƒ}ƒbƒ`‚Ì”š‚ğ–á‚¤
+
+	GaugeAnimation();
 
 #ifdef _DEBUG	// ƒfƒoƒbƒOî•ñ‚ğ•\¦‚·‚é
-
+	if (GetKeyboardTrigger(DIK_K))
+	{
+		for (int i = 0; i < ITEM_MAX; i++)
+		{
+			if (g_ItemBox[i].use == FALSE)
+			{
+				g_ItemBox[i].use = TRUE;
+				break;
+			}
+		}
+	}
 #endif
 
 }
@@ -166,8 +260,10 @@ void UpdateInterface(void)
 //=============================================================================
 void DrawInterface(void)
 {
-	for(int i=0;i<TEXTURE_MAX;i++)
+	for (int i = 0; i < TEXTURE_MAX - 1; i++)
 	{
+		if (i == MATCH_NUM)																//ƒ}ƒbƒ`‚Ì”š‚ğ•Ê‚Åˆóü
+			continue;
 		// ’¸“_ƒoƒbƒtƒ@İ’è
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
@@ -201,9 +297,150 @@ void DrawInterface(void)
 
 		// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
 		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+			g_UI[i].color);
 
 		// ƒ|ƒŠƒSƒ“•`‰æ
 		GetDeviceContext()->Draw(4, 0);
 	}
+
+	//ƒ}ƒbƒ`‚Ì”š
+
+	// ’¸“_ƒoƒbƒtƒ@İ’è
+	UINT stride = sizeof(VERTEX_3D);
+	UINT offset = 0;
+	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+	// ƒ}ƒgƒŠƒNƒXİ’è
+	SetWorldViewProjection2D();
+
+	// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒWİ’è
+	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// ƒ}ƒeƒŠƒAƒ‹İ’è
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
+	// ƒeƒNƒXƒ`ƒƒİ’è
+	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[MATCH_NUM].TexNo]);
+
+	// Œ…”•ªˆ—‚·‚é
+	int number = g_match;
+	for (int i = 0; i < MATCH_DIGIT; i++)
+	{
+		// ¡‰ñ•\¦‚·‚éŒ…‚Ì”š
+		float x = (float)(number % 10);
+
+		// ƒXƒRƒA‚ÌˆÊ’u‚âƒeƒNƒXƒ`ƒƒ[À•W‚ğ”½‰f
+		float px = g_UI[MATCH_NUM].pos.x - g_UI[MATCH_NUM].w * i;	// ƒXƒRƒA‚Ì•\¦ˆÊ’uX
+		float py = g_UI[MATCH_NUM].pos.y;			// ƒXƒRƒA‚Ì•\¦ˆÊ’uY
+		float pw = g_UI[MATCH_NUM].w;				// ƒXƒRƒA‚Ì•\¦•
+		float ph = g_UI[MATCH_NUM].h;				// ƒXƒRƒA‚Ì•\¦‚‚³
+
+		float tw = 1.0f / 10;		// ƒeƒNƒXƒ`ƒƒ‚Ì•
+		float th = 1.0f / 1;		// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³
+		float tx = x * tw;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãXÀ•W
+		float ty = 0.0f;			// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãYÀ•W
+
+		// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+
+		// ƒ|ƒŠƒSƒ“•`‰æ
+		GetDeviceContext()->Draw(4, 0);
+
+		// Ÿ‚ÌŒ…‚Ö
+		number /= 10;
+	}
+
+
+	//ƒAƒCƒeƒ€ƒ{ƒbƒNƒX
+	for (int i = 0; i < ITEM_MAX; i++)
+	{
+		if (g_ItemBox[i].use == FALSE)
+			continue;
+		// ’¸“_ƒoƒbƒtƒ@İ’è
+		UINT stride = sizeof(VERTEX_3D);
+		UINT offset = 0;
+		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+		// ƒ}ƒgƒŠƒNƒXİ’è
+		SetWorldViewProjection2D();
+
+		// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒWİ’è
+		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		// ƒ}ƒeƒŠƒAƒ‹İ’è
+		MATERIAL material;
+		ZeroMemory(&material, sizeof(material));
+		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		SetMaterial(material);
+
+		// ƒeƒNƒXƒ`ƒƒİ’è
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);
+
+		// ƒXƒRƒA‚ÌˆÊ’u‚âƒeƒNƒXƒ`ƒƒ[À•W‚ğ”½‰f
+		float px = g_ItemBox[i].pos.x;	// •\¦ˆÊ’uX
+		float py = g_ItemBox[i].pos.y;			// •\¦ˆÊ’uY
+		float pw = g_ItemBox[i].w;				// •\¦•
+		float ph = g_ItemBox[i].h;				// •\¦‚‚³
+
+		float tw = g_ItemBox[i].tw;		// ƒeƒNƒXƒ`ƒƒ‚Ì•
+		float th = g_ItemBox[i].th;		// ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³
+		float tx = g_ItemBox[i].tx;		// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãXÀ•W
+		float ty = g_ItemBox[i].ty;		// ƒeƒNƒXƒ`ƒƒ‚Ì¶ãYÀ•W
+
+		// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ğİ’è
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			g_ItemBox[i].color);
+
+		// ƒ|ƒŠƒSƒ“•`‰æ
+		GetDeviceContext()->Draw(4, 0);
+	}
+}
+
+//=============================================================================
+// ƒQ[ƒWŒ¸‚ç‚·ƒAƒjƒ[ƒVƒ‡ƒ“ˆ—
+//=============================================================================
+void GaugeAnimation()
+{
+	if (g_UI[HP_RED].w == g_UI[HP_RED_BG].w)
+		return;
+
+	if (g_UI[HP_RED].w > g_UI[HP_RED_BG].w)
+	{
+		g_UI[HP_RED_BG].w = g_UI[HP_RED].w;
+		g_UI[HP_RED_BG].pos.x = g_UI[HP_RED].pos.x;
+		g_time = 0;
+		return;
+	}
+	if (g_time > WAIT_TIME)
+	{
+		g_UI[HP_RED_BG].w -= 1.5f;
+		g_UI[HP_RED_BG].pos.x -= 1.5f;
+	}
+	else
+	{
+		g_time++;
+	}
+
+	return;
+}
+
+UI_ELEMENT *GetItemBox()
+{
+	return &g_ItemBox[0];
+}
+
+int GetItemMax()
+{
+	return g_ItemMax;
+}
+
+void IncreaseItemmax()
+{
+	if (g_ItemMax >= ITEM_MAX)
+		return;
+	g_ItemMax++;
 }
