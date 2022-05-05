@@ -75,6 +75,11 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ (char*)"data/SE/Breath_001.wav", 0 },		// 激しい息遣い
 	{ (char*)"data/SE/Breath_002.wav", 0 },		// 軽い息遣い
 	{ (char*)"data/SE/Breath_003.wav", 0 },		// 過呼吸
+	{ (char*)"data/SE/EnemyVoice.wav", 0 },		// 笑い声
+	{ (char*)"data/SE/GetItem.wav", 0 },		// 高音SE
+	{ (char*)"data/SE/WoodWalk.wav", 0 },		// 木のきしむ足音
+	{ (char*)"data/BGM/Normal.wav", 1 },		// 探索時通常bgm
+	{ (char*)"data/BGM/Fear.wav", 1 },			// 被発見時bgm
 };
 
 //Fade関連
@@ -444,7 +449,7 @@ void UpdateSound(void)
 }
 
 //=============================================================================
-// SoundFade処理
+// SoundFade処理(引数;ラベル、フェードモード、ターゲットの目標ボリューム値(0.0f～1.0f)、遷移時間)
 //=============================================================================
 void SetSoundFade(int label, SOUND_FADE fademode, float TargetVolume, float TargetTime)
 {

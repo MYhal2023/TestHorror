@@ -208,6 +208,8 @@ void UpdateGame(void)
 	// ライフの更新処理
 	UpdateLife();
 	
+	UpdateSound();
+
 	CheckModeChange();
 }
 
