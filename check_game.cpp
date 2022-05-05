@@ -12,10 +12,11 @@
 #include "collision.h"
 #include "life.h"
 #include "check_game.h"
+#include "sound.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define INV_TIME		(180)					//無敵フレーム数
+#define INV_TIME		(120)					//無敵フレーム数
 #define SAN_INV_TIME	(60)				//正気度無敵フレーム数
 #define NATURALHEAL		(600)				//自然回復し始めるまでの時間
 #define SAN_PROTECT		(180)				//暗闇ダメージを受けるまでの時間
@@ -73,6 +74,7 @@ void CheckPECollision(void)
 		if (enemy[i].use != TRUE || playerInv > 0)continue;		//エネミーが使われていないか無敵時間中ならスルー
 		if (CollisionBC(player->pos, enemy[i].pos, player->size, enemy[i].fWidth))
 		{
+			PlaySound(SOUND_LABEL_SE_EnemyVoice);	//サウンド再生
 			AddLife(-5, PLAYER_LIFE, 0);	//ライフダメージ
 			AddSanity(-5, PLAYER_LIFE, 0);	//正気度ダメージ
 			playerInv = INV_TIME;			//当たったら無敵時間を追加

@@ -54,6 +54,11 @@ enum
 	SOUND_LABEL_SE_Breath001,			// SE
 	SOUND_LABEL_SE_Breath002,			// SE
 	SOUND_LABEL_SE_Breath003,			// SE
+	SOUND_LABEL_SE_EnemyVoice,			// SE
+	SOUND_LABEL_SE_GetItem,			// SE
+	SOUND_LABEL_SE_WoodWalk,			// SE
+	SOUND_LABEL_BGM_Normal,			// BGM
+	SOUND_LABEL_BGM_Fear,			// BGM
 	SOUND_LABEL_MAX,
 };
 
