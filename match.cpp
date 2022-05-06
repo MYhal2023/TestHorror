@@ -236,14 +236,17 @@ void StandbyMatch(void)
 		case FORCE_SLOW:
 			g_Match.num--;
 			g_Match.AblazeTime = MATCH_SLOW;
+			PlaySound(SOUND_LABEL_SE_MatchON);
 			break;
 		case FORCE_MIDDLE:
 			g_Match.num--;
 			g_Match.AblazeTime = MATCH_MIDDLE;
+			PlaySound(SOUND_LABEL_SE_MatchON);
 			break;
 		case FORCE_FAST:
 			g_Match.num--;
 			g_Match.AblazeTime = MATCH_FAST;
+			PlaySound(SOUND_LABEL_SE_MatchON);
 			break;
 		}
 		InitForce(0);
