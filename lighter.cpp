@@ -10,6 +10,7 @@
 #include "interface.h"
 #include "lighter.h"
 #include "sprite.h"
+#include "sound.h"
 #include "player.h"
 #include "time.h"
 #include "game.h"
@@ -212,6 +213,9 @@ void SetLighterOn(BOOL flag)
 {
 	//CheckOil();
 	if (!g_Lighter.use)		return;
+
+	PlaySound(SOUND_LABEL_SE_LighterON);		//
+
 	g_Lighter.out = flag;
 }
 

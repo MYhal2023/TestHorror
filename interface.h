@@ -18,11 +18,13 @@ enum
 	CONTROL_TEXTURE,
 };
 
+
 enum UI_TEXTURE
 {
 	HP_RED_BG,
 	HP_RED,
 	HP_BAR,
+	STAM_BAR,
 	OIL_RED,
 	OIL_BAR,
 	MATCH_NUM,

@@ -20,7 +20,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX					(9)				// テクスチャの数
+#define TEXTURE_MAX					(10)				// テクスチャの数
 
 
 
@@ -34,10 +34,15 @@
 #define OIL_X						(SCREEN_WIDTH-50)	// テクスチャ座標
 #define OIL_Y						(SCREEN_HEIGHT-100)					// 
 
+#define STAM_TEXTURE_WIDTH			(300)	// テクスチャサイズ
+#define STAM_TEXTURE_HEIGHT			(10)	// 
+#define	STAM_X						(HP_X)			// テクスチャ座標
+#define STAM_Y						(HP_Y+20)
+
 #define MIND_TEXTURE_WIDTH			(350)	// テクスチャサイズ
 #define MIND_TEXTURE_HEIGHT			(20)	// 
 #define	MIND_X						(HP_X)			// テクスチャ座標
-#define MIND_Y						(HP_Y+50)
+#define MIND_Y						(HP_Y+40)
 
 #define ITEM_BOX_TEXTURE_WIDTH		(40)	// テクスチャサイズ
 #define ITEM_BOX_TEXTURE_HEIGHT		(35)	// 
@@ -57,6 +62,8 @@
 #define HUNDRED						(100.0f)				//フロート型100
 #define	DEVIATION_HP				(0.8f)					//ゲージの移動を訂正するため
 #define DEVIATION_OIL				(0.6f)
+#define DEVIATION_STAM				(0.8f)
+
 #define WAIT_TIME					(50)					//ゲージアニメーションを待たせる時間
 
 
@@ -75,6 +82,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbar.png",
+	"data/TEXTURE/stamina1.png",				//後で追加してくださいね
 	"data/TEXTURE/oilbarred.png",
 	"data/TEXTURE/oilbar.png",
 	"data/TEXTURE/number16x32.png",
@@ -166,6 +174,11 @@ HRESULT InitInterface(void)
 	g_UI[MIND].w = MIND_TEXTURE_WIDTH;
 	g_UI[MIND].h = MIND_TEXTURE_HEIGHT;
 
+	g_UI[STAM_BAR].pos = { STAM_X , STAM_Y , 0.0f };
+	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH;
+	g_UI[STAM_BAR].h = STAM_TEXTURE_HEIGHT;
+	g_UI[STAM_BAR].color = { 1.0f,1.0f,1.0f,1.0f };
+
 
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
@@ -233,6 +246,8 @@ void UpdateInterface(void)
 
 	g_UI[HP_RED].w = HP_TEXTURE_WIDTH * (player.life / HUNDRED);
 	g_UI[HP_RED].pos.x = HP_X - (HUNDRED - player.life)*DEVIATION_HP;
+	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH * (player.stamina / HUNDRED);
+	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - player.life) * DEVIATION_STAM;
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//小さくすれば、下に移動する
 	g_match = match.num;													//マッチの数字を貰う
