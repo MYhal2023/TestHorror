@@ -54,6 +54,7 @@ struct PLAYER
 	int					shadowIdx;	// 影のIndex
 	BOOL				use;
 	BOOL				dash;		//ダッシュしているか
+	BOOL				batdash;		//走行可能か否か
 
 	// 階層アニメーション用のメンバー変数
 	INTERPOLATION_DATA	*tbl_adr;	// アニメデータのテーブル先頭アドレス
@@ -77,6 +78,7 @@ struct PLAYER
 	int				staminaMax;		//プレイヤーの最大スタミナ
 	int				sanity;			//プレイヤー正気度
 	int				sanityMax;		//プレイヤー最大正気度
+
 
 	BOOL			atInvinc;				//無敵時間中か否か
 	float			atInvincTime;			//時間計測用
