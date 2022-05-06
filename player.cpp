@@ -98,6 +98,7 @@ HRESULT InitPlayer(void)
 
 	g_Player.use = TRUE;
 	g_Player.dash = FALSE;
+	g_Player.batdash = TRUE;
 	g_Player.attack = FALSE;
 	g_Player.attackUse = FALSE;
 
@@ -384,8 +385,14 @@ void PlayerMoveControl(void)
 
 void PlayerDashControl(void)
 {
-	//スタミナ0以下はダッシュできない
-	if (g_Player.stamina <= 0)return;	
+	//スタミナ0以下になったらダッシュできなくなる
+	if (g_Player.stamina <= 0)g_Player.batdash = FALSE;	
+
+	//ダッシュ不可状態の場合、スタミナが最大値になったらダッシュ可能になる
+	if (g_Player.batdash != TRUE && g_Player.stamina < g_Player.staminaMax)
+		return;
+	else if (g_Player.batdash != TRUE && g_Player.stamina >= g_Player.staminaMax)
+		g_Player.batdash = TRUE;
 
 	if (IsButtonPressed(0, BUTTON_B) || GetKeyboardPress(DIK_Z))
 		g_Player.dash = TRUE;
