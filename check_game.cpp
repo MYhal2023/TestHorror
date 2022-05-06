@@ -130,3 +130,14 @@ void LightCheck(void)
 	if (sanProtect == SAN_PROTECT)AddSanity(5, PLAYER_LIFE, 0);	//正気度回復
 	lightLife = LIGHT_LIFE_CD;
 }
+//走ってないときスタミナ回復
+void StaminaHeal(BOOL run)
+{
+	if (run == FALSE)
+	{
+		PLAYER *player = GetPlayer();
+
+		if (player->staminaMax <= player->stamina)return;
+			player->stamina++;
+	}
+}
