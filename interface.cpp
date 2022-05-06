@@ -82,7 +82,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbar.png",
-	"data/TEXTURE/stamina1.png",				//Œã‚Å’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢
+	"data/TEXTURE/stamina1.png",				//Œã‚Å’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢‚Ë
 	"data/TEXTURE/oilbarred.png",
 	"data/TEXTURE/oilbar.png",
 	"data/TEXTURE/number16x32.png",

@@ -18,6 +18,7 @@ enum
 	CONTROL_TEXTURE,
 };
 
+
 enum UI_TEXTURE
 {
 	HP_RED_BG,

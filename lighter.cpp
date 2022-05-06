@@ -213,7 +213,9 @@ void SetLighterOn(BOOL flag)
 {
 	//CheckOil();
 	if (!g_Lighter.use)		return;
-	PlaySound(SOUND_LABEL_SE_LighterON);
+
+	PlaySound(SOUND_LABEL_SE_LighterON);		//
+
 	g_Lighter.out = flag;
 }
 
