@@ -444,7 +444,7 @@ void StateAdjust(int i)
 	{
 	case Patrol:	//追跡から巡回へ
 		//BGM遷移処理
-		SetSoundFade(SOUND_LABEL_BGM_Fear, SOUNDFADE_OUT, 0.0f, 5.0f);
+		SetSoundFade(SOUND_LABEL_BGM_Fear, SOUNDFADE_OUT, 0.0f, 3.0f);
 		if (g_Enemy[i].tbl_adr == NULL)return;	// 線形補間を実行する？
 
 		// 線形補間データから座標情報の抽出
@@ -455,7 +455,8 @@ void StateAdjust(int i)
 
 	case Chase:		//巡回から追跡へ
 		StopSound();
-		SetSoundFade(SOUND_LABEL_BGM_Fear, SOUNDFADE_IN, 1.0f, 1.0f);
+		float Volume = 0.5f;
+		SetSourceVolume(SOUND_LABEL_BGM_Fear, Volume);
 		PlaySound(SOUND_LABEL_BGM_Fear);
 		break;
 	}

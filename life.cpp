@@ -274,7 +274,6 @@ void AddLife(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエネ
 {
 	PLAYER *player = GetPlayer();
 	ENEMY *enemy = GetEnemy();
-	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルは加算無し
 
 	switch (chara)			//0ならプレイヤーのライフを増減させる。g_Lifeにプレイヤーのライフ情報を格納
 	{
@@ -312,8 +311,6 @@ void AddSanity(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエ
 {
 	PLAYER *player = GetPlayer();
 	ENEMY *enemy = GetEnemy();
-	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルは加算無し
-
 	switch (chara)			//0ならプレイヤーのライフを増減させる。g_Lifeにプレイヤーの正気度情報を格納
 	{
 	case 0:
