@@ -18,7 +18,7 @@
 //*****************************************************************************
 #define INV_TIME		(120)					//無敵フレーム数
 #define SAN_INV_TIME	(60)				//正気度無敵フレーム数
-#define NATURALHEAL		(600)				//自然回復し始めるまでの時間
+#define NATURALHEAL		(180)				//自然回復し始めるまでの時間
 #define SAN_PROTECT		(180)				//暗闇ダメージを受けるまでの時間
 #define LIGHT_LIFE_CD	(60)				//明るさによるライフの影響のCD
 #define HEAL_CD			(120)				//自然回復のCD
@@ -42,7 +42,7 @@ void CheckGame(void)
 	if (playerInv > 0)playerInv--;
 	CheckPECollision();
 
-	if (playerDamageLast > NATURALHEAL)
+	if (playerDamageLast < NATURALHEAL)
 	playerDamageLast++;
 
 	if (SanInv > 0)SanInv--;
@@ -91,7 +91,7 @@ void CheckPECollisionSan(void)
 	ENEMY *enemy = GetEnemy();
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
-		if (enemy[i].use != TRUE || playerInv > 0)continue;		//エネミーが使われていないか無敵時間中ならスルー
+		if (enemy[i].use != TRUE || SanInv > 0)continue;		//エネミーが使われていないか無敵時間中ならスルー
 		if (CollisionBC(player->pos, enemy[i].pos, player->size + SANITY_DAMAGE_AREA, enemy[i].fWidth))
 		{
 			AddSanity(-1, PLAYER_LIFE, 0);	//正気度ダメージ
@@ -106,6 +106,7 @@ void LifeHeal(void)
 {
 	ENEMY *enemy = GetEnemy();
 	if (healTime > 0)return;	//回復のCDだったらスルー
+	if (playerDamageLast < NATURALHEAL)return;
 	for (int i = 0; i < MAX_ENEMY; i++)
 	{
 		if (enemy[i].state == Chase)return;

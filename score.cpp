@@ -196,8 +196,6 @@ void DrawScore(void)
 //=============================================================================
 void AddScore(int add)
 {
-	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルはスコア加算無し
-
 	PLAYER *player = GetPlayer();
 	//ゲームオーバーなら処理をスキップ
 	if (GetTime() <= 0 || player->life <= 0)

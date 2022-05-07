@@ -27,15 +27,23 @@
 enum
 {
 	TITLE_NON,
-	TUTORIAL,
 	MAIN_GAME,
-	TUTORIAL_GAME,
 	RESULT
+};
+
+enum STAGE
+{
+	DEBUG_STAGE,
+	PRISON_STAGE,
+	MAX_STAGE
 };
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 HRESULT InitGame(void);
+void InitStage(int g_PlayStage);
+void InitDebugStage(void);
+void InitPrisonStage(void);
 void UninitGame(void);
 void UpdateGame(void);
 void DrawGame(void);
@@ -44,6 +52,8 @@ void DrawGame1(void);
 void CheckModeChange(void);
 void SetPlayMode(int playMode);
 int GetPlayMode(void);
+void SetPlayStage(int stageNum);
+int GetPlayStage(void);
 void SetViewPortType(int viewport);
 int GetViewPortTypeGame(void);
 float FloatClamp(float x, float a, float b);

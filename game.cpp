@@ -50,64 +50,81 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 
 static BOOL	g_bPause = TRUE;	// ポーズON/OFF
 static int	g_PlayMode = MAIN_GAME;
+static int	g_PlayStage = DEBUG_STAGE;
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitGame(void)
 {
+	g_ViewPortType_Game = TYPE_FULL_SCREEN;
+
 	switch (GetMode())
 	{
 	case MODE_TITLE:
-	case MODE_GAME:
-		g_ViewPortType_Game = TYPE_FULL_SCREEN;
-
-
-		// フィールドの初期化
-		InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), FIELD_X, FIELD_Z, BLOCK_SIZE, BLOCK_SIZE, WATER);
-
-		// ライトを有効化	// 影の初期化処理
-		InitShadow();
-
-		// プレイヤーの初期化
-		InitPlayer();
-
-		InitEnemy();
-
-		// フィールド限界の壁の初期化
-		InitMeshWall(XMFLOAT3(0.0f, WAVE_POS_Y, FIELD_Z_LIMIT), XMFLOAT3(0.0f, 0.0f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, WALL_BLOCK_SIZE_XZ, WALL_BLOCK_SIZE_Y, WALL_WHITE);
-		InitMeshWall(XMFLOAT3(-FIELD_X_LIMIT, WAVE_POS_Y, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, WALL_BLOCK_SIZE_XZ, WALL_BLOCK_SIZE_Y, WALL_WHITE);
-		InitMeshWall(XMFLOAT3(FIELD_X_LIMIT, WAVE_POS_Y, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, WALL_BLOCK_SIZE_XZ, WALL_BLOCK_SIZE_Y, WALL_WHITE);
-		InitMeshWall(XMFLOAT3(0.0f, WAVE_POS_Y, -FIELD_Z_LIMIT), XMFLOAT3(0.0f, XM_PI, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, WALL_BLOCK_SIZE_XZ, WALL_BLOCK_SIZE_Y, WALL_WHITE);
-
-		//マップに使う壁の初期化
-		InitFieldMeshWall();
-
-		InitMatch();
-
-		InitLighter();
-
-		// スコアの初期化
-		InitScore();
-
-		// ライフの初期化
-		InitLife();
-
-		//UI表示初期化
-		InitInterface();
-
-		InitItembox();
-
-		////BGM再生
-		//PlaySound(SOUND_LABEL_BGM_title);
 		break;
-
+	case MODE_GAME:
+		InitStage(g_PlayStage);
+		break;
+	case MODE_RESULT:
+		break;
 	}
 
 	return S_OK;
+}
+
+//ステージ別の初期化処理
+void InitStage(int stageNum)
+{
+	switch (stageNum)
+	{
+	case DEBUG_STAGE:
+		InitDebugStage();
+		break;
+	case PRISON_STAGE:
+		InitPrisonStage();
+		break;
+	case MAX_STAGE:
+		break;
+	}
+}
+
+//デバッグステージの初期化
+void InitDebugStage(void)
+{
+	// フィールドの初期化
+	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), FIELD_X, FIELD_Z, BLOCK_SIZE, BLOCK_SIZE, WATER);
+
+	// ライトを有効化	// 影の初期化処理
+	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
+
+	InitEnemy();
+
+	//マップに使う壁の初期化
+	InitFieldMeshWall();
+
+	InitMatch();
+
+	InitLighter();
+
+	// スコアの初期化
+	InitScore();
+
+	// ライフの初期化
+	InitLife();
+
+	//UI表示初期化
+	InitInterface();
+
+	InitItembox();
+}
+
+//牢屋ステージ初期化(第一ステージ？)
+void InitPrisonStage(void)
+{
+
 }
 
 //=============================================================================
@@ -191,9 +208,6 @@ void UpdateGame(void)
 
 	UpdateFog();
 
-	if (g_PlayMode <= TUTORIAL)	//タイトルならここまで更新
-		return;
-
 	UpdateMatch();
 
 	UpdateLighter();
@@ -247,23 +261,20 @@ void DrawGame0(void)
 	// ライティングを無効
 	SetLightEnable(FALSE);
 
-	if (g_PlayMode > TUTORIAL)
-	{
-		DrawMatch();
+	DrawMatch();
 
-		DrawLighter();
+	DrawLighter();
 
-		// スコアの描画処理
-		DrawScore();
+	// スコアの描画処理
+	DrawScore();
 
-		// ライフの描画処理
-		DrawLife();
+	// ライフの描画処理
+	DrawLife();
 
-		DrawItembox();
+	DrawItembox();
 
-		////UI表示描画処理
-		DrawInterface();
-	}
+	////UI表示描画処理
+	DrawInterface();
 
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
@@ -343,14 +354,6 @@ void DrawGame(void)
 
 void CheckModeChange(void)
 {
-	PLAYER *player = GetPlayer();
-	if (GetPlayMode() == TUTORIAL_GAME)
-	{
-		if (GetKeyboardTrigger(DIK_X) || IsButtonTriggered(0, BUTTON_B))
-		{
-			SetFade(FADE_OUT, MODE_RESULT);
-		}
-	}
 
 }
 
@@ -362,6 +365,16 @@ void SetPlayMode(int playMode)
 int GetPlayMode(void)
 {
 	return g_PlayMode;
+}
+
+void SetPlayStage(int stageNum)
+{
+	g_PlayStage = stageNum;
+}
+
+int GetPlayStage(void)
+{
+	return g_PlayStage;
 }
 
 void SetViewPortType(int viewport)

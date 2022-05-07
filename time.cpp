@@ -265,8 +265,6 @@ void DrawTime(void)
 //=============================================================================
 void RemoveTime(int remove)
 {
-	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルはスコア加算無し
-
 	second++;
 	if (second >= ONE_SECOND)
 	{
@@ -292,8 +290,6 @@ void RemoveTime(int remove)
 //=============================================================================
 void AddTime(int add)
 {
-	if (GetPlayMode() == TUTORIAL_GAME)return;	//チュートリアルはスコア加算無し
-
 	if (g_Time > 0)
 	{
 		g_Time += add;
