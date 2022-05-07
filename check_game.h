@@ -18,3 +18,4 @@ void CheckPECollision(void);
 void CheckPECollisionSan(void);
 void LifeHeal(void);
 void LightCheck(void);
+void StaminaHeal(BOOL run);

@@ -21,6 +21,7 @@
 #include "lighter.h"
 #include "match.h"
 #include "lighter.h"
+#include "check_game.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -30,10 +31,11 @@
 #define	VALUE_ROTATE		(XM_PI * 0.02f)					// 回転量
 
 #define PLAYER_SHADOW_SIZE	(1.0f)							// 影の大きさ
-#define PLAYER_OFFSET_Y		(0.0f)							// プレイヤーの足元をあわせる
+#define PLAYER_OFFSET_Y		(20.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_LIFE			(100)								// プレイヤーのライフ
 #define PLAYER_STAMINA		(100)								// プレイヤーのスタミナ
+#define PLAYER_STAMINA_INT	(3)								// スタミナ回復間隔
 #define PLAYER_SANITY		(100)								// プレイヤーの正気度
 
 #define PLAYER_PARTS_MAX	(1)								// プレイヤーのパーツの数
@@ -93,6 +95,7 @@ HRESULT InitPlayer(void)
 	g_Player.lifeMax = g_Player.life;
 	g_Player.stamina = PLAYER_STAMINA;
 	g_Player.staminaMax = g_Player.stamina;
+	g_Player.staminaInt = PLAYER_STAMINA_INT;
 	g_Player.sanity = PLAYER_SANITY;
 	g_Player.sanityMax = g_Player.sanity;
 
@@ -388,6 +391,12 @@ void PlayerDashControl(void)
 	//スタミナ0以下になったらダッシュできなくなる
 	if (g_Player.stamina <= 0)g_Player.batdash = FALSE;	
 
+	g_Player.staminaInt++;
+	if (g_Player.staminaInt > PLAYER_STAMINA_INT)
+	{
+		StaminaHeal(g_Player.dash);	//スタミナ回復判定
+		g_Player.staminaInt = 0;
+	}
 	//ダッシュ不可状態の場合、スタミナが最大値になったらダッシュ可能になる
 	if (g_Player.batdash != TRUE && g_Player.stamina < g_Player.staminaMax)
 		return;

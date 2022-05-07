@@ -21,7 +21,7 @@
 #define NATURALHEAL		(600)				//自然回復し始めるまでの時間
 #define SAN_PROTECT		(180)				//暗闇ダメージを受けるまでの時間
 #define LIGHT_LIFE_CD	(60)				//明るさによるライフの影響のCD
-#define HEAL_CD			(60)				//自然回復のCD
+#define HEAL_CD			(120)				//自然回復のCD
 #define SANITY_DAMAGE_AREA	(200.0f)		//正気度がダメージを受ける範囲
 
 //*****************************************************************************
@@ -75,8 +75,8 @@ void CheckPECollision(void)
 		if (CollisionBC(player->pos, enemy[i].pos, player->size, enemy[i].fWidth))
 		{
 			PlaySound(SOUND_LABEL_SE_EnemyVoice);	//サウンド再生
-			AddLife(-5, PLAYER_LIFE, 0);	//ライフダメージ
-			AddSanity(-5, PLAYER_LIFE, 0);	//正気度ダメージ
+			AddLife(-35, PLAYER_LIFE, 0);	//ライフダメージ
+			AddSanity(-35, PLAYER_LIFE, 0);	//正気度ダメージ
 			playerInv = INV_TIME;			//当たったら無敵時間を追加
 			playerDamageLast = 0;			//当たったため経過時間を0に
 		}
