@@ -269,9 +269,6 @@ void DrawMeshWall(void)
 	MESH_WALL *pMesh;
 	int nCntMeshField;
 	
-	// ライティングオフ
-	SetLightEnable(FALSE);
-
 	// カリング無効
 	SetCullingMode(CULL_MODE_NONE);
 
@@ -319,9 +316,6 @@ void DrawMeshWall(void)
 
 	// カリング設定を戻す
 	SetCullingMode(CULL_MODE_BACK);
-
-	// ライティングオン
-	SetLightEnable(TRUE);
 }
 
 void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)

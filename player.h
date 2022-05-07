@@ -76,6 +76,7 @@ struct PLAYER
 	int				lifeMax;		//プレイヤー最大HP
 	int				stamina;		//プレイヤーのスタミナ
 	int				staminaMax;		//プレイヤーの最大スタミナ
+	int				staminaInt;		//回復インターバル
 	int				sanity;			//プレイヤー正気度
 	int				sanityMax;		//プレイヤー最大正気度
 

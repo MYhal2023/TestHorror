@@ -225,17 +225,8 @@ void DrawGame0(void)
 	SwapShader(ans);
 
 	// 3Dの物を描画する処理
-	//シェーダー切り替え。水面の描画処理
-	ans = MODE_SPECULAR;
-
-	SwapShader(ans);
 	// 地面の描画処理
 	DrawMeshField();
-
-	//シェーダー切り替え。ノーマルの物に戻す
-	ans = MODE_PLANE;
-
-	SwapShader(ans);
 
 	// 影の描画処理
 	DrawShadow();

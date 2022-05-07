@@ -14,6 +14,8 @@
 #include "input.h"
 #include "player.h"
 #include "amadeus.h"
+#include "game.h"
+#include "light.h"
 
 
 //*****************************************************************************
@@ -21,10 +23,10 @@
 //*****************************************************************************
 #define TEXTURE_MAX			(3)			// テクスチャの数
 
-#define	ENEMY_TEXMAG	(0.04f)							// 元画像に対する倍率
+#define	ENEMY_TEXMAG	(0.08f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
-#define ENEMY_SIGHT		(100.0f)		//エネミーの視力
+#define ENEMY_SIGHT		(300.0f)		//エネミーの視力
 #define	ENEMY_SPEED		(0.5f)			// エネミーの移動スピード
 
 
@@ -143,6 +145,28 @@ void UpdateEnemy(void)
 		if (g_Enemy[i].use != TRUE)	//使われてないエネミーは処理をスキップ
 			continue;
 
+		PLAYER *player = GetPlayer();
+		LIGHT *light = GetLightData(1);
+		XMVECTOR vec = XMLoadFloat3(&g_Enemy[i].pos) - XMLoadFloat3(&player->pos);
+		vec = XMVector3Length(vec);
+		float lenSq = 0.0f;
+		XMStoreFloat(&lenSq, vec);
+		lenSq = fabsf(lenSq);
+		float line = 0.0f;
+		if (CheckLightOn() == TRUE)
+		{
+			line = LIGHT_LINE_ON;
+		}
+		else
+		{
+			line = LIGHT_LINE_OFF;
+		}
+
+		float diffuse = FloatClamp(1.0f - (lenSq + 0.01f) / line, 0.0f, 1.0f);
+		float alpha = 1.0f;
+		if (diffuse <= 0.1f)alpha = diffuse;
+		g_Enemy[i].material.Diffuse = { diffuse, diffuse, diffuse, alpha };
+
 		//エネミーのステート処理
 		int oldState = g_Enemy[i].state;
 		g_Enemy[i].state = StateCheck(i);
@@ -178,7 +202,7 @@ void UpdateEnemy(void)
 	//エネミーのセットを行える
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_G))
-		SetEnemy(XMFLOAT3(0.0f, 0.0f, -250.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		SetEnemy(XMFLOAT3(0.0f, 0.0f, -0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
 
 #endif
 
@@ -364,7 +388,8 @@ int StateCheck(int i)
 	PLAYER *player = GetPlayer();
 	int ans = Patrol;			//デフォルトは巡回モード
 	//プレイヤーを視界に捉えたか
-	if (Visibility(g_Enemy[i].pos, player->pos, g_Enemy[i].rot.y, ENEMY_SIGHT) == TRUE)
+	if (Visibility(g_Enemy[i].pos, player->pos, g_Enemy[i].rot.y, ENEMY_SIGHT) == TRUE ||
+		 CollisionBC(player->pos, g_Enemy[i].pos, player->size, g_Enemy[i].fWidth) == TRUE)
 	{
 		ans = Chase;	//追跡開始
 	}

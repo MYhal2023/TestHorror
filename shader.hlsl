@@ -164,23 +164,24 @@ void PixelShaderPolygon( in  float4 inPosition		: SV_POSITION,
 		color = inDiffuse;
 	}
 
-	// 影の処理
-	float ZValue = inSMPosition.z / inSMPosition.w;
 
-	float2 SMTexture;
-	SMTexture.x = (1.0f + inSMPosition.x / inSMPosition.w) * 0.5f;
-	SMTexture.y = (1.0f - inSMPosition.y / inSMPosition.w) * 0.5f;
+	//// 影の処理
+	//float ZValue = inSMPosition.z / inSMPosition.w;
 
-	float SMZValue = g_SMDepth.Sample(g_SMSamplerState, SMTexture).r + 0.001f;	//影にしたい領域
+	//float2 SMTexture;
+	//SMTexture.x = (1.0f + inSMPosition.x / inSMPosition.w) * 0.5f;
+	//SMTexture.y = (1.0f - inSMPosition.y / inSMPosition.w) * 0.5f;
+
+	//float SMZValue = g_SMDepth.Sample(g_SMSamplerState, SMTexture).r + 0.001f;	//影にしたい領域
 
 	if (Light.Enable == 0)
 	{
 		color = color * Material.Diffuse;
 	}
-	else if(SMZValue < ZValue) // ライトPOSから計算　SM＝ライトからの情報　Z＝視点からの情報
-	{
-		color = float4(clamp(color.rgb - 0.85f, 0.0f, 1.0f), 1.0f);   // 影の色
-	}
+	//else if(SMZValue < ZValue) // ライトPOSから計算　SM＝ライトからの情報　Z＝視点からの情報
+	//{
+	//	color = float4(clamp(color.rgb - 0.85f, 0.0f, 1.0f), 1.0f);   // 影の色
+	//}
 	else
 	{
 		float4 tempColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -222,23 +223,37 @@ void PixelShaderPolygon( in  float4 inPosition		: SV_POSITION,
 			}
 		}
 
-		color = outColor;
+		color = outColor, 0.0f, 1.0f;
 		color.a = inDiffuse.a * Material.Diffuse.a;
 	}
 
-	//フォグ
-	if (Fog.Enable == 1)
-	{
-		float z = inPosition.z*inPosition.w;
-		float f = (Fog.Distance.y - z) / (Fog.Distance.y - Fog.Distance.x);
-		f = saturate(f);
-		outDiffuse = f * color + (1 - f)*Fog.FogColor;
-		outDiffuse.a = color.a;
-	}
-	else
-	{
+	////フォグ
+	//if (Fog.Enable == 1)
+	//{
+	//	float z = inPosition.z*inPosition.w;
+	//	float f = (Fog.Distance.y - z) / (Fog.Distance.y - Fog.Distance.x);
+	//	f = saturate(f);
+	//	outDiffuse = f * color + (1 - f)*Fog.FogColor;
+	//	outDiffuse.a = color.a;
+	//}
+	//else
+	//{
 		outDiffuse = color;
-	}
+	//}
+
+	////フォグ
+	//if (Fog.Enable == 1)
+	//{
+	//	float z = inPosition.z*inPosition.w;
+	//	float f = (Fog.Distance.y - z) / (Fog.Distance.y - Fog.Distance.x);
+	//	f = saturate(f);
+	//	outDiffuse = f * color + (1 - f)*Fog.FogColor;
+	//	outDiffuse.a = color.a;
+	//}
+	//else
+	//{
+	//	outDiffuse = color;
+	//}
 
 	////縁取り
 	//if (fuchi == 1)

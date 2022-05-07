@@ -54,12 +54,30 @@ void InitLight(void)
 	// 光源の設定（世界を照らす光）
 	g_Light[0].Position = XMFLOAT3(500.0f, 500.0f, 500.0f);
 	g_Light[0].Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
-	g_Light[0].Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	float diffuse = 0.1f;
+	g_Light[0].Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
 	g_Light[0].Type = LIGHT_TYPE_DIRECTIONAL;					// 並行光源
 	g_Light[0].Enable = TRUE;									// このライトをON
 	SetLight(0, &g_Light[0]);									// これで設定している
 
+		// 光源の設定（世界を照らす光）
+	g_Light[1].Position = XMFLOAT3(0.0f, 50.0f, 0.0f);
+	g_Light[1].Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+	diffuse = 1.0f;
+	g_Light[1].Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
+	g_Light[1].Attenuation = LIGHT_LINE_OFF;	// 減衰距離
+	g_Light[1].Type = LIGHT_TYPE_POINT;							// 並行光源
+	g_Light[1].Enable = TRUE;									// このライトをON
+	SetLight(1, &g_Light[1]);									// これで設定している
 
+	//g_Light[2].Position = XMFLOAT3(100.0f, 100.0f, 0.0f);
+	//g_Light[2].Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+	//diffuse = 1.0f;
+	//g_Light[2].Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
+	//g_Light[2].Attenuation = 300.0f;	// 減衰距離
+	//g_Light[2].Type = LIGHT_TYPE_POINT;							// 並行光源
+	//g_Light[2].Enable = TRUE;									// このライトをON
+	//SetLight(2, &g_Light[2]);									// これで設定している
 
 	// フォグの初期化（霧の効果）
 	g_Fog.FogStart = GAME_FOG_ST;									// 視点からこの距離離れるとフォグがかかり始める
@@ -102,37 +120,55 @@ void UpdateLight(void)
 	PLAYER *player = GetPlayer();
 	g_Light[0].Position = XMFLOAT3(player->pos.x + 0.0f, 500.0f, player->pos.z + 200.0f);
 	g_Light[0].Direction = XMFLOAT3(0.5f, -1.0f, 0.0f);
+#ifdef _DEBUG //デバッグ時のみキーボード操作で明暗切り替えを自由に
+	if (GetKeyboardTrigger(DIK_H))
+	{
+		float diffuse = (g_Light[0].Diffuse.x == 0.1f) ? 1.0f : 0.1f;
+		g_Light[0].Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
+	}
+#endif
 	SetLight(0, &g_Light[0]);									// これで設定している
+
+	g_Light[1].Position = XMFLOAT3(player->pos.x, player->pos.y + 50.0f, player->pos.z);
+	if (CheckLightOn() == TRUE)
+	{
+		g_Light[1].Attenuation = LIGHT_LINE_ON;
+	}
+	else
+	{
+		g_Light[1].Attenuation = LIGHT_LINE_OFF;
+	}
+	SetLight(1, &g_Light[1]);
 }
 
 void UpdateFog(void)
 {
-	BOOL debugSW = FALSE;	//デバッグ判断用変数
-#ifdef _DEBUG //デバッグ時のみキーボード操作でフォグを遠くへ
-	if (GetKeyboardTrigger(DIK_H))
-	{
-		g_Fog.FogStart = (g_Fog.FogStart == GAME_FOG_ST) ? DEBUG_FOG_ST : GAME_FOG_ST;
-		g_Fog.FogEnd = (g_Fog.FogEnd == GAME_FOG_ED) ? DEBUG_FOG_ED : GAME_FOG_ED;
-		SetFog(&g_Fog);	//フォグをセット
-	}
-#endif
-	//debugSW変数で、デバッグ中か否かを判断。判断はフォグの開始位置で行う
-	(g_Fog.FogStart == DEBUG_FOG_ST) ? debugSW = TRUE : debugSW = FALSE;
-
-	//デバッグ中のフォグを使用しているなら、リリース版のフォグをスルー
-	if (debugSW == TRUE)return;
-
-	//ライト状態に適さないフォグの場合、状態に合うように再セット
-	if (CheckLightOn() == TRUE && g_Fog.FogStart != GAME_LFOG_ST)
-	{
-		g_Fog.FogStart = GAME_LFOG_ST;
-		g_Fog.FogEnd = GAME_LFOG_ED;
-		SetFog(&g_Fog);	//フォグをセット
-	}
-	else if (CheckLightOn() != TRUE && g_Fog.FogStart == GAME_LFOG_ST)
-	{
-		g_Fog.FogStart = GAME_FOG_ST;
-		g_Fog.FogEnd = GAME_FOG_ED;
-		SetFog(&g_Fog);	//フォグをセット
-	}
+//	BOOL debugSW = FALSE;	//デバッグ判断用変数
+//#ifdef _DEBUG //デバッグ時のみキーボード操作でフォグを遠くへ
+//	if (GetKeyboardTrigger(DIK_H))
+//	{
+//		g_Fog.FogStart = (g_Fog.FogStart == GAME_FOG_ST) ? DEBUG_FOG_ST : GAME_FOG_ST;
+//		g_Fog.FogEnd = (g_Fog.FogEnd == GAME_FOG_ED) ? DEBUG_FOG_ED : GAME_FOG_ED;
+//		SetFog(&g_Fog);	//フォグをセット
+//	}
+//#endif
+//	//debugSW変数で、デバッグ中か否かを判断。判断はフォグの開始位置で行う
+//	(g_Fog.FogStart == DEBUG_FOG_ST) ? debugSW = TRUE : debugSW = FALSE;
+//
+//	//デバッグ中のフォグを使用しているなら、リリース版のフォグをスルー
+//	if (debugSW == TRUE)return;
+//
+//	//ライト状態に適さないフォグの場合、状態に合うように再セット
+//	if (CheckLightOn() == TRUE && g_Fog.FogStart != GAME_LFOG_ST)
+//	{
+//		g_Fog.FogStart = GAME_LFOG_ST;
+//		g_Fog.FogEnd = GAME_LFOG_ED;
+//		SetFog(&g_Fog);	//フォグをセット
+//	}
+//	else if (CheckLightOn() != TRUE && g_Fog.FogStart == GAME_LFOG_ST)
+//	{
+//		g_Fog.FogStart = GAME_FOG_ST;
+//		g_Fog.FogEnd = GAME_FOG_ED;
+//		SetFog(&g_Fog);	//フォグをセット
+//	}
 }
