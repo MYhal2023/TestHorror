@@ -177,7 +177,7 @@ HRESULT InitInterface(void)
 	g_UI[STAM_BAR].pos = { STAM_X , STAM_Y , 0.0f };
 	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH;
 	g_UI[STAM_BAR].h = STAM_TEXTURE_HEIGHT;
-	g_UI[STAM_BAR].color = { 1.0f,1.0f,1.0f,1.0f };
+	g_UI[STAM_BAR].color = { 0.0f,1.0f,0.0f,1.0f };
 
 
 	for (int i = 0; i < ITEM_MAX; i++)
@@ -246,10 +246,14 @@ void UpdateInterface(void)
 
 	g_UI[HP_RED].w = HP_TEXTURE_WIDTH * (player.life / HUNDRED);
 	g_UI[HP_RED].pos.x = HP_X - (HUNDRED - player.life)*DEVIATION_HP;
+
 	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH * (player.stamina / HUNDRED);
-	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - player.life) * DEVIATION_STAM;
+	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - player.stamina) * DEVIATION_STAM;
+	g_UI[STAM_BAR].color = { 1.0f - player.stamina / HUNDRED , player.stamina / HUNDRED , 0.0f,1.0f };
+
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//小さくすれば、下に移動する
+
 	g_match = match.num;													//マッチの数字を貰う
 
 	GaugeAnimation();
