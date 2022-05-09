@@ -234,7 +234,7 @@ void UpdatePlayer(void)
 #ifdef _DEBUG	// デバッグ情報を表示する
 	PrintDebugProc("Player:↑ → ↓ ←　Space\n");
 	PrintDebugProc("Player:X:%f Y:%f Z:%f\n", g_Player.pos.x, g_Player.pos.y, g_Player.pos.z);
-	PrintDebugProc("Player:Stamina %d Player:spd %f\n", g_Player.stamina, g_Player.spd);
+	PrintDebugProc("Player:Stamina %d Player:san %d\n", g_Player.stamina, g_Player.sanity);
 #endif
 }
 

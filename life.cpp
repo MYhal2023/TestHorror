@@ -323,7 +323,6 @@ void AddSanity(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエ
 		}
 		player->sanity = g_Life.sanity;
 		break;
-
 	}
 }
 

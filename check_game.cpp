@@ -19,8 +19,8 @@
 #define INV_TIME		(120)					//無敵フレーム数
 #define SAN_INV_TIME	(60)				//正気度無敵フレーム数
 #define NATURALHEAL		(180)				//自然回復し始めるまでの時間
-#define SAN_PROTECT		(180)				//暗闇ダメージを受けるまでの時間
-#define LIGHT_LIFE_CD	(60)				//明るさによるライフの影響のCD
+#define SAN_PROTECT		(60)				//暗闇ダメージを受けるまでの時間
+#define LIGHT_LIFE_CD	(10)				//明るさによるライフの影響のCD
 #define HEAL_CD			(120)				//自然回復のCD
 #define SANITY_DAMAGE_AREA	(200.0f)		//正気度がダメージを受ける範囲
 
@@ -127,9 +127,17 @@ void LightCheck(void)
 	{
 		if(sanProtect<SAN_PROTECT)sanProtect++;
 	}
-	if (sanProtect == 0)AddSanity(-5, PLAYER_LIFE, 0);	//正気度ダメージ
-	if (sanProtect == SAN_PROTECT)AddSanity(5, PLAYER_LIFE, 0);	//正気度回復
-	lightLife = LIGHT_LIFE_CD;
+
+	if (sanProtect == 0)
+	{
+		AddSanity(-1, PLAYER_LIFE, 0);	//正気度ダメージ
+		lightLife = LIGHT_LIFE_CD;
+	}
+	else if (sanProtect == SAN_PROTECT) 
+	{
+		AddSanity(1, PLAYER_LIFE, 0);	//正気度回復
+		lightLife = LIGHT_LIFE_CD;
+	}
 }
 //走ってないときスタミナ回復
 void StaminaHeal(BOOL run)
