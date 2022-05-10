@@ -39,10 +39,10 @@ BOOL CollisionBB(XMFLOAT3 mpos, float mw, float mz,
 	BOOL ans = FALSE;	// 外れをセットしておく
 
 	// 座標が中心点なので計算しやすく半分にしている
-	mw /= 2;
-	mz /= 2;
-	yw /= 2;
-	yz /= 2;
+	if(mw != 0.0f)mw /= 2;
+	if (mz != 0.0f)mz /= 2;
+	if (yw != 0.0f)yw /= 2;
+	if (yz != 0.0f)yz /= 2;
 
 	// バウンディングボックス(BB)の処理
 	if ((mpos.x + mw > ypos.x - yw) &&
