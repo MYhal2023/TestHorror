@@ -23,6 +23,8 @@
 #define LIGHT_LIFE_CD	(10)				//明るさによるライフの影響のCD
 #define HEAL_CD			(120)				//自然回復のCD
 #define SANITY_DAMAGE_AREA	(200.0f)		//正気度がダメージを受ける範囲
+#define SAN_TO_LIFE_DMG		(25)			//正気度喪失によるライフダメージの浸食割合間隔
+#define SAN_TO_LIFE_INT		(60)			//正気度喪失によるライフダメージの間隔
 
 //*****************************************************************************
 // グローバル変数
@@ -33,6 +35,7 @@ static int playerDamageLast = 0;	//最後にダメージを受けてからの経過時間
 static int sanProtect = SAN_PROTECT;
 static int lightLife = LIGHT_LIFE_CD;
 static int healTime = HEAL_CD;
+static int intStoL = SAN_TO_LIFE_INT;
 //*****************************************************************************
 // 更新処理
 //*****************************************************************************
@@ -53,6 +56,8 @@ void CheckGame(void)
 
 	if (healTime > 0)healTime--;
 	LifeHeal();
+
+	CheckSan();
 
 }
 
@@ -148,5 +153,23 @@ void StaminaHeal(BOOL run)
 
 		if (player->staminaMax <= player->stamina)return;
 			player->stamina++;
+	}
+}
+
+//SAN値が低いほど、症状進行が深刻に
+void CheckSan(void)
+{
+	PLAYER *player = GetPlayer();
+	int f = player->sanity / SAN_TO_LIFE_DMG;
+	//SAN値が75%以下で発症
+	if (f <= 2)
+	{
+		intStoL--;
+		if (intStoL > 0)return;
+
+		int x = -1 * (3 - f);
+		AddLife(x, PLAYER_LIFE, 0);
+		intStoL = SAN_TO_LIFE_INT;
+		healTime = HEAL_CD;			//自然回復キャンセル
 	}
 }
