@@ -325,12 +325,11 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 	{
 		pMesh = &g_aMeshWall[i];
 
-		//回転量を元にx軸とz軸方向の幅を計算。0にならないように余剰値を追加しておく。
-		float buffer = 1.0f;
+		//回転量を元にx軸とz軸方向の幅を計算
 		float rotatew = cosf(pMesh->rot.y);
 		float rotatez = sinf(pMesh->rot.y);
-		float width = pMesh->fBlockSizeX * fabsf(rotatew) + buffer;
-		float thickness = pMesh->fBlockSizeX * fabsf(rotatez) + buffer;
+		float width = pMesh->fBlockSizeX * fabsf(rotatew);
+		float thickness = pMesh->fBlockSizeX * fabsf(rotatez);
 
 		//壁とプレイヤーの当たり判定。BBで行うため、y座標は現状考慮していない。
 		if (CollisionBB(pos, size, size, pMesh->pos, width, thickness) == TRUE)
