@@ -30,6 +30,7 @@
 #include "match.h"
 #include "check_game.h"
 #include "itembox.h"
+#include "furniture.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -105,6 +106,8 @@ void InitDebugStage(void)
 	//マップに使う壁の初期化
 	InitFieldMeshWall();
 
+	InitFurniture();
+
 	InitMatch();
 
 	InitLighter();
@@ -155,6 +158,7 @@ void UninitGame(void)
 	// 地面の終了処理
 	UninitMeshField();
 
+	UninitFurniture();
 
 	// 影の終了処理
 	UninitShadow();
@@ -190,6 +194,8 @@ void UpdateGame(void)
 
 	// 壁処理の更新
 	UpdateMeshWall();
+
+	UpdateFurniture();
 
 	// プレイヤーの更新処理
 	UpdatePlayer();
@@ -242,6 +248,7 @@ void DrawGame0(void)
 	// 地面の描画処理
 	DrawMeshField();
 
+	DrawFurniture();
 	// 影の描画処理
 	DrawShadow();
 

@@ -321,6 +321,10 @@ void AddSanity(int add, int chara, int i)//加算量、対象(0ならプレイヤー、1ならエ
 		{
 			g_Life.sanity = g_Life.sanity_max;
 		}
+		else if (g_Life.sanity <= 0)
+		{
+			g_Life.sanity = 0;
+		}
 		player->sanity = g_Life.sanity;
 		break;
 	}
