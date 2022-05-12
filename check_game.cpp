@@ -13,6 +13,8 @@
 #include "life.h"
 #include "check_game.h"
 #include "sound.h"
+
+#include "interface.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -84,6 +86,7 @@ void CheckPECollision(void)
 			AddSanity(-35, PLAYER_LIFE, 0);	//正気度ダメージ
 			playerInv = INV_TIME;			//当たったら無敵時間を追加
 			playerDamageLast = 0;			//当たったため経過時間を0に
+			HurtAnimationOn();				//当たったらUIアニメーションをONにする
 		}
 	}
 

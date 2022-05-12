@@ -30,6 +30,8 @@ enum UI_TEXTURE
 	MATCH_NUM,
 	MATCH_PIC,
 	MIND,
+	HURT,
+	INSANE,
 	ITEM_BOX,
 };
 
@@ -57,4 +59,6 @@ void GaugeAnimation(void);
 UI_ELEMENT *GetItemBox(void);
 int GetItemMax(void);
 void IncreaseItemmax(void);
-void DecreaseItemmax(void);
+void HurtAnimationOn(void);
+void HurtAnimation(void);
+void SanityCheck(int sanity);

@@ -20,8 +20,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX					(10)				// テクスチャの数
+#define TEXTURE_MAX					(12)				// テクスチャの数
 
+#define PLAYER_HURT_FRAME			(120)			// プレイヤー無敵フレーム
 
 
 #define HP_TEXTURE_WIDTH			(3200/5)	// テクスチャサイズ
@@ -63,6 +64,7 @@
 #define	DEVIATION_HP				(0.8f)					//ゲージの移動を訂正するため
 #define DEVIATION_OIL				(0.6f)
 #define DEVIATION_STAM				(0.8f)
+#define DEVIATION_MIND				(0.6f)
 
 #define WAIT_TIME					(50)					//ゲージアニメーションを待たせる時間
 
@@ -88,6 +90,8 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/number16x32.png",
 	"data/TEXTURE/match_ui.png",
 	"data/TEXTURE/mind.png",
+	"data/TEXTURE/hurt.png",
+	"data/TEXTURE/lowmind.png",
 	"data/TEXTURE/itembox.png",
 };
 
@@ -98,6 +102,7 @@ static UI_ELEMENT	g_ItemBox[ITEM_MAX];
 static BOOL						g_Load = FALSE;
 static int						g_match = 0;
 static int						g_time = 0;
+static int						g_hurt_time = 0;
 static int						g_ItemMax = ITEM_MIN;			//現在アイテムを持てる限界
 
 
@@ -140,40 +145,63 @@ HRESULT InitInterface(void)
 		g_UI[i].ty = 0.0f;			// テクスチャの左上Y座標
 		g_UI[i].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
+	//HPゲージ
 	g_UI[HP_BAR].pos = { HP_X , HP_Y , 0.0f };
 	g_UI[HP_BAR].w = HP_TEXTURE_WIDTH;
 	g_UI[HP_BAR].h = HP_TEXTURE_HEIGHT;
 
+	//HP　背景
 	g_UI[HP_RED_BG].pos = { HP_X , HP_Y , 0.0f };
 	g_UI[HP_RED_BG].w = HP_TEXTURE_WIDTH;
 	g_UI[HP_RED_BG].h = HP_TEXTURE_HEIGHT;
 	g_UI[HP_RED_BG].color = { 15.0f,0.7f,1.0f,1.0f };
 
+	//HP　色
 	g_UI[HP_RED].pos = { HP_X , HP_Y , 0.0f };
 	g_UI[HP_RED].w = HP_TEXTURE_WIDTH;
 	g_UI[HP_RED].h = HP_TEXTURE_HEIGHT;
 	g_UI[HP_RED].color = { 0.0f,5.0f,2.0f,1.0f };
 
+	//オイルゲージ
 	g_UI[OIL_BAR].pos = { OIL_X , OIL_Y , 0.0f };
 	g_UI[OIL_BAR].w = OIL_TEXTURE_WIDTH;
 	g_UI[OIL_BAR].h = OIL_TEXTURE_HEIGHT;
 
+	//オイル色
 	g_UI[OIL_RED].pos = { OIL_X , OIL_Y , 0.0f };
 	g_UI[OIL_RED].w = OIL_TEXTURE_WIDTH;
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT;
 
+	//マッチ数字
 	g_UI[MATCH_NUM].pos = { MATCH_X + MATCH_TEXTURE_WIDTH, MATCH_Y, 0.0f };
 	g_UI[MATCH_NUM].w = MATCH_NUM_TEXTURE_WIDTH;
 	g_UI[MATCH_NUM].h = MATCH_NUM_TEXTURE_HEIGHT;
 
+	//マッチUI
 	g_UI[MATCH_PIC].pos = { MATCH_X, MATCH_Y, 0.0f };
 	g_UI[MATCH_PIC].w = MATCH_TEXTURE_WIDTH;
 	g_UI[MATCH_PIC].h = MATCH_TEXTURE_HEIGHT;
 
+	//Sanityゲージ
 	g_UI[MIND].pos = { MIND_X, MIND_Y, 0.0f };
 	g_UI[MIND].w = MIND_TEXTURE_WIDTH;
 	g_UI[MIND].h = MIND_TEXTURE_HEIGHT;
 
+	//痛みエフェクト
+	g_UI[HURT].use = FALSE;
+	g_UI[HURT].pos = { SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f };
+	g_UI[HURT].w = SCREEN_WIDTH;
+	g_UI[HURT].h = SCREEN_HEIGHT;
+	g_UI[HURT].color = { 0.3f,0.0f,0.0f,0.0f };
+
+	//Sanityエフェクト
+	g_UI[INSANE].use = FALSE;
+	g_UI[INSANE].pos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f };
+	g_UI[INSANE].w = SCREEN_WIDTH;
+	g_UI[INSANE].h = SCREEN_HEIGHT;
+	g_UI[INSANE].color = { 1.0f,0.0f,0.0f,0.0f };
+
+	//スタミナバー
 	g_UI[STAM_BAR].pos = { STAM_X , STAM_Y , 0.0f };
 	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH;
 	g_UI[STAM_BAR].h = STAM_TEXTURE_HEIGHT;
@@ -244,19 +272,31 @@ void UpdateInterface(void)
 	LIGHTER lighter = *GetLighter();
 	MATCH match = *GetMatch();
 
+	//HP 
 	g_UI[HP_RED].w = HP_TEXTURE_WIDTH * (player.life / HUNDRED);
 	g_UI[HP_RED].pos.x = HP_X - (HUNDRED - player.life)*DEVIATION_HP;
 
+	//スタミナ
 	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH * (player.stamina / HUNDRED);
 	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - player.stamina) * DEVIATION_STAM;
 	g_UI[STAM_BAR].color = { 1.0f - player.stamina / HUNDRED , player.stamina / HUNDRED , 0.0f,1.0f };
 
+	//ライター
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//小さくすれば、下に移動する
+
+	//Sanity
+	g_UI[MIND].w = MIND_TEXTURE_WIDTH * (player.sanity / HUNDRED);
+	g_UI[MIND].pos.x = MIND_X - (HUNDRED - player.sanity) * DEVIATION_MIND;
+
+	//Sanity エフェクト
+	SanityCheck(player.sanity);
+
 
 	g_match = match.num;													//マッチの数字を貰う
 
 	GaugeAnimation();
+	HurtAnimation();
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 	if (GetKeyboardTrigger(DIK_K))
@@ -283,6 +323,12 @@ void DrawInterface(void)
 	{
 		if (i == MATCH_NUM)																//マッチの数字を別で印刷
 			continue;
+		if (g_UI[i].use == FALSE)
+			continue;
+		if (i == HURT || i == INSANE)
+		{
+			SetBlendState(BLEND_MODE_ADD);
+		}
 		// 頂点バッファ設定
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
@@ -320,6 +366,11 @@ void DrawInterface(void)
 
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
+
+		if (i == HURT || i== INSANE)
+		{
+			SetBlendState(BLEND_MODE_NONE);
+		}
 	}
 
 	//マッチの数字
@@ -447,19 +498,71 @@ void GaugeAnimation()
 	return;
 }
 
+
+//=============================================================================
+// アイテムボックスを戻す
+//=============================================================================
 UI_ELEMENT *GetItemBox()
 {
 	return &g_ItemBox[0];
 }
-
+//=============================================================================
+// 現時点でアイテムボックスの最大値
+//=============================================================================
 int GetItemMax()
 {
 	return g_ItemMax;
 }
-
+//=============================================================================
+// アイテムボックスの最大値を＋１増加
+//=============================================================================
 void IncreaseItemmax()
 {
 	if (g_ItemMax >= ITEM_MAX)
 		return;
 	g_ItemMax++;
+}
+
+//=============================================================================
+// ダメージを受けるとアニメーションをONにする
+//=============================================================================
+void HurtAnimationOn()
+{
+	g_UI[HURT].use = TRUE;
+}
+
+//=============================================================================
+// ダメージを受けるとのアニメーション
+//=============================================================================
+void HurtAnimation()
+{
+	if (g_UI[HURT].use == FALSE)
+		return;
+	if (g_hurt_time >= PLAYER_HURT_FRAME)
+	{
+		g_hurt_time = 0;
+		g_UI[HURT].use = FALSE;
+		g_UI[HURT].color.w = 0.0f;
+		return;
+	}
+	g_hurt_time++;
+	if (g_UI[HURT].color.w < 1.0f)
+	{
+		g_UI[HURT].color.w += 0.08f;
+	}
+	else
+	{
+		g_UI[HURT].color.w -= 0.08f;
+	}
+	return;
+}
+
+//Sanity エフェクト
+void SanityCheck(int sanity)
+{
+	if (sanity > 75) { g_UI[INSANE].color.w = 0.25f; };
+	if (sanity > 50 && sanity < 75) { g_UI[INSANE].color.w = 0.5f; };
+	if (sanity > 25 && sanity < 50) { g_UI[INSANE].color.w = 0.75f; };
+	if (sanity < 25) { g_UI[INSANE].color.w = 0.89f; };
+	return;
 }
