@@ -17,7 +17,7 @@ enum ITEM_TEXTURE
 {
 	MATCH_ITEM,
 	LIGHTER_ITEM,
-	RANDOM_ITEM_1,
+	KEY,
 	RANDOM_ITEM_2,
 	EMPTY,
 };
@@ -55,3 +55,4 @@ void AddItembox(int TNum);
 void IncreaseItembox(int n);
 void MoveSelect();
 int	ReturnSelect();
+void UseItemSelect();

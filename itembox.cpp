@@ -44,7 +44,7 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/match.png",
 	"data/TEXTURE/lighter.png",
-	"data/TEXTURE/enemy_debug.png",
+	"data/TEXTURE/key.png",
 	"data/TEXTURE/enemy.png",
 	"data/TEXTURE/itembox.png",
 };
@@ -193,7 +193,7 @@ void UpdateItembox(void)
 	}
 	if (GetKeyboardTrigger(DIK_8))
 	{
-		AddItembox(g_Item[RANDOM_ITEM_1].TexNo);
+		AddItembox(g_Item[KEY].TexNo);
 	}
 	if (GetKeyboardTrigger(DIK_7))
 	{
@@ -201,7 +201,7 @@ void UpdateItembox(void)
 	}
 	if (GetKeyboardTrigger(DIK_N))
 	{
-		IncreaseItembox(1);
+		UseItemSelect();
 	}
 
 #endif
@@ -314,6 +314,7 @@ void AddItembox(int TNum)
 	}
 	return;
 }
+
 //=============================================================================
 // ƒAƒCƒeƒ€ƒ{ƒbƒNƒX‚É‹ó‚¢‚Ä‚¢‚é‚Æ‚±‚ë‚ğ’Ç‰Á
 //=============================================================================
@@ -354,4 +355,29 @@ void MoveSelect()		//C¨		A©
 int	ReturnSelect()		//¡‘I‘ğ‚µ‚Ä‚¢‚éƒAƒCƒeƒ€‚ÌID‚ğ–ß‚·
 {
 	return g_Box[g_Select].TexNo;
+}
+
+////============================================////
+//‘I‘ğ‚µ‚Ä‚¢‚éƒAƒCƒeƒ€‚ğg‚Á‚½‚çƒAƒCƒeƒ€‚ğÁ‚·
+////============================================////
+void UseItemSelect()
+{
+	g_Box[g_Select].TexNo = EMPTY;
+	for (int i = g_Select; i <= g_items; i++)
+	{
+		if (g_Box[i + 1].use == FALSE)
+		{
+			g_Box[i].open = TRUE;
+			return;
+		}
+		if (g_Box[i + 1].open == TRUE)
+		{
+			g_Box[i].open = TRUE;
+			return;
+		}
+		g_Box[i].TexNo = g_Box[i+1].TexNo;
+		g_Box[i + 1].TexNo = EMPTY;
+
+	}
+	return;
 }
