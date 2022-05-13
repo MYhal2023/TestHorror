@@ -143,6 +143,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="interface.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="itembox.cpp" />
     <ClCompile Include="life.cpp" />
     <ClCompile Include="light.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="interface.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="itembox.h" />
     <ClInclude Include="life.h" />
     <ClInclude Include="light.h" />
