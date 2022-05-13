@@ -31,6 +31,7 @@
 #include "check_game.h"
 #include "itembox.h"
 #include "furniture.h"
+#include "item.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -108,6 +109,8 @@ void InitDebugStage(void)
 
 	InitFurniture();
 
+	InitItem();
+
 	InitMatch();
 
 	InitLighter();
@@ -160,6 +163,8 @@ void UninitGame(void)
 
 	UninitFurniture();
 
+	UninitItem();
+
 	// 影の終了処理
 	UninitShadow();
 
@@ -196,6 +201,8 @@ void UpdateGame(void)
 	UpdateMeshWall();
 
 	UpdateFurniture();
+
+	UpdateItem();
 
 	// プレイヤーの更新処理
 	UpdatePlayer();
@@ -249,6 +256,9 @@ void DrawGame0(void)
 	DrawMeshField();
 
 	DrawFurniture();
+
+	DrawItem();
+
 	// 影の描画処理
 	DrawShadow();
 
