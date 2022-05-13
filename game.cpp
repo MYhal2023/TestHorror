@@ -25,6 +25,7 @@
 #include "collision.h"
 #include "debugproc.h"
 #include "file.h"
+#include "particle.h"
 
 #include "lighter.h"
 #include "match.h"
@@ -125,6 +126,8 @@ void InitDebugStage(void)
 	InitInterface();
 
 	InitItembox();
+
+	InitParticle();
 }
 
 //牢屋ステージ初期化(第一ステージ？)
@@ -138,6 +141,8 @@ void InitPrisonStage(void)
 //=============================================================================
 void UninitGame(void)
 {
+	UninitParticle();
+
 	UninitEnemy();
 
 	//UI表示終了処理
@@ -225,6 +230,7 @@ void UpdateGame(void)
 
 	UpdateLighter();
 
+	UpdateParticle();
 
 	// スコアの更新処理
 	UpdateScore();
@@ -269,6 +275,8 @@ void DrawGame0(void)
 	DrawMatch();
 
 	DrawLighter();
+
+	DrawParticle();
 
 	DrawEnemy();
 

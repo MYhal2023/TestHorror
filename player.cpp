@@ -22,6 +22,7 @@
 #include "match.h"
 #include "lighter.h"
 #include "check_game.h"
+#include "particle.h"
 
 //*****************************************************************************
 // É}ÉNÉçíËã`
@@ -227,6 +228,11 @@ void UpdatePlayer(void)
 		g_Player.spd *= 10.0f;
 	}
 	PrintDebugProc("g_Player.life %d\n", g_Player.life);
+
+	//if (GetKeyboardTrigger(DIK_B))
+	//{
+	//	SetParticle(g_Player.pos, XMFLOAT3(0.0f, 100.0f, 0.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), 30.0f, 30.0f, 120);
+	//}
 
 #endif
 

@@ -174,19 +174,19 @@ void UpdateParticle(void)
 				g_aParticle[nCntParticle].move.y -= 0.25f;
 				g_aParticle[nCntParticle].move.z += (0.0f - g_aParticle[nCntParticle].move.z) * 0.015f;
 
-#ifdef DISP_SHADOW
-				if(g_aParticle[nCntParticle].nIdxShadow != -1)
-				{// 影使用中
-					float colA;
-
-					// 影の位置設定
-					SetPositionShadow(g_aParticle[nCntParticle].nIdxShadow, XMFLOAT3(g_aParticle[nCntParticle].pos.x, 0.1f, g_aParticle[nCntParticle].pos.z));
-
-					// 影の色の設定
-					colA = g_aParticle[nCntParticle].material.Diffuse.w;
-					SetColorShadow(g_aParticle[nCntParticle].nIdxShadow, XMFLOAT4(0.5f, 0.5f, 0.5f, colA));
-				}
-#endif
+//#ifdef DISP_SHADOW
+//				if(g_aParticle[nCntParticle].nIdxShadow != -1)
+//				{// 影使用中
+//					float colA;
+//
+//					// 影の位置設定
+//					SetPositionShadow(g_aParticle[nCntParticle].nIdxShadow, XMFLOAT3(g_aParticle[nCntParticle].pos.x, 0.1f, g_aParticle[nCntParticle].pos.z));
+//
+//					// 影の色の設定
+//					colA = g_aParticle[nCntParticle].material.Diffuse.w;
+//					SetColorShadow(g_aParticle[nCntParticle].nIdxShadow, XMFLOAT4(0.5f, 0.5f, 0.5f, colA));
+//				}
+//#endif
 
 				g_aParticle[nCntParticle].nLife--;
 				if(g_aParticle[nCntParticle].nLife <= 0)
@@ -218,14 +218,16 @@ void UpdateParticle(void)
 		}
 
 		// パーティクル発生
+		if (GetKeyboardPress(DIK_B))
 		{
+			PLAYER *player = GetPlayer();
 			XMFLOAT3 pos;
 			XMFLOAT3 move;
 			float fAngle, fLength;
 			int nLife;
 			float fSize;
 
-			pos = g_posBase;
+			pos = player->pos;
 
 			fAngle = (float)(rand() % 628 - 314) / 100.0f;
 			fLength = rand() % (int)(g_fWidthBase * 200 ) / 100.0f - g_fWidthBase;
@@ -233,16 +235,18 @@ void UpdateParticle(void)
 			move.y = rand() % 300 / 100.0f + g_fHeightBase;
 			move.z = cosf(fAngle) * fLength;
 
-			nLife = rand() % 100 + 150;  
+			nLife = 120;  
 
-			fSize = (float)(rand() % 30 + 20);
+			fSize = 5;
 
 			pos.y = fSize / 2;
 
 			// ビルボードの設定
-			SetParticle(pos, move, XMFLOAT4(0.8f, 0.7f, 0.2f, 0.85f), fSize, fSize, nLife);
+			SetParticle(pos, move, XMFLOAT4(0.8f, 0.0f, 0.0f, 0.5f), fSize, fSize, nLife);
 		}
 	}
+
+
 }
 
 //=============================================================================
@@ -403,22 +407,22 @@ int SetParticle(XMFLOAT3 pos, XMFLOAT3 move, XMFLOAT4 col, float fSizeX, float f
 {
 	int nIdxParticle = -1;
 
-//	for(int nCntParticle = 0; nCntParticle < MAX_PARTICLE; nCntParticle++)
-//	{
-//		if(!g_aParticle[nCntParticle].bUse)
-//		{
-//			g_aParticle[nCntParticle].pos = pos;
-//			g_aParticle[nCntParticle].rot   = { 0.0f, 0.0f, 0.0f };
-//			g_aParticle[nCntParticle].scale = { 1.0f, 1.0f, 1.0f };
-//			g_aParticle[nCntParticle].move = move;
-//			g_aParticle[nCntParticle].material.Diffuse = col;
-//			g_aParticle[nCntParticle].fSizeX = fSizeX;
-//			g_aParticle[nCntParticle].fSizeY = fSizeY;
-//			g_aParticle[nCntParticle].nLife = nLife;
-//			g_aParticle[nCntParticle].bUse = TRUE;
-//
-//			nIdxParticle = nCntParticle;
-//
+	for(int nCntParticle = 0; nCntParticle < MAX_PARTICLE; nCntParticle++)
+	{
+		if(!g_aParticle[nCntParticle].bUse)
+		{
+			g_aParticle[nCntParticle].pos = pos;
+			g_aParticle[nCntParticle].rot   = { 0.0f, 0.0f, 0.0f };
+			g_aParticle[nCntParticle].scale = { 1.0f, 1.0f, 1.0f };
+			g_aParticle[nCntParticle].move = move;
+			g_aParticle[nCntParticle].material.Diffuse = col;
+			g_aParticle[nCntParticle].fSizeX = fSizeX;
+			g_aParticle[nCntParticle].fSizeY = fSizeY;
+			g_aParticle[nCntParticle].nLife = nLife;
+			g_aParticle[nCntParticle].bUse = TRUE;
+
+			nIdxParticle = nCntParticle;
+
 //#ifdef DISP_SHADOW
 //			// 影の設定
 //			g_aParticle[nCntParticle].nIdxShadow = CreateShadow(XMFLOAT3(pos.x, 0.1f, pos.z), 0.8f, 0.8f);		// 影の設定
@@ -427,10 +431,10 @@ int SetParticle(XMFLOAT3 pos, XMFLOAT3 move, XMFLOAT4 col, float fSizeX, float f
 //				SetColorShadow(g_aParticle[nCntParticle].nIdxShadow, XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f));
 //			}
 //#endif
-//
-//			break;
-//		}
-//	}
+
+			break;
+		}
+	}
 
 	return nIdxParticle;
 }
