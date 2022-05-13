@@ -266,6 +266,10 @@ void DrawGame0(void)
 	// プレイヤーの描画処理
 	DrawPlayer();
 
+	DrawMatch();
+
+	DrawLighter();
+
 	DrawEnemy();
 
 	// 壁の描画処理
@@ -278,9 +282,6 @@ void DrawGame0(void)
 	// ライティングを無効
 	SetLightEnable(FALSE);
 
-	DrawMatch();
-
-	DrawLighter();
 
 	// スコアの描画処理
 	DrawScore();

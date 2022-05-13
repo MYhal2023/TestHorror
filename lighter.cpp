@@ -7,6 +7,7 @@
 #include "main.h"
 #include "input.h"
 #include "renderer.h"
+#include "model.h"
 #include "interface.h"
 #include "lighter.h"
 #include "sprite.h"
@@ -30,6 +31,7 @@
 
 #define LIGHTER_POS_X	(SCREEN_CENTER_X + 250)
 #define LIGHTER_POS_Y	(SCREEN_CENTER_Y + 100)
+//#define	MODEL_???			"data/MODEL/???"		// 読み込むモデル名
 
 
 
@@ -162,48 +164,41 @@ void UpdateLighter(void)
 //=============================================================================
 void DrawLighter(void)
 {
-	if (!g_Lighter.out)
-		return;
+	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
-	// 頂点バッファ設定
-	UINT stride = sizeof(VERTEX_3D);
-	UINT offset = 0;
-	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+	//// カリング無効
+	//SetCullingMode(CULL_MODE_NONE);
 
-	// マトリクス設定
-	SetWorldViewProjection2D();
+	//if (g_Lighter.use == false) return;
 
-	// プリミティブトポロジ設定
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	//// ワールドマトリックスの初期化
+	//mtxWorld = XMMatrixIdentity();
 
-	// マテリアル設定
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	SetMaterial(material);
+	//// スケールを反映
+	//mtxScl = XMMatrixScaling(g_Lighter.scl.x, g_Lighter.scl.y, g_Lighter.scl.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
-	// テクスチャ設定
-	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
+	//// 回転を反映
+	//mtxRot = XMMatrixRotationRollPitchYaw(g_Lighter.rot.x, g_Lighter.rot.y, g_Lighter.rot.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-	// スコアの位置やテクスチャー座標を反映
-	float px = g_Lighter.pos.x;	// スコアの表示位置X
-	float py = g_Lighter.pos.y;			// スコアの表示位置Y
-	float pw = g_Lighter.w;				// スコアの表示幅
-	float ph = g_Lighter.h;				// スコアの表示高さ
+	//// 移動を反映
+	//mtxTranslate = XMMatrixTranslation(g_Lighter.pos.x, g_Lighter.pos.y, g_Lighter.pos.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	float tw = 1.0f;		// テクスチャの幅
-	float th = 1.0f;		// テクスチャの高さ
-	float tx = 0.0f;			// テクスチャの左上X座標
-	float ty = 0.0f;			// テクスチャの左上Y座標
+	//// ワールドマトリックスの設定
+	//SetWorldMatrix(&mtxWorld);
 
-	// １枚のポリゴンの頂点とテクスチャ座標を設定
-	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//XMStoreFloat4x4(&g_Lighter.mtxWorld, mtxWorld);
 
-	// ポリゴン描画
-	GetDeviceContext()->Draw(4, 0);
+	//// モデル描画
+	//DrawModel(&g_Lighter.model);
 
+	//// カリング設定を戻す
+	//SetCullingMode(CULL_MODE_BACK);
 }
+
+
 
 //=============================================================================
 // ライターON
