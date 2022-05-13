@@ -18,6 +18,12 @@
 
 struct MATCH
 {
+	XMFLOAT4X4			mtxWorld;			// ワールドマトリックス
+	XMFLOAT3			rot;				// モデルの向き(回転)
+	XMFLOAT3			scl;				// モデルの大きさ(スケール)
+	DX11_MODEL			model;				// モデル情報
+	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
+
 	BOOL					Use;					// TRUE:使っている  FALSE:未使用
 	float					w, h;					// 幅と高さ
 	XMFLOAT3				Pos;					// ポリゴンの座標

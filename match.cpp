@@ -6,6 +6,7 @@
 //=============================================================================
 #include "main.h"
 #include "renderer.h"
+#include "model.h"
 #include "sprite.h"
 #include "player.h"
 #include "time.h"
@@ -33,6 +34,8 @@
 #define MATCH_SLOW					(300)
 #define MATCH_MIDDLE				(600)
 #define MATCH_FAST					(100)
+//#define	MODEL_???			"data/MODEL/???"		// 読み込むモデル名
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -156,48 +159,38 @@ void UpdateMatch(void)
 //=============================================================================
 void DrawMatch(void)
 {
-	// 頂点バッファ設定
-	UINT stride = sizeof(VERTEX_3D);
-	UINT offset = 0;
-	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
-	// マトリクス設定
-	SetWorldViewProjection2D();
+	//// カリング無効
+	//SetCullingMode(CULL_MODE_NONE);
 
-	// プリミティブトポロジ設定
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	//if (g_Match.Use == false) return;
 
-	// マテリアル設定
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	SetMaterial(material);
+	//// ワールドマトリックスの初期化
+	//mtxWorld = XMMatrixIdentity();
 
-	// マッチを描画
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[0]);
+	//// スケールを反映
+	//mtxScl = XMMatrixScaling(g_Match.scl.x, g_Match.scl.y, g_Match.scl.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSprite(g_VertexBuffer, g_Match.Pos.x, g_Match.Pos.y, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0.0f, 0.0f, 1.0f, 1.0f);
+	//// 回転を反映
+	//mtxRot = XMMatrixRotationRollPitchYaw(g_Match.rot.x, g_Match.rot.y, g_Match.rot.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//// 移動を反映
+	//mtxTranslate = XMMatrixTranslation(g_Match.Pos.x, g_Match.Pos.y, g_Match.Pos.z);
+	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	// 炎を描画
-	if(g_Match.AblazeTime > 0)
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+	//// ワールドマトリックスの設定
+	//SetWorldMatrix(&mtxWorld);
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSprite(g_VertexBuffer, g_Match.Pos.x, g_Match.Pos.y-50, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0.0f, 0.0f, 1.0f, 1.0f);
+	//XMStoreFloat4x4(&g_Match.mtxWorld, mtxWorld);
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//// モデル描画
+	//DrawModel(&g_Match.model);
 
+	//// カリング設定を戻す
+	//SetCullingMode(CULL_MODE_BACK);
 }
 
 //

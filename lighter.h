@@ -21,12 +21,18 @@
 //*****************************************************************************
 struct LIGHTER
 {
+	XMFLOAT4X4			mtxWorld;			// ワールドマトリックス
+	XMFLOAT3			pos;				// モデルの位置
+	XMFLOAT3			rot;				// モデルの向き(回転)
+	XMFLOAT3			scl;				// モデルの大きさ(スケール)
+	DX11_MODEL			model;				// モデル情報
+	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
+
 	BOOL		use;		//出せれる
 	BOOL		out;		//出している
 	float		oil;		//オイル
 	float		w, h;		// 幅と高さ
 
-	XMFLOAT3	pos;		// ポリゴンの位置
 };
 //*****************************************************************************
 // プロトタイプ宣言
