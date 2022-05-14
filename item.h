@@ -5,10 +5,12 @@
 // Author : 
 //
 //=============================================================================
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAX_ITEM (0)	//使うアイテムの数
+#define MAX_ITEM (2)	//使うアイテムの数
+#define SIZE_KEY (8)	//鍵の当たり判定の大きさ
 
 //*****************************************************************************
 // 構造体定義
@@ -19,13 +21,20 @@ typedef struct
 	XMFLOAT3			pos;				// モデルの位置
 	XMFLOAT3			rot;				// モデルの向き(回転)
 	XMFLOAT3			scl;				// モデルの大きさ(スケール)
-	bool				use;
-	bool				load;
+	BOOL				use;
+	BOOL				load;
+	BOOL				drop;				//アイテムが取得状態か(TRUEで落ちている、FALSEで拾われている)
 	DX11_MODEL			model;				// モデル情報
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 	float				size;				// 当たり判定の大きさ
+	int					type;				//アイテムの種類
 } MODEL_ITEM;
 
+enum ITEM_TYPE
+{
+	ITEM_KEY,
+	MAXTYPE_ITEM
+};
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -33,3 +42,4 @@ HRESULT InitItem(void);
 void UninitItem(void);
 void UpdateItem(void);
 void DrawItem(void);
+void CollisionItem(XMFLOAT3 pos, float size);
