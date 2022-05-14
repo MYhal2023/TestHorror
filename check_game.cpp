@@ -15,6 +15,7 @@
 #include "sound.h"
 
 #include "interface.h"
+#include "item.h"
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
@@ -43,6 +44,7 @@ static int intStoL = SAN_TO_LIFE_INT;
 //*****************************************************************************
 void CheckGame(void)
 {
+	PLAYER *player = GetPlayer();
 	//CheckLightOn();
 	if (playerInv > 0)playerInv--;
 	CheckPECollision();
@@ -61,6 +63,7 @@ void CheckGame(void)
 
 	CheckSan();
 
+	CollisionItem(player->pos, player->size);
 }
 
 //*****************************************************************************
