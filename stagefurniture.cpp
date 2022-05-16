@@ -1,14 +1,14 @@
 //=============================================================================
 //
-// オブジェクトモデル処理 [furniture.cpp]
+// ステージオブジェクトモデル処理 [furniture.cpp]
 //
 //=============================================================================
 #include "main.h"
 #include "model.h"
 #include "renderer.h"
 #include "game.h"
-#include "furniture.h"
 #include "stagefurniture.h"
+#include "furniture.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -17,40 +17,38 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static FURNITURE g_Furniture[MAX_FURNITURE];
+//static FURNITURE g_StageFurniture[MAX_FURNITURE];
 
 //*****************************************************************************
 // 初期化処理
 //*****************************************************************************
-HRESULT InitFurniture(void)
+HRESULT InitFurnitureFirStage(void)
 {
-	for (int i = 0; i < MAX_FURNITURE; i++)
+	for (int i = 0; i < MAX_STAGEFURNITURE; i++)
 	{
-
 	}
 
 	return S_OK;
 }
 
-
 //*****************************************************************************
 // 終了処理
 //*****************************************************************************
-void UninitFurniture(void)
+void UninitStageFurniture(void)
 {
 
 }
 //*****************************************************************************
 // 更新処理
 //*****************************************************************************
-void UpdateFurniture(void)
+void UpdateStageFurniture(void)
 {
 
 }
 //*****************************************************************************
 // 描画処理
 //*****************************************************************************
-void DrawFurniture(void)
+void DrawStageFurniture(void)
 {
 	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
@@ -59,39 +57,34 @@ void DrawFurniture(void)
 
 	//for (int i = 0; i < MAX_FURNITURE; i++)
 	//{
-	//	if (g_Furniture[i].use == false) continue;
+	//	if (g_StageFurniture[i].use == false) continue;
 
 	//	// ワールドマトリックスの初期化
 	//	mtxWorld = XMMatrixIdentity();
 
 	//	// スケールを反映
-	//	mtxScl = XMMatrixScaling(g_Furniture[i].scl.x, g_Furniture[i].scl.y, g_Furniture[i].scl.z);
+	//	mtxScl = XMMatrixScaling(g_StageFurniture[i].scl.x, g_StageFurniture[i].scl.y, g_StageFurniture[i].scl.z);
 	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
 	//	// 回転を反映
-	//	mtxRot = XMMatrixRotationRollPitchYaw(g_Furniture[i].rot.x, g_Furniture[i].rot.y, g_Furniture[i].rot.z);
+	//	mtxRot = XMMatrixRotationRollPitchYaw(g_StageFurniture[i].rot.x, g_StageFurniture[i].rot.y, g_StageFurniture[i].rot.z);
 	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
 	//	// 移動を反映
-	//	mtxTranslate = XMMatrixTranslation(g_Furniture[i].pos.x, g_Furniture[i].pos.y, g_Furniture[i].pos.z);
+	//	mtxTranslate = XMMatrixTranslation(g_StageFurniture[i].pos.x, g_StageFurniture[i].pos.y, g_StageFurniture[i].pos.z);
 	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
 	//	// ワールドマトリックスの設定
 	//	SetWorldMatrix(&mtxWorld);
 
-	//	XMStoreFloat4x4(&g_Furniture[i].mtxWorld, mtxWorld);
+	//	XMStoreFloat4x4(&g_StageFurniture[i].mtxWorld, mtxWorld);
 
 
 	//	// モデル描画
-	//	DrawModel(&g_Furniture[i].model);
+	//	DrawModel(&g_StageFurniture[i].model);
 	//}
 
 	//// カリング設定を戻す
 	//SetCullingMode(CULL_MODE_BACK);
 
-}
-
-FURNITURE *GetFurniture(void)
-{
-	return &g_Furniture[0];
 }

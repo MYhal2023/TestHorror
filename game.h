@@ -48,6 +48,7 @@ void InitFastStage(void);
 void InitSecondStage(void);
 void UninitGame(void);
 void UpdateGame(void);
+void UpdateFirstGame(void);
 void DrawGame(void);
 void DrawGame0(void);
 void DrawGame1(void);

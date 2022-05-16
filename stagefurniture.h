@@ -2,7 +2,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAX_FURNITURE (1)	//使うオブジェクトの数
+#define MAX_STAGEFURNITURE (0)	//使うオブジェクトの数
 
 //*****************************************************************************
 // 構造体定義
@@ -18,14 +18,12 @@ typedef struct
 	DX11_MODEL			model;				// モデル情報
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 	float				size;				// 当たり判定の大きさ
-} FURNITURE;
+} STAGEFURNITURE;
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT InitFurniture(void);
-void UninitFurniture(void);
-void UpdateFurniture(void);
-void DrawFurniture(void);
-void SetFurnitureDebugStage(void);
-FURNITURE *GetFurniture(void);
+HRESULT InitFurnitureFirStage(void);
+void UninitStageFurniture(void);
+void UpdateStageFurniture(void);
+void DrawStageFurniture(void);
