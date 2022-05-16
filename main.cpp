@@ -307,7 +307,16 @@ void Update(void)
 		//break;
 
 	case MODE_GAME:			// ゲーム画面の更新
-		UpdateGame();
+		switch (GetPlayStage())
+		{
+		case DEBUG_STAGE:
+		case PRISON_STAGE:
+			UpdateGame();
+			break;
+		case FIRST_STAGE:
+			UpdateFirstGame();
+			break;
+		}
 		break;
 
 	case MODE_RESULT:		// リザルト画面の更新
@@ -369,6 +378,7 @@ void Draw(void)
 		SetViewPortType(TYPE_FULL_SCREEN);
 		SetRenderer();		//通常描画
 		DrawGame();
+		break;
 		break;
 
 	case MODE_RESULT:		// リザルト画面の描画

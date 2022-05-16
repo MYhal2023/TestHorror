@@ -163,6 +163,7 @@
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="stage.cpp" />
+    <ClCompile Include="stagefurniture.cpp" />
     <ClCompile Include="time.cpp" />
     <ClCompile Include="tutorial.cpp" />
   </ItemGroup>
@@ -198,6 +199,7 @@
     <ClInclude Include="sound.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="stage.h" />
+    <ClInclude Include="stagefurniture.h" />
     <ClInclude Include="time.h" />
     <ClInclude Include="tutorial.h" />
   </ItemGroup>

@@ -32,6 +32,7 @@
 #include "check_game.h"
 #include "itembox.h"
 #include "furniture.h"
+#include "stagefurniture.h"
 #include "item.h"
 #include "stage.h"
 #include "tutorial.h"
@@ -188,7 +189,7 @@ void InitSecondStage(void)
 	//マップに使う壁の初期化
 	InitSetStage();
 
-	InitFurniture();
+	InitFurnitureFirStage();
 
 	InitItem();
 
@@ -240,6 +241,8 @@ void UninitGame(void)
 	UninitMeshField();
 
 	UninitFurniture();
+
+	UninitStageFurniture();
 
 	UninitItem();
 
@@ -319,6 +322,74 @@ void UpdateGame(void)
 	CheckModeChange();
 }
 
+void UpdateFirstGame(void)
+{
+#ifdef _DEBUG
+	if (GetKeyboardTrigger(DIK_V))
+	{
+		g_ViewPortType_Game = (g_ViewPortType_Game + 1) % TYPE_NONE;
+		SetViewPort(g_ViewPortType_Game);
+	}
+
+	if (GetKeyboardTrigger(DIK_P))
+	{
+		g_bPause = g_bPause ? FALSE : TRUE;
+	}
+
+
+#endif
+
+	if (g_bPause == FALSE)
+		return;
+	PLAYER *player = GetPlayer();
+
+	// 地面処理の更新
+	UpdateMeshField();
+
+	// 壁処理の更新
+	UpdateMeshWall();
+
+	UpdateStageFurniture();
+
+	UpdateItem();
+
+	// プレイヤーの更新処理
+	UpdatePlayer();
+
+	UpdateEnemy();
+
+	UpdateLight();
+
+	//ゲーム内部でのやり取り
+	CheckGame();
+
+	UpdateItembox();
+
+	// 影の更新処理
+	UpdateShadow();
+
+	UpdateFog();
+
+	UpdateMatch();
+
+	UpdateLighter();
+
+	UpdateParticle();
+
+	// スコアの更新処理
+	UpdateScore();
+
+	//UI表示更新処理
+	UpdateInterface();
+
+	// ライフの更新処理
+	UpdateLife();
+
+	UpdateSound();
+
+	CheckModeChange();
+
+}
 //=============================================================================
 // 描画処理(カメラ目線)
 //=============================================================================
@@ -387,6 +458,72 @@ void DrawGame0(void)
 	SetDepthEnable(TRUE);
 }
 
+void DrawFirstStageGame(void)
+{
+	PLAYER *player = GetPlayer();
+	//シェーダー管理
+	//ポストエフェクトをかける場合はここから
+	int ans = MODE_PLANE;
+	SwapShader(ans);
+
+	// 3Dの物を描画する処理
+	// 地面の描画処理
+	DrawMeshField();
+
+	DrawStageFurniture();
+
+	DrawItem();
+
+	// 影の描画処理
+	DrawShadow();
+
+
+	// プレイヤーの描画処理
+	DrawPlayer();
+
+	DrawMatch();
+
+	DrawLighter();
+
+	DrawParticle();
+
+	DrawEnemy();
+
+	// 壁の描画処理
+	DrawMeshWall();
+
+	// 2Dの物を描画する処理
+	// Z比較なし
+	SetDepthEnable(FALSE);
+
+	// ライティングを無効
+	SetLightEnable(FALSE);
+
+
+	// スコアの描画処理
+	DrawScore();
+
+	// ライフの描画処理
+	DrawLife();
+
+	DrawItembox();
+
+	////UI表示描画処理
+	DrawInterface();
+
+	//シェーダー管理
+	//シェーダーを元に戻す。ポストエフェクトはここまで
+	ans = MODE_PLANE;
+	SwapShader(ans);
+
+	// ライティングを有効に
+	SetLightEnable(TRUE);
+
+	// Z比較あり
+	SetDepthEnable(TRUE);
+
+}
+
 //=============================================================================
 // 描画処理(ライト目線。生成したい影に関するオブジェクトだけを指定)
 //=============================================================================
@@ -421,8 +558,17 @@ void DrawGame(void)
 	switch(g_ViewPortType_Game)
 	{
 	case TYPE_FULL_SCREEN:
-		SetViewPort(TYPE_FULL_SCREEN);
-		DrawGame0();
+		switch (g_PlayStage)
+		{
+		case DEBUG_STAGE:
+		case PRISON_STAGE:
+			SetViewPort(TYPE_FULL_SCREEN);
+			DrawGame0();
+			break;
+		case FIRST_STAGE:
+			SetViewPort(TYPE_FULL_SCREEN);
+			DrawFirstStageGame();
+		}
 		break;
 
 	case TYPE_LEFT_HALF_SCREEN:
