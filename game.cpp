@@ -33,6 +33,8 @@
 #include "itembox.h"
 #include "furniture.h"
 #include "item.h"
+#include "stage.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -84,7 +86,7 @@ void InitStage(int stageNum)
 		InitDebugStage();
 		break;
 	case PRISON_STAGE:
-		InitPrisonStage();
+		InitFastStage();
 		break;
 	case MAX_STAGE:
 		break;
@@ -131,11 +133,49 @@ void InitDebugStage(void)
 }
 
 //牢屋ステージ初期化(第一ステージ？)
-void InitPrisonStage(void)
+void InitFastStage(void)
 {
+	// フィールドの初期化
+	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), FIELD_X, FIELD_Z, BLOCK_SIZE, BLOCK_SIZE, WATER);
+
+	// ライトを有効化	// 影の初期化処理
+	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
+
+	InitEnemy();
+
+	//マップに使う壁の初期化
+	InitFieldMeshWall();
+
+	InitFurniture();
+
+	InitItem();
+
+	InitMatch();
+
+	InitLighter();
+
+	// スコアの初期化
+	InitScore();
+
+	// ライフの初期化
+	InitLife();
+
+	//UI表示初期化
+	InitInterface();
+
+	InitItembox();
+
+	InitParticle();
 
 }
 
+void InitSecondStage(void)
+{
+	InitSetStage();
+}
 //=============================================================================
 // 終了処理
 //=============================================================================

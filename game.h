@@ -43,7 +43,8 @@ enum STAGE
 HRESULT InitGame(void);
 void InitStage(int g_PlayStage);
 void InitDebugStage(void);
-void InitPrisonStage(void);
+void InitFastStage(void);
+void InitSecondStage(void);
 void UninitGame(void);
 void UpdateGame(void);
 void DrawGame(void);
