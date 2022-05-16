@@ -8,11 +8,13 @@
 #include "renderer.h"
 #include "model.h"
 #include "sprite.h"
+#include "camera.h"
 #include "player.h"
 #include "time.h"
 #include "game.h"
 #include "input.h"
 #include "match.h"
+#include "itembox.h"
 #include "debugproc.h"
 #include "sound.h"
 
@@ -20,9 +22,20 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+
+#define	MODEL_MATCH		"data/MODEL/match.obj"			// 読み込むモデル名
+
+
 #define TEXTURE_WIDTH				(100)	// テクスチャサイズ
 #define TEXTURE_HEIGHT				(100)	// 
-#define TEXTURE_MAX					(2)		// テクスチャの数
+
+#define DISTANCE_X					(25.0f)
+#define DISTANCE_Y					(10.0f)
+#define DISTANCE_Z					(25.0f)
+
+#define NO_USE_Y					(25.0f)
+
+#define MATCH_SCALE					(0.5f)
 
 #define MATCH_POS_X					(600)		// マッチを表示する場所(X軸)
 #define DEFAULTMATCH_POS_Y			(600.0f)	// 通常時のマッチの場所(Y軸)
@@ -45,13 +58,7 @@
 // グローバル変数
 //*****************************************************************************
 static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
-static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
-static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/match.png",
-	"data/TEXTURE/fire.png",
-
-};
 
 
 
@@ -68,17 +75,7 @@ HRESULT InitMatch(void)
 {
 	ID3D11Device *pDevice = GetDevice();
 
-	//テクスチャ生成
-	for (int i = 0; i < TEXTURE_MAX; i++)
-	{
-		g_Texture[i] = NULL;
-		D3DX11CreateShaderResourceViewFromFile(GetDevice(),
-			g_TexturName[i],
-			NULL,
-			NULL,
-			&g_Texture[i],
-			NULL);
-	}
+	LoadModel(MODEL_MATCH, &g_Match.model);
 
 
 	// 頂点バッファ生成
@@ -93,9 +90,15 @@ HRESULT InitMatch(void)
 
 	// マッチの初期化
 	g_Match.Use   = TRUE;
-	g_Match.w     = TEXTURE_WIDTH;
-	g_Match.h     = TEXTURE_HEIGHT;
-	g_Match.Pos   = { MATCH_POS_X, DEFAULTMATCH_POS_Y, 0.0f };
+
+	CAMERA		camera = *GetCamera();
+
+	g_Match.Pos = { camera.pos.x + sinf(camera.rot.y)*DISTANCE_X, camera.pos.y - NO_USE_Y  , camera.pos.z + cosf(camera.rot.y)*DISTANCE_Z };
+	g_Match.rot = { camera.rot.x , camera.rot.y + XM_PI ,camera.rot.z + XM_PI*0.15f };
+	g_Match.scl = { MATCH_SCALE , MATCH_SCALE , MATCH_SCALE };
+
+	g_Match.Out = FALSE;
+
 	g_Match.TexNo = 0;
 	g_Match.StandbyTime = 0;
 	g_Match.num = MATCH_NUM;
@@ -116,14 +119,6 @@ void UninitMatch(void)
 		g_VertexBuffer = NULL;
 	}
 
-	for (int i = 0; i < TEXTURE_MAX; i++)
-	{
-		if (g_Texture[i])
-		{
-			g_Texture[i]->Release();
-			g_Texture[i] = NULL;
-		}
-	}
 
 	g_Load = FALSE;
 }
@@ -135,6 +130,8 @@ void UpdateMatch(void)
 {
 
 	StandbyMatch();
+
+
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 	//マッチの燃焼時間を設定
@@ -159,38 +156,38 @@ void UpdateMatch(void)
 //=============================================================================
 void DrawMatch(void)
 {
-	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
-	//// カリング無効
-	//SetCullingMode(CULL_MODE_NONE);
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
 
-	//if (g_Match.Use == false) return;
+	if (g_Match.Use == FALSE || g_Match.Pos.y <= GAME_Y_CAM - NO_USE_Y) return;
 
-	//// ワールドマトリックスの初期化
-	//mtxWorld = XMMatrixIdentity();
+	// ワールドマトリックスの初期化
+	mtxWorld = XMMatrixIdentity();
 
-	//// スケールを反映
-	//mtxScl = XMMatrixScaling(g_Match.scl.x, g_Match.scl.y, g_Match.scl.z);
-	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+	// スケールを反映
+	mtxScl = XMMatrixScaling(g_Match.scl.x, g_Match.scl.y, g_Match.scl.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
-	//// 回転を反映
-	//mtxRot = XMMatrixRotationRollPitchYaw(g_Match.rot.x, g_Match.rot.y, g_Match.rot.z);
-	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+	// 回転を反映
+	mtxRot = XMMatrixRotationRollPitchYaw(g_Match.rot.x, g_Match.rot.y, g_Match.rot.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-	//// 移動を反映
-	//mtxTranslate = XMMatrixTranslation(g_Match.Pos.x, g_Match.Pos.y, g_Match.Pos.z);
-	//mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+	// 移動を反映
+	mtxTranslate = XMMatrixTranslation(g_Match.Pos.x, g_Match.Pos.y, g_Match.Pos.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	//// ワールドマトリックスの設定
-	//SetWorldMatrix(&mtxWorld);
+	// ワールドマトリックスの設定
+	SetWorldMatrix(&mtxWorld);
 
-	//XMStoreFloat4x4(&g_Match.mtxWorld, mtxWorld);
+	XMStoreFloat4x4(&g_Match.mtxWorld, mtxWorld);
 
-	//// モデル描画
-	//DrawModel(&g_Match.model);
+	// モデル描画
+	DrawModel(&g_Match.model);
 
-	//// カリング設定を戻す
-	//SetCullingMode(CULL_MODE_BACK);
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
 }
 
 //
@@ -201,17 +198,21 @@ void StandbyMatch(void)
 	if (g_Match.AblazeTime > 0)g_Match.AblazeTime--;//燃焼時間が残ってるなら減算
 	int nowBtime = g_Match.AblazeTime;				//減算後の残燃焼時間を保存
 	//燃え尽きたらマッチのスタンバイ時間をリセットする
-	if (nowBtime <= 0 && oldBtime > 0) g_Match.StandbyTime = 0;	//過去残が1以上、現在残が0以下→ここが燃え尽きたタイミング！
-
-	g_Match.Pos.y = STANDBY_MOVE_FRAME * g_Match.StandbyTime + DEFAULTMATCH_POS_Y;	//マッチのポジションは常に更新
+	if (nowBtime <= 0 && oldBtime > 0) 	//過去残が1以上、現在残が0以下→ここが燃え尽きたタイミング！
+	{
+		g_Match.StandbyTime = 0;
+		g_Match.Out = FALSE;
+	}
+	MoveMatch();
 
 	//マッチが燃えてないならここで処理を終わる
 	if (g_Match.AblazeTime > 0)return;
 	
 	//マッチが燃えていない時の処理
 	//マッチを構える条件
-	if (IsButtonPressed(0, BUTTON_L)&&(0 < g_Match.num))
+	if (IsButtonPressed(0, BUTTON_L)&&(0 < g_Match.num) )
 	{
+		g_Match.Out = TRUE;
 		//構えきるまでの時間
 		if (g_Match.StandbyTime < STANDBYTIME)
 		{
@@ -254,6 +255,24 @@ void StandbyMatch(void)
 		}
 	}
 
+}
+
+void MoveMatch()
+{
+	CAMERA		camera = *GetCamera();
+	g_Match.Pos.x = camera.pos.x + sinf(camera.rot.y + XM_PI * 0.1f)*DISTANCE_X;
+	g_Match.Pos.z = camera.pos.z + cosf(camera.rot.y + XM_PI * 0.1f)*DISTANCE_Z;
+	if (g_Match.Out == FALSE && g_Match.Pos.y > camera.pos.y - NO_USE_Y)
+	{
+		g_Match.Pos.y -= MATCH_MOVE;
+	}
+
+	if (g_Match.Out == TRUE && g_Match.Pos.y < camera.pos.y - DISTANCE_Y)
+	{
+		g_Match.Pos.y += MATCH_MOVE;
+	}
+
+	g_Match.rot.y = camera.rot.y + XM_PI * 0.5;
 }
 
 
