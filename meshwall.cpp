@@ -14,7 +14,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX			(2)						// テクスチャの数
+#define TEXTURE_MAX			(3)						// テクスチャの数
 
 #define	VALUE_MOVE_WALL		(5.0f)					// 移動速度
 #define	VALUE_ROTATE_WALL	(D3DX_PI * 0.001f)		// 回転速度
@@ -50,6 +50,7 @@ static int g_nNumMeshWall = 0;						// メッシュ壁の数
 static char* g_TextureName[TEXTURE_MAX] = {
 	"data/TEXTURE/wall_001.png",
 	"data/TEXTURE/wall_002.png",
+	"data/TEXTURE/wall_101.png",
 };
 
 static BOOL							g_Load = FALSE;
