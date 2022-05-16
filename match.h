@@ -15,6 +15,8 @@
 #define SCORE_DIGIT			(7)			// 桁数
 #define SCORE_SAVE			(10)		// スコアの保存数
 
+#define MATCH_MOVE			(0.8f)		//マッチの速さ
+
 
 struct MATCH
 {
@@ -24,7 +26,7 @@ struct MATCH
 	DX11_MODEL			model;				// モデル情報
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 
-	BOOL					Use;					// TRUE:使っている  FALSE:未使用
+	BOOL					Use, Out;					// TRUE:使っている  FALSE:未使用
 	float					w, h;					// 幅と高さ
 	XMFLOAT3				Pos;					// ポリゴンの座標
 	int						TexNo;					// テクスチャ番号
@@ -43,6 +45,7 @@ HRESULT InitMatch(void);
 void UninitMatch(void);
 void UpdateMatch(void);
 void DrawMatch(void);
+void MoveMatch(void);
 
 void StandbyMatch(void);
 void SetMatchForce(int force);
