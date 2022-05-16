@@ -35,7 +35,7 @@ static float		g_fBlockSizeXField, g_fBlockSizeZField;	// ブロックサイズ
 
 static char* g_TextureName[] = {
 	"data/TEXTURE/field004.jpg",
-	"data/TEXTURE/field003.jpg",
+	"data/TEXTURE/field101.jpg",
 };
 
 
