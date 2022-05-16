@@ -34,6 +34,8 @@
 #include "furniture.h"
 #include "item.h"
 #include "stage.h"
+#include "tutorial.h"
+
 
 
 //*****************************************************************************
@@ -135,8 +137,6 @@ void InitDebugStage(void)
 //牢屋ステージ初期化(第一ステージ？)
 void InitFastStage(void)
 {
-	// フィールドの初期化
-	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), FIELD_X, FIELD_Z, BLOCK_SIZE, BLOCK_SIZE, WATER);
 
 	// ライトを有効化	// 影の初期化処理
 	InitShadow();
@@ -147,7 +147,43 @@ void InitFastStage(void)
 	InitEnemy();
 
 	//マップに使う壁の初期化
-	InitFieldMeshWall();
+	InitSetTutorial();
+
+	InitFurniture();
+
+	InitItem();
+
+	InitMatch();
+
+	InitLighter();
+
+	// スコアの初期化
+	InitScore();
+
+	// ライフの初期化
+	InitLife();
+
+	//UI表示初期化
+	InitInterface();
+	
+	InitItembox();
+
+	InitParticle();
+
+}
+
+void InitSecondStage(void)
+{
+	// ライトを有効化	// 影の初期化処理
+	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
+
+	InitEnemy();
+
+	//マップに使う壁の初期化
+	InitSetStage();
 
 	InitFurniture();
 
@@ -169,12 +205,6 @@ void InitFastStage(void)
 	InitItembox();
 
 	InitParticle();
-
-}
-
-void InitSecondStage(void)
-{
-	InitSetStage();
 }
 //=============================================================================
 // 終了処理
