@@ -35,6 +35,7 @@ enum STAGE
 {
 	DEBUG_STAGE,
 	PRISON_STAGE,
+	FIRST_STAGE,
 	MAX_STAGE
 };
 //*****************************************************************************

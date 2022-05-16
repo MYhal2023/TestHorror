@@ -90,6 +90,9 @@ void InitStage(int stageNum)
 	case PRISON_STAGE:
 		InitFastStage();
 		break;
+	case FIRST_STAGE:
+		InitSecondStage();
+		break;
 	case MAX_STAGE:
 		break;
 	}
