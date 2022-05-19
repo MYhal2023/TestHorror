@@ -12,7 +12,10 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-//#define	MODEL_???			"data/MODEL/???"		// 読み込むモデル名
+#define	MODEL_BED			"data/MODEL/bed.obj"		//ベッドのモデル
+#define	MODEL_TOILET		"data/MODEL/toilet.obj"		//トイレのモデル
+#define	MODEL_CANDLE		"data/MODEL/Candlestick.obj"//燭台のモデル
+#define	MODEL_BED			"data/MODEL/bed.obj"		//
 
 //*****************************************************************************
 // グローバル変数
@@ -52,42 +55,42 @@ void UpdateFurniture(void)
 //*****************************************************************************
 void DrawFurniture(void)
 {
-	//XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
-	//// カリング無効
-	//SetCullingMode(CULL_MODE_NONE);
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
 
-	//for (int i = 0; i < MAX_FURNITURE; i++)
-	//{
-	//	if (g_Furniture[i].use == false) continue;
+	for (int i = 0; i < MAX_FURNITURE; i++)
+	{
+		if (g_Furniture[i].use == false) continue;
 
-	//	// ワールドマトリックスの初期化
-	//	mtxWorld = XMMatrixIdentity();
+		// ワールドマトリックスの初期化
+		mtxWorld = XMMatrixIdentity();
 
-	//	// スケールを反映
-	//	mtxScl = XMMatrixScaling(g_Furniture[i].scl.x, g_Furniture[i].scl.y, g_Furniture[i].scl.z);
-	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+		// スケールを反映
+		mtxScl = XMMatrixScaling(g_Furniture[i].scl.x, g_Furniture[i].scl.y, g_Furniture[i].scl.z);
+		mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
 
-	//	// 回転を反映
-	//	mtxRot = XMMatrixRotationRollPitchYaw(g_Furniture[i].rot.x, g_Furniture[i].rot.y, g_Furniture[i].rot.z);
-	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+		// 回転を反映
+		mtxRot = XMMatrixRotationRollPitchYaw(g_Furniture[i].rot.x, g_Furniture[i].rot.y, g_Furniture[i].rot.z);
+		mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
 
-	//	// 移動を反映
-	//	mtxTranslate = XMMatrixTranslation(g_Furniture[i].pos.x, g_Furniture[i].pos.y, g_Furniture[i].pos.z);
-	//	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+		// 移動を反映
+		mtxTranslate = XMMatrixTranslation(g_Furniture[i].pos.x, g_Furniture[i].pos.y, g_Furniture[i].pos.z);
+		mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
 
-	//	// ワールドマトリックスの設定
-	//	SetWorldMatrix(&mtxWorld);
+		// ワールドマトリックスの設定
+		SetWorldMatrix(&mtxWorld);
 
-	//	XMStoreFloat4x4(&g_Furniture[i].mtxWorld, mtxWorld);
+		XMStoreFloat4x4(&g_Furniture[i].mtxWorld, mtxWorld);
 
 
-	//	// モデル描画
-	//	DrawModel(&g_Furniture[i].model);
-	//}
+		// モデル描画
+		DrawModel(&g_Furniture[i].model);
+	}
 
-	//// カリング設定を戻す
-	//SetCullingMode(CULL_MODE_BACK);
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
 
 }
 

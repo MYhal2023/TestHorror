@@ -50,7 +50,7 @@ static int g_nNumMeshWall = 0;						// メッシュ壁の数
 static char* g_TextureName[TEXTURE_MAX] = {
 	"data/TEXTURE/wall_001.png",
 	"data/TEXTURE/wall_002.png",
-	"data/TEXTURE/wall_101.png",
+	"data/TEXTURE/wall101.jpg",
 };
 
 static BOOL							g_Load = FALSE;
@@ -333,7 +333,8 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 		float thickness = pMesh->fBlockSizeX * fabsf(rotatez);
 
 		//壁とプレイヤーの当たり判定。BBで行うため、y座標は現状考慮していない。
-		if (CollisionBB(pos, size, size, pMesh->pos, width, thickness) == TRUE)
+		if (CollisionBB(pos, size, size, pMesh->pos, width, thickness) == TRUE
+			&& pMesh->rot.x != XM_PI * 0.5f && pMesh->rot.z != XM_PI * 0.5f)
 		{
 			PLAYER *player = GetPlayer();
 			//操作感を上げるために、片方の座標のみを元に戻す
