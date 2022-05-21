@@ -28,7 +28,15 @@ static int obj;
 //*****************************************************************************
 HRESULT InitFurniture(void)
 {
-
+	for (int i = 0; i < MAX_FURNITURE; i++)
+	{
+		g_Furniture[i].pos = {0.0f,0.0f,0.0f };
+		g_Furniture[i].rot = { 0.0f,0.0f,0.0f };
+		g_Furniture[i].scl = { 0.0f,0.0f,0.0f };
+		g_Furniture[i].use = FALSE;
+		g_Furniture[i].load = FALSE;
+		g_Furniture[i].size = 0;
+	}
 	return S_OK;
 }
 
@@ -38,6 +46,16 @@ HRESULT InitFurniture(void)
 //*****************************************************************************
 void UninitFurniture(void)
 {
+
+
+	for (int i = 0; i < MAX_FURNITURE; i++)
+	{
+		if (g_Furniture[i].load)
+		{
+			UnloadModel(&g_Furniture[i].model);
+			g_Furniture[i].load = FALSE;
+		}
+	}
 
 }
 //*****************************************************************************
