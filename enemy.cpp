@@ -27,7 +27,7 @@
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define ENEMY_SIGHT		(300.0f)		//エネミーの視力
-#define	ENEMY_SPEED		(0.5f)			// エネミーの移動スピード
+#define	ENEMY_SPEED		(0.75f)			// エネミーの移動スピード
 
 
 //*****************************************************************************

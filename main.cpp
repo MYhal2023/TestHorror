@@ -26,6 +26,7 @@
 #include "game.h"
 #include "result.h"
 #include "fade.h"
+#include "title.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -303,8 +304,8 @@ void Update(void)
 	switch (g_Mode)
 	{
 	case MODE_TITLE:		// タイトル画面の更新
-		//UpdateTitle();
-		//break;
+		UpdateTitle();
+		break;
 
 	case MODE_GAME:			// ゲーム画面の更新
 		switch (GetPlayStage())
@@ -351,23 +352,23 @@ void Draw(void)
 	switch (g_Mode)
 	{
 	case MODE_TITLE:		// タイトル画面の描画
-		//SetViewPort(TYPE_FULL_SCREEN);
+		SetViewPort(TYPE_FULL_SCREEN);
 
-		//// 2Dの物を描画する処理
-		//// Z比較なし
-		//SetDepthEnable(FALSE);
+		// 2Dの物を描画する処理
+		// Z比較なし
+		SetDepthEnable(FALSE);
 
-		//// ライティングを無効
-		//SetLightEnable(FALSE);
+		// ライティングを無効
+		SetLightEnable(FALSE);
 
-		//DrawTitle();
+		DrawTitle();
 
-		//// ライティングを有効に
-		//SetLightEnable(TRUE);
+		// ライティングを有効に
+		SetLightEnable(TRUE);
 
-		//// Z比較あり
-		//SetDepthEnable(TRUE);
-		//break;
+		// Z比較あり
+		SetDepthEnable(TRUE);
+		break;
 
 
 	case MODE_GAME:			// ゲーム画面の描画
@@ -450,15 +451,17 @@ void SetMode(int mode)
 	// リザルト画面の終了処理
 	UninitResult();
 
+	//タイトル画面の終了処理
+	UninitTitle();
 
 	g_Mode = mode;	// 次のモードをセットしている
 
 	switch (g_Mode)
 	{
 	case MODE_TITLE:
-		//// タイトル画面の初期化
-		//InitTitle();
-		//break;
+		// タイトル画面の初期化
+		InitTitle();
+		break;
 
 	case MODE_GAME:
 		// ゲーム画面の初期化

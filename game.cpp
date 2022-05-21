@@ -13,6 +13,7 @@
 #include "sound.h"
 #include "fade.h"
 #include "game.h"
+#include "title.h"
 
 #include "player.h"
 #include "enemy.h"
@@ -58,7 +59,7 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 
 static BOOL	g_bPause = TRUE;	// ポーズON/OFF
 static int	g_PlayMode = MAIN_GAME;
-static int	g_PlayStage = DEBUG_STAGE;
+static int	g_PlayStage = PRISON_STAGE;
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -150,10 +151,10 @@ void InitFastStage(void)
 
 	InitEnemy();
 
-	//マップに使う壁の初期化
-	InitSetTutorial();
-
 	InitFurniture();
+
+	//マップに使うメッシュ、オブジェクトの初期化
+	InitSetTutorial();
 
 	InitItem();
 
@@ -270,6 +271,7 @@ void UpdateGame(void)
 
 
 #endif
+	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
 	if(g_bPause == FALSE)
 		return;
@@ -677,6 +679,16 @@ BOOL CheckLightOn(void)
 	//マッチ燃焼時間が0以上、またはライターが炎を出している時、光がある扱い
 	if (match->AblazeTime > 0 ||
 		lighter->out == TRUE)
+		ans = TRUE;
+
+	return ans;
+}
+
+BOOL CheckGameover(void)
+{
+	BOOL ans = FALSE;
+	PLAYER *player = GetPlayer();
+	if (player->life <= 0)
 		ans = TRUE;
 
 	return ans;

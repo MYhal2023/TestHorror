@@ -272,7 +272,7 @@ void MoveMatch()
 		g_Match.Pos.y += MATCH_MOVE;
 	}
 
-	g_Match.rot.y = camera.rot.y + XM_PI * 0.5;
+	g_Match.rot.y = camera.rot.y + XM_PI * 0.5f;
 }
 
 
