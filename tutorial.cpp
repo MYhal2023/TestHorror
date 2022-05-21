@@ -65,3 +65,8 @@ void InitSetTutorial(void)
 
 	}
 }
+
+void InitSetClearStage(void)
+{
+
+}

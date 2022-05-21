@@ -17,7 +17,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(SCREEN_WIDTH)	// îwåiÉTÉCÉY
 #define TEXTURE_HEIGHT				(SCREEN_HEIGHT)	// 
-#define TEXTURE_MAX					(1)				// É^ÉCÉgÉãÉeÉNÉXÉ`ÉÉÇÃêî
+#define TEXTURE_MAX					(2)				// É^ÉCÉgÉãÉeÉNÉXÉ`ÉÉÇÃêî
 
 #define TEXTURE_WIDTH_LOGO			(480)			// ÉçÉSÉTÉCÉY
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
@@ -35,6 +35,7 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ÉeÉNÉXÉ`É
 
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/sky001.jpg",
+	"data/TEXTURE/gameover.png",
 };
 
 

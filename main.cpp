@@ -312,6 +312,7 @@ void Update(void)
 		{
 		case DEBUG_STAGE:
 		case PRISON_STAGE:
+		case CLEAR_STAGE:
 			UpdateGame();
 			break;
 		case FIRST_STAGE:

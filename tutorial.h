@@ -31,3 +31,4 @@
 // プロトタイプ宣言
 //*****************************************************************************
 void InitSetTutorial(void);
+void InitSetClearStage(void);

@@ -36,6 +36,7 @@ enum STAGE
 	DEBUG_STAGE,
 	PRISON_STAGE,
 	FIRST_STAGE,
+	CLEAR_STAGE,
 	MAX_STAGE
 };
 //*****************************************************************************
@@ -46,6 +47,7 @@ void InitStage(int g_PlayStage);
 void InitDebugStage(void);
 void InitFastStage(void);
 void InitSecondStage(void);
+void InitClearStage(void);
 void UninitGame(void);
 void UpdateGame(void);
 void UpdateFirstGame(void);
