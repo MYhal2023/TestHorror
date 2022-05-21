@@ -4,9 +4,9 @@
 //
 //=============================================================================
 #include "main.h"
-#include "model.h"
 #include "renderer.h"
 #include "game.h"
+#include "tutorial.h"
 #include "furniture.h"
 #include "stagefurniture.h"
 //*****************************************************************************
@@ -15,13 +15,14 @@
 #define	MODEL_BED			"data/MODEL/bed.obj"		//ベッドのモデル
 #define	MODEL_TOILET		"data/MODEL/toilet.obj"		//トイレのモデル
 #define	MODEL_CANDLE		"data/MODEL/Candlestick.obj"//燭台のモデル
-#define	MODEL_BED			"data/MODEL/bed.obj"		//
+#define	MODEL_STAIRS		"data/MODEL/stairs.obj"		//階段のモデル
+
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
 static FURNITURE g_Furniture[MAX_FURNITURE];
-
+static int obj;
 //*****************************************************************************
 // 初期化処理
 //*****************************************************************************
@@ -29,9 +30,13 @@ HRESULT InitFurniture(void)
 {
 	for (int i = 0; i < MAX_FURNITURE; i++)
 	{
-
+		g_Furniture[i].pos = {0.0f,0.0f,0.0f };
+		g_Furniture[i].rot = { 0.0f,0.0f,0.0f };
+		g_Furniture[i].scl = { 0.0f,0.0f,0.0f };
+		g_Furniture[i].use = FALSE;
+		g_Furniture[i].load = FALSE;
+		g_Furniture[i].size = 0;
 	}
-
 	return S_OK;
 }
 
@@ -41,6 +46,16 @@ HRESULT InitFurniture(void)
 //*****************************************************************************
 void UninitFurniture(void)
 {
+
+
+	for (int i = 0; i < MAX_FURNITURE; i++)
+	{
+		if (g_Furniture[i].load)
+		{
+			UnloadModel(&g_Furniture[i].model);
+			g_Furniture[i].load = FALSE;
+		}
+	}
 
 }
 //*****************************************************************************
@@ -92,6 +107,41 @@ void DrawFurniture(void)
 	// カリング設定を戻す
 	SetCullingMode(CULL_MODE_BACK);
 
+}
+
+void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type)
+{
+	g_Furniture[obj].pos = pos;
+	g_Furniture[obj].rot = rot;
+
+	switch (type)
+	{
+	case BED:
+		g_Furniture[obj].scl = { BED_SCL, BED_SCL, BED_SCL };
+		LoadModel(MODEL_BED, &g_Furniture[obj].model);
+		g_Furniture[obj].load = TRUE;
+		g_Furniture[obj].use = TRUE;
+		break;
+	case TOILET:
+		g_Furniture[obj].scl = { TOILET_SCL, TOILET_SCL, TOILET_SCL };
+		LoadModel(MODEL_TOILET, &g_Furniture[obj].model);
+		g_Furniture[obj].load = TRUE;
+		g_Furniture[obj].use = TRUE;
+		break;
+	case CANDLE:
+		g_Furniture[obj].scl = { CANDLE_SCL*0.75f, CANDLE_SCL, CANDLE_SCL*0.75f };
+		LoadModel(MODEL_CANDLE, &g_Furniture[obj].model);
+		g_Furniture[obj].load = TRUE;
+		g_Furniture[obj].use = TRUE;
+		break;
+	case STAIRS:
+		g_Furniture[obj].scl = { STAIRS_SCL, STAIRS_SCL, STAIRS_SCL };
+		LoadModel(MODEL_STAIRS, &g_Furniture[obj].model);
+		g_Furniture[obj].load = TRUE;
+		g_Furniture[obj].use = TRUE;
+		break;
+	}
+	obj++;
 }
 
 FURNITURE *GetFurniture(void)

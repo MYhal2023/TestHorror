@@ -1,8 +1,17 @@
 #pragma once
+#include "model.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAX_FURNITURE (4)	//使うオブジェクトの数
+#define ROOM_FURNITURE (2)		//1部屋の家具の数
+#define UNIQUE_FURNITURE (2)	//コピー出来ない家具の数
+#define MAX_FURNITURE (ROOM_FURNITURE*(ROOM*2)+UNIQUE_FURNITURE)	//使うオブジェクトの数
+
+#define BED_SCL		(1.5f)
+#define TOILET_SCL	(5.0f)
+#define CANDLE_SCL	(3.25f)
+#define STAIRS_SCL	(2.0f)
 
 //*****************************************************************************
 // 構造体定義
@@ -20,6 +29,13 @@ typedef struct
 	float				size;				// 当たり判定の大きさ
 } FURNITURE;
 
+enum
+{
+	BED,
+	TOILET,
+	CANDLE,
+	STAIRS
+};
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -27,5 +43,5 @@ HRESULT InitFurniture(void);
 void UninitFurniture(void);
 void UpdateFurniture(void);
 void DrawFurniture(void);
-void SetFurnitureDebugStage(void);
+void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type);
 FURNITURE *GetFurniture(void);
