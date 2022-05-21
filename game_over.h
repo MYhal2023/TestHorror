@@ -13,10 +13,17 @@
 enum TEXTURE_GAME_OVER
 {
 	GAME_OVER_BG,
-	GAME_OVER_CURSOL
+	GAME_OVER_TEXT,
+	GAME_OVER_ENEMY
 };
 
-
+enum EVENT_PART
+{
+	Start_BGM,
+	Enemy_Dash,
+	Dead,
+	MAX_EVENT
+};
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -25,3 +32,4 @@ HRESULT InitGame_over(void);
 void UninitGame_over(void);
 void UpdateGame_over(void);
 void DrawGame_over(void);
+void SetGameOver(void);

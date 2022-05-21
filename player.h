@@ -89,6 +89,8 @@ struct PLAYER
 	float			blinkingCount;
 	int				BeatSpeed;				//ŒÛ“®‚Ì‘¬‚³
 	int				BreathInterval;			//‘§Œ­‚¢‚ÌSEŠÔŠu‚ğŠJ‚¯‚é‚½‚ß‚Éİ’è
+	int				WalkInterval;			//‘§Œ­‚¢‚ÌSEŠÔŠu‚ğŠJ‚¯‚é‚½‚ß‚Éİ’è
+	int				DashInterval;			//‘§Œ­‚¢‚ÌSEŠÔŠu‚ğŠJ‚¯‚é‚½‚ß‚Éİ’è
 };
 
 //*****************************************************************************
@@ -102,6 +104,7 @@ void DrawPlayer(void);
 PLAYER *GetPlayer(void);
 void IncibleEffect(void);
 void PlayerMoveControl(void);
+void PlayerMoveSE(void);
 void PlayerDashControl(void);
 void PlayerDashProcess(void);
 

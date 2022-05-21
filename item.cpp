@@ -11,6 +11,7 @@
 #include "player.h"
 #include "collision.h"
 #include "itembox.h"
+#include "sound.h"
 //*****************************************************************************
 // É}ÉNÉçíËã`
 //*****************************************************************************
@@ -153,6 +154,7 @@ void CollisionItem(XMFLOAT3 pos, float size)
 		case ITEM_KEY:
 			AddItembox(KEY);
 			g_Item[i].drop = FALSE;
+			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case MAXTYPE_ITEM:
 			break;

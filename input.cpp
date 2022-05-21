@@ -514,7 +514,7 @@ HRESULT InitializePad(void)			// パッド初期化
 //------------------------------------------- 終了処理
 void UninitPad(void)
 {
-	for (int i=0 ; i<GAMEPADMAX ; i++) {
+	for (int i=0 ; i< padCount; i++) {
 		if ( pGamePad[i] )
 		{
 			pGamePad[i]->Unacquire();
