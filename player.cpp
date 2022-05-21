@@ -35,7 +35,7 @@
 #define PLAYER_OFFSET_Y		(20.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_LIFE			(100)								// プレイヤーのライフ
-#define PLAYER_STAMINA		(100)								// プレイヤーのスタミナ
+#define PLAYER_STAMINA		(120)								// プレイヤーのスタミナ
 #define PLAYER_STAMINA_INT	(3)								// スタミナ回復間隔
 #define PLAYER_SANITY		(100)								// プレイヤーの正気度
 
@@ -121,6 +121,16 @@ HRESULT InitPlayer(void)
 	g_BreathType = 0;
 	g_Load = TRUE;
 	atCount = 0;
+
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, PLAYER_OFFSET_Z };
+		break;
+	case FIRST_STAGE:
+		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, PLAYER_OFFSET_Z };
+		break;
+	}
 	return S_OK;
 }
 

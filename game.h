@@ -62,3 +62,4 @@ int GetViewPortTypeGame(void);
 float FloatClamp(float x, float a, float b);
 float FloatCompare(BOOL flag, float a, float b);
 BOOL CheckLightOn(void);
+BOOL CheckGameover(void);

@@ -277,7 +277,7 @@ void MoveLighter()
 		g_Lighter.pos.y += LIGHTER_MOVE;
 	}
 
-	g_Lighter.rot.y = camera.rot.y + XM_PI * 0.5;
+	g_Lighter.rot.y = camera.rot.y + XM_PI * 0.5f;
 
 
 }

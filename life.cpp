@@ -127,91 +127,91 @@ void UpdateLife(void)
 //=============================================================================
 void DrawLife(void)
 {
-	// 頂点バッファ設定
-	UINT stride = sizeof(VERTEX_3D);
-	UINT offset = 0;
-	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+	//// 頂点バッファ設定
+	//UINT stride = sizeof(VERTEX_3D);
+	//UINT offset = 0;
+	//GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
 
-	// マトリクス設定
-	SetWorldViewProjection2D();
+	//// マトリクス設定
+	//SetWorldViewProjection2D();
 
-	// プリミティブトポロジ設定
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	//// プリミティブトポロジ設定
+	//GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	// マテリアル設定
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	SetMaterial(material);
+	//// マテリアル設定
+	//MATERIAL material;
+	//ZeroMemory(&material, sizeof(material));
+	//material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//SetMaterial(material);
 
-	PLAYER *player = GetPlayer();
-	//何個描画するか計算する
-	g_Life.life = player->life;
-	g_Life.life_max = player->lifeMax;
-	g_Life.pos = XMFLOAT3(LIFE_DX, LIFE_DY, 0.0f);
-	g_Life.w = LIFE_DW;
-	g_Life.h = LIFE_DH;
-	for (int i = 0; i < g_Life.life_max; i++)
-	{
-		//今あるライフ分は赤のハートを、現在ライフ値とライフ最大値の差分には黒のハートを描画する
-		if (g_Life.life > i)
-		{
-			g_Life.texNo = HART;
-		}
-		else
-		{
-			g_Life.texNo = HART_LOST;
-		}
+	//PLAYER *player = GetPlayer();
+	////何個描画するか計算する
+	//g_Life.life = player->life;
+	//g_Life.life_max = player->lifeMax;
+	//g_Life.pos = XMFLOAT3(LIFE_DX, LIFE_DY, 0.0f);
+	//g_Life.w = LIFE_DW;
+	//g_Life.h = LIFE_DH;
+	//for (int i = 0; i < g_Life.life_max; i++)
+	//{
+	//	//今あるライフ分は赤のハートを、現在ライフ値とライフ最大値の差分には黒のハートを描画する
+	//	if (g_Life.life > i)
+	//	{
+	//		g_Life.texNo = HART;
+	//	}
+	//	else
+	//	{
+	//		g_Life.texNo = HART_LOST;
+	//	}
 
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Life.texNo]);
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Life.texNo]);
 
-		//ハートの左右半分どちらを描画するか計算
-		int number = i % 2;
+	//	//ハートの左右半分どちらを描画するか計算
+	//	int number = i % 2;
 
-		// ライフの位置やテクスチャー座標を反映
-		float px = g_Life.pos.x + ((g_Life.w / 2)*i);	// ライフの表示位置X
-		float py = g_Life.pos.y;				// ライフの表示位置Y
-		float pw = g_Life.w / 2;					// ライフの表示幅
-		float ph = g_Life.h;					// ライフの表示高さ
+	//	// ライフの位置やテクスチャー座標を反映
+	//	float px = g_Life.pos.x + ((g_Life.w / 2)*i);	// ライフの表示位置X
+	//	float py = g_Life.pos.y;				// ライフの表示位置Y
+	//	float pw = g_Life.w / 2;					// ライフの表示幅
+	//	float ph = g_Life.h;					// ライフの表示高さ
 
-		float tw = 1.0f / LIFE_DIGIT;					// テクスチャの幅
-		float th = 1.0f;					// テクスチャの高さ
-		float tx = tw * (float)(number);						// テクスチャの左上X座標
-		float ty = 0.0f;						// テクスチャの左上Y座標
+	//	float tw = 1.0f / LIFE_DIGIT;					// テクスチャの幅
+	//	float th = 1.0f;					// テクスチャの高さ
+	//	float tx = tw * (float)(number);						// テクスチャの左上X座標
+	//	float ty = 0.0f;						// テクスチャの左上Y座標
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+	//		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+	//}
 
-	g_Life.texNo = HART_BOS;
+	//g_Life.texNo = HART_BOS;
 
-	// テクスチャ設定
-	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Life.texNo]);
-	g_Life.w = LIFE_BW;
-	g_Life.h = LIFE_BH;
-	g_Life.pos = XMFLOAT3(LIFE_DX - (LIFE_BW * 0.7f), LIFE_DY + (LIFE_BH * 0.2f), 0.0f);	//多少の微調整の元、座標を決定
-	// ライフの位置やテクスチャー座標を反映
-	float px = g_Life.pos.x;				// ライフの表示位置X
-	float py = g_Life.pos.y;				// ライフの表示位置Y
-	float pw = g_Life.w;					// ライフの表示幅
-	float ph = g_Life.h;					// ライフの表示高さ
+	//// テクスチャ設定
+	//GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Life.texNo]);
+	//g_Life.w = LIFE_BW;
+	//g_Life.h = LIFE_BH;
+	//g_Life.pos = XMFLOAT3(LIFE_DX - (LIFE_BW * 0.7f), LIFE_DY + (LIFE_BH * 0.2f), 0.0f);	//多少の微調整の元、座標を決定
+	//// ライフの位置やテクスチャー座標を反映
+	//float px = g_Life.pos.x;				// ライフの表示位置X
+	//float py = g_Life.pos.y;				// ライフの表示位置Y
+	//float pw = g_Life.w;					// ライフの表示幅
+	//float ph = g_Life.h;					// ライフの表示高さ
 
-	float tw = 1.0f;						// テクスチャの幅
-	float th = 1.0f;						// テクスチャの高さ
-	float tx = 0.0f;						// テクスチャの左上X座標
-	float ty = 0.0f;						// テクスチャの左上Y座標
+	//float tw = 1.0f;						// テクスチャの幅
+	//float th = 1.0f;						// テクスチャの高さ
+	//float tx = 0.0f;						// テクスチャの左上X座標
+	//float ty = 0.0f;						// テクスチャの左上Y座標
 
-	// １枚のポリゴンの頂点とテクスチャ座標を設定
-	SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+	//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// ポリゴン描画
-	GetDeviceContext()->Draw(4, 0);
+	//// ポリゴン描画
+	//GetDeviceContext()->Draw(4, 0);
 
 }
 //=============================================================================
