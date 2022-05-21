@@ -62,6 +62,7 @@ enum
 	SOUND_LABEL_SE_Cursol_On,			// SE
 	SOUND_LABEL_SE_Door_Close,			// SE
 	SOUND_LABEL_SE_Door_Open,			// SE
+	SOUND_LABEL_SE_Dash,			// SE
 	SOUND_LABEL_BGM_Normal,			// BGM
 	SOUND_LABEL_BGM_Fear,			// BGM
 	SOUND_LABEL_BGM_GameOver,			// BGM

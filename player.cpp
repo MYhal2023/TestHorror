@@ -27,8 +27,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	VALUE_MOVE			(1.0f)							// 移動量
-#define	VALUE_DASH_MOVE		(2.0f)							// 移動量
+#define	VALUE_MOVE			(1.5f)							// 移動量
+#define	VALUE_DASH_MOVE		(3.0f)							// 移動量
 #define	VALUE_ROTATE		(XM_PI * 0.02f)					// 回転量
 
 #define PLAYER_SHADOW_SIZE	(1.0f)							// 影の大きさ
@@ -114,6 +114,8 @@ HRESULT InitPlayer(void)
 	g_Player.blinkingCount = 2.0f;
 	g_Player.BeatSpeed = 1;
 	g_Player.BreathInterval = 0;
+	g_Player.WalkInterval = 0;
+	g_Player.DashInterval = 0;
 	// 階層アニメーション用の初期化処理
 	g_Player.parent = NULL;			// 本体（親）なのでNULLを入れる
 
@@ -164,6 +166,7 @@ void UpdatePlayer(void)
 	PlayerMoveControl();	//プレイヤーの移動操作	
 	PlayerDashControl();	//ダッシュ操作
 	PlayerDashProcess();	//ダッシュの処理
+	PlayerMoveSE();
 
 	// Key入力があったら移動処理する
 	if (g_Player.spd > 0.0f)
@@ -399,6 +402,46 @@ void PlayerMoveControl(void)
 		g_Player.spd = VALUE_MOVE;
 		g_Player.moveVec.x -= sinf(cam->rot.y) * changeRotCamera;
 		g_Player.moveVec.z -= cosf(cam->rot.y) * changeRotCamera;
+	}
+}
+
+void PlayerMoveSE(void)
+{
+	//SEをどう鳴らすかは速度とWalkIntervalで判定。鳴らさない場合は変数ごとリセット
+	if (g_Player.spd >= VALUE_MOVE && g_Player.WalkInterval == 0 && g_Player.spd < VALUE_DASH_MOVE)
+	{
+		SetSourceVolume(SOUND_LABEL_SE_Dash, 0.0f);
+		SetSourceVolume(SOUND_LABEL_SE_Walk_sound, 1.0f);
+		PlaySound(SOUND_LABEL_SE_Walk_sound);
+		g_Player.WalkInterval++;
+		g_Player.DashInterval = 0;
+	}
+	else if (g_Player.spd <= 0.1f)
+	{
+		SetSourceVolume(SOUND_LABEL_SE_Walk_sound, 0.0f);
+		SetSourceVolume(SOUND_LABEL_SE_Dash, 0.0f);
+		g_Player.WalkInterval = 0;
+		g_Player.DashInterval = 0;
+	}
+	else if (g_Player.spd >= VALUE_MOVE && g_Player.WalkInterval != 0 && g_Player.spd < VALUE_DASH_MOVE)
+	{
+		g_Player.WalkInterval++;
+		if (g_Player.WalkInterval >= 760)
+			g_Player.WalkInterval = 0;
+	}
+	else if (g_Player.spd >= VALUE_DASH_MOVE && g_Player.DashInterval == 0)
+	{
+		SetSourceVolume(SOUND_LABEL_SE_Dash, 1.0f);
+		SetSourceVolume(SOUND_LABEL_SE_Walk_sound, 0.0f);
+		PlaySound(SOUND_LABEL_SE_Dash);
+		g_Player.DashInterval++;
+		g_Player.WalkInterval = 0;
+	}
+	else if (g_Player.spd >= VALUE_DASH_MOVE && g_Player.DashInterval != 0)
+	{
+		g_Player.DashInterval++;
+		if (g_Player.DashInterval >= 660)
+			g_Player.DashInterval = 0;
 	}
 }
 

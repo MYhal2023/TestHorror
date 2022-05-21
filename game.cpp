@@ -37,6 +37,7 @@
 #include "item.h"
 #include "stage.h"
 #include "tutorial.h"
+#include "game_over.h"
 
 
 
@@ -140,6 +141,7 @@ void InitDebugStage(void)
 	InitItembox();
 
 	InitParticle();
+	InitGame_over();
 }
 
 //牢屋ステージ初期化(第一ステージ？)
@@ -177,6 +179,7 @@ void InitFastStage(void)
 	InitItembox();
 
 	InitParticle();
+	InitGame_over();
 
 }
 
@@ -248,6 +251,7 @@ void InitClearStage(void)
 	InitItembox();
 
 	InitParticle();
+	InitGame_over();
 
 }
 //=============================================================================
@@ -288,7 +292,7 @@ void UninitGame(void)
 
 	// 影の終了処理
 	UninitShadow();
-
+	UninitGame_over();
 }
 
 //=============================================================================
@@ -310,6 +314,7 @@ void UpdateGame(void)
 
 
 #endif
+	UpdateGame_over();
 	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
 	if(g_bPause == FALSE)
@@ -379,6 +384,8 @@ void UpdateFirstGame(void)
 
 
 #endif
+	UpdateGame_over();
+	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
 	if (g_bPause == FALSE)
 		return;
@@ -487,6 +494,7 @@ void DrawGame0(void)
 	////UI表示描画処理
 	DrawInterface();
 
+	DrawGame_over();
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
 	ans = MODE_PLANE;
@@ -551,6 +559,8 @@ void DrawFirstStageGame(void)
 
 	////UI表示描画処理
 	DrawInterface();
+
+	DrawGame_over();
 
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
@@ -731,5 +741,7 @@ BOOL CheckGameover(void)
 	if (player->life <= 0)
 		ans = TRUE;
 
+	if (ans)
+		SetGameOver();
 	return ans;
 }
