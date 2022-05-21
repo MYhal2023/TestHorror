@@ -95,6 +95,9 @@ void InitStage(int stageNum)
 	case FIRST_STAGE:
 		InitSecondStage();
 		break;
+	case CLEAR_STAGE:
+		InitClearStage();
+		break;
 	case MAX_STAGE:
 		break;
 	}
@@ -187,10 +190,10 @@ void InitSecondStage(void)
 
 	InitEnemy();
 
+	InitFurnitureFirStage();
+
 	//マップに使う壁の初期化
 	InitSetStage();
-
-	InitFurnitureFirStage();
 
 	InitItem();
 
@@ -210,6 +213,42 @@ void InitSecondStage(void)
 	InitItembox();
 
 	InitParticle();
+}
+
+void InitClearStage(void)
+{
+	// ライトを有効化	// 影の初期化処理
+	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
+
+	InitEnemy();
+
+	InitFurniture();
+
+	//マップに使うメッシュ、オブジェクトの初期化
+	InitSetClearStage();
+
+	InitItem();
+
+	InitMatch();
+
+	InitLighter();
+
+	// スコアの初期化
+	InitScore();
+
+	// ライフの初期化
+	InitLife();
+
+	//UI表示初期化
+	InitInterface();
+
+	InitItembox();
+
+	InitParticle();
+
 }
 //=============================================================================
 // 終了処理
@@ -564,6 +603,7 @@ void DrawGame(void)
 		{
 		case DEBUG_STAGE:
 		case PRISON_STAGE:
+		case CLEAR_STAGE:
 			SetViewPort(TYPE_FULL_SCREEN);
 			DrawGame0();
 			break;
