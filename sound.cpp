@@ -79,14 +79,14 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ (char*)"data/SE/GetItem.wav", 0 },		// ‚‰¹SE
 	{ (char*)"data/SE/WoodWalk.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/SE/Walk_sound.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
-	{ (char*)"data/SE/Cursor_Move.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
+	{ (char*)"data/SE/CursorMove.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/SE/Cursor_ON.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/SE/Don_t_open_door.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/SE/Unlock.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/SE/Dash.wav", 0 },		// –Ø‚Ì‚«‚µ‚Ş‘«‰¹
 	{ (char*)"data/BGM/Normal.wav", 1 },		// ’Tõ’Êíbgm
 	{ (char*)"data/BGM/Fear.wav", 1 },			// ”í”­Œ©bgm
-	{ (char*)"data/BGM/GameOver.wav", 1 },			// ”í”­Œ©bgm
+	{ (char*)"data/BGM/GameOver.wav", 0 },			// ”í”­Œ©bgm
 	{ (char*)"data/BGM/HorrorZone.wav", 1 },			// ”í”­Œ©bgm
 };
 

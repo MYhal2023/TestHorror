@@ -67,7 +67,7 @@ static int	g_PlayStage = PRISON_STAGE;
 HRESULT InitGame(void)
 {
 	g_ViewPortType_Game = TYPE_FULL_SCREEN;
-
+	InitSystem();
 	switch (GetMode())
 	{
 	case MODE_TITLE:
@@ -82,6 +82,39 @@ HRESULT InitGame(void)
 	return S_OK;
 }
 
+void InitSystem(void)
+{
+	// ライトを有効化	// 影の初期化処理
+	InitShadow();
+
+	// プレイヤーの初期化
+	InitPlayer();
+
+	InitEnemy();
+
+	InitFurniture();
+
+	InitItem();
+
+	InitMatch();
+
+	InitLighter();
+
+	// スコアの初期化
+	InitScore();
+
+	// ライフの初期化
+	InitLife();
+
+	//UI表示初期化
+	InitInterface();
+
+	InitItembox();
+
+	InitParticle();
+	InitGame_over();
+
+}
 //ステージ別の初期化処理
 void InitStage(int stageNum)
 {
@@ -109,150 +142,29 @@ void InitDebugStage(void)
 {
 	// フィールドの初期化
 	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), FIELD_X, FIELD_Z, BLOCK_SIZE, BLOCK_SIZE, WATER);
-
-	// ライトを有効化	// 影の初期化処理
-	InitShadow();
-
-	// プレイヤーの初期化
-	InitPlayer();
-
-	InitEnemy();
-
 	//マップに使う壁の初期化
 	InitFieldMeshWall();
-
-	InitFurniture();
-
-	InitItem();
-
-	InitMatch();
-
-	InitLighter();
-
-	// スコアの初期化
-	InitScore();
-
-	// ライフの初期化
-	InitLife();
-
-	//UI表示初期化
-	InitInterface();
-
-	InitItembox();
-
-	InitParticle();
-	InitGame_over();
 }
 
 //牢屋ステージ初期化(第一ステージ？)
 void InitFastStage(void)
 {
-
-	// ライトを有効化	// 影の初期化処理
-	InitShadow();
-
-	// プレイヤーの初期化
-	InitPlayer();
-
-	InitEnemy();
-
-	InitFurniture();
-
 	//マップに使うメッシュ、オブジェクトの初期化
 	InitSetTutorial();
-
-	InitItem();
-
-	InitMatch();
-
-	InitLighter();
-
-	// スコアの初期化
-	InitScore();
-
-	// ライフの初期化
-	InitLife();
-
-	//UI表示初期化
-	InitInterface();
-	
-	InitItembox();
-
-	InitParticle();
-	InitGame_over();
-
 }
 
 void InitSecondStage(void)
 {
-	// ライトを有効化	// 影の初期化処理
-	InitShadow();
-
-	// プレイヤーの初期化
-	InitPlayer();
-
-	InitEnemy();
-
 	InitFurnitureFirStage();
 
 	//マップに使う壁の初期化
 	InitSetStage();
-
-	InitItem();
-
-	InitMatch();
-
-	InitLighter();
-
-	// スコアの初期化
-	InitScore();
-
-	// ライフの初期化
-	InitLife();
-
-	//UI表示初期化
-	InitInterface();
-
-	InitItembox();
-
-	InitParticle();
 }
 
 void InitClearStage(void)
 {
-	// ライトを有効化	// 影の初期化処理
-	InitShadow();
-
-	// プレイヤーの初期化
-	InitPlayer();
-
-	InitEnemy();
-
-	InitFurniture();
-
 	//マップに使うメッシュ、オブジェクトの初期化
 	InitSetClearStage();
-
-	InitItem();
-
-	InitMatch();
-
-	InitLighter();
-
-	// スコアの初期化
-	InitScore();
-
-	// ライフの初期化
-	InitLife();
-
-	//UI表示初期化
-	InitInterface();
-
-	InitItembox();
-
-	InitParticle();
-	InitGame_over();
-
 }
 //=============================================================================
 // 終了処理
@@ -449,6 +361,9 @@ void DrawGame0(void)
 	int ans = MODE_PLANE;
 	SwapShader(ans);
 
+	DrawGame_over();
+	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
+
 	// 3Dの物を描画する処理
 	// 地面の描画処理
 	DrawMeshField();
@@ -483,8 +398,8 @@ void DrawGame0(void)
 	SetLightEnable(FALSE);
 
 
-	// スコアの描画処理
-	DrawScore();
+	//// スコアの描画処理
+	//DrawScore();
 
 	// ライフの描画処理
 	DrawLife();
@@ -514,6 +429,9 @@ void DrawFirstStageGame(void)
 	//ポストエフェクトをかける場合はここから
 	int ans = MODE_PLANE;
 	SwapShader(ans);
+
+	DrawGame_over();
+	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
 	// 3Dの物を描画する処理
 	// 地面の描画処理
@@ -549,8 +467,8 @@ void DrawFirstStageGame(void)
 	SetLightEnable(FALSE);
 
 
-	// スコアの描画処理
-	DrawScore();
+	//// スコアの描画処理
+	//DrawScore();
 
 	// ライフの描画処理
 	DrawLife();
@@ -559,8 +477,6 @@ void DrawFirstStageGame(void)
 
 	////UI表示描画処理
 	DrawInterface();
-
-	DrawGame_over();
 
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで

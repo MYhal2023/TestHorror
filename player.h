@@ -112,3 +112,4 @@ void HeartBeat(void);
 void BeatTypeDecision(void);
 void PlayerBreath(void);
 void BreathDicision(void);
+void FunitureHit(float x, float z);

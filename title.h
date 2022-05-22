@@ -10,13 +10,26 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define TITLE_TEXTURE_MAX					(5)				// タイトルテクスチャの数
+
 enum TEXTURE_TITLE
 {
 	TITLE_BG,
-	TITLE_CURSOL
+	TITLE_CURSOL,
+	TITLE_END,
+	TITLE_NEW,
+	TITLE_LOAD
 };
 
+typedef struct
+{
+	BOOL						use;						// TRUE:使っている  FALSE:未使用
+	float						w, h;					// 幅と高さ
+	XMFLOAT3					pos;						// ポリゴンの座標
+	int							texNo;					// テクスチャ番号
+	XMFLOAT4					color;
 
+}TITLE;
 
 //*****************************************************************************
 // プロトタイプ宣言

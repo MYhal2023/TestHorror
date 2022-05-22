@@ -26,7 +26,7 @@
 #define	VIEW_FAR_Z		(10000.0f)										// ビュー平面のFarZ値
 
 #define	VALUE_MOVE_CAMERA	(2.0f)										// カメラの移動量
-#define	VALUE_ROTATE_CAMERA	(XM_PI * 0.01f)								// カメラの回転量
+#define	VALUE_ROTATE_CAMERA	(XM_PI * 0.015f)								// カメラの回転量
 
 typedef enum
 {
