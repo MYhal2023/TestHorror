@@ -60,7 +60,8 @@ HRESULT InitItem(void)
 		g_Item[i].load = TRUE;
 		g_Item[i].use = TRUE;
 		g_Item[i].drop = TRUE;
-		
+		g_Item[i].ID = i;
+
 		GetModelDiffuse(&g_Item[i].model, &g_Item[i].diffuse[0]);
 	}
 	return S_OK;

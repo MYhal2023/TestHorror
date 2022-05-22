@@ -99,8 +99,6 @@ HRESULT InitGame_over(void)
 	g_EPos = XMFLOAT3(g_w / 2, g_h / 2, 0.0f);
 	g_TexNo = 0;
 
-	// BGM再生
-	//PlaySound(SOUND_LABEL_BGM_sample000);
 	g_Event = 0;
 	g_Count = 0;
 	alpha = 0.0f;
@@ -174,7 +172,7 @@ void UpdateGame_over(void)
 		}
 		else if (g_Count == 220)
 		{
-			SetFade(FADE_OUT, MODE_GAME);	//文字が出たらモードリセット
+			SetFade(FADE_OUT, MODE_TITLE);	//文字が出たらモードリセット
 		}
 		g_Count++;
 		break;
@@ -197,25 +195,30 @@ void DrawGame_over(void)
 {
 	if (!g_Use)return;
 
+	SetDepthEnable(FALSE);
+
+	// ライティングを無効
+	SetLightEnable(FALSE);
+
+	// 頂点バッファ設定
+	UINT stride = sizeof(VERTEX_3D);
+	UINT offset = 0;
+	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+	// マトリクス設定
+	SetWorldViewProjection2D();
+
+	// プリミティブトポロジ設定
+	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// マテリアル設定
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
 	for (int i = 0; i < TEXTURE_MAX; i++)
 	{
-		// 頂点バッファ設定
-		UINT stride = sizeof(VERTEX_3D);
-		UINT offset = 0;
-		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-		// マトリクス設定
-		SetWorldViewProjection2D();
-
-		// プリミティブトポロジ設定
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		// マテリアル設定
-		MATERIAL material;
-		ZeroMemory(&material, sizeof(material));
-		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		SetMaterial(material);
-
 		// テクスチャ設定
 		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[i]);
 
@@ -248,6 +251,10 @@ void DrawGame_over(void)
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
 	}
+	SetDepthEnable(TRUE);
+
+	// ライティングを無効
+	SetLightEnable(TRUE);
 
 }
 

@@ -28,6 +28,7 @@ typedef struct
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 	float				size;				// 当たり判定の大きさ
 	int					type;				//アイテムの種類
+	int					ID;					//鍵のみに使用。このIDとドアのIDが一致していれば使用可能になる
 } MODEL_ITEM;
 
 enum ITEM_TYPE

@@ -20,6 +20,8 @@
 #include "time.h"
 #include "score.h"
 #include "debugproc.h"
+#include "furniture.h"
+#include "tutorial.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
@@ -224,12 +226,22 @@ BOOL FilterWayPoint(XMFLOAT3 pos, XMFLOAT3 pos2, int k)		//ƒEƒFƒCƒ|ƒCƒ“ƒgA©g‚
 	//N“ü•s‰Â‚ÌêŠ‚ğíœ
 	for (int i = 0; i < GetMeshWallNum(); i++)
 	{
-
+		if (i == GetCeilingWallNum())continue;
 		if (CheckCrossLine(pos2, pos, GetMeshWallStPosition(i), GetMeshWallEdPosition(i)) == TRUE)
 		{
 			return ans = FALSE;
 		}
 	}
+
+	//FURNITURE *fur = GetFurniture();
+	//for (int i = 0; i < MAX_FURNITURE; i++)
+	//{
+	//	if (fur[i].size == 0.0f)continue;
+	//	if (GetCrossPoints(pos2, pos, fur[i].pos, fur[i].size) == TRUE)
+	//	{
+	//		return ans = FALSE;
+	//	}
+	//}
 	return ans;
 }
 

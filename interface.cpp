@@ -21,42 +21,44 @@
 // マクロ定義
 //*****************************************************************************
 #define TEXTURE_MAX					(12)				// テクスチャの数
+#define WIDTH						(960.0f)
+#define HEIGHT						(540.0f)
 
 #define PLAYER_HURT_FRAME			(120)			// プレイヤー無敵フレーム
 
 
-#define HP_TEXTURE_WIDTH			(3200/5)	// テクスチャサイズ
-#define HP_TEXTURE_HEIGHT			(80/5)	// 
-#define	HP_X						(80)			// テクスチャ座標
-#define HP_Y						(50)
+#define HP_TEXTURE_WIDTH			(3200.0f * 0.2f)	// テクスチャサイズ
+#define HP_TEXTURE_HEIGHT			(80.0f * 0.2f)	// 
+#define	HP_X						(80.0f)			// テクスチャ座標
+#define HP_Y						(50.0f)
 
-#define OIL_TEXTURE_WIDTH			(100/5)	// テクスチャサイズ
-#define OIL_TEXTURE_HEIGHT			(600/5)	// 
-#define OIL_X						(SCREEN_WIDTH-50)	// テクスチャ座標
-#define OIL_Y						(SCREEN_HEIGHT-100)					// 
+#define OIL_TEXTURE_WIDTH			(100.0f * 0.2f)	// テクスチャサイズ
+#define OIL_TEXTURE_HEIGHT			(600.0f * 0.2f)	// 
+#define OIL_X						(WIDTH-50.0f)	// テクスチャ座標
+#define OIL_Y						(HEIGHT-100.0f)					// 
 
-#define STAM_TEXTURE_WIDTH			(300)	// テクスチャサイズ
-#define STAM_TEXTURE_HEIGHT			(10)	// 
+#define STAM_TEXTURE_WIDTH			(300.0f)	// テクスチャサイズ
+#define STAM_TEXTURE_HEIGHT			(10.0f)	// 
 #define	STAM_X						(HP_X)			// テクスチャ座標
-#define STAM_Y						(HP_Y+20)
+#define STAM_Y						(HP_Y+20.0f)
 
-#define MIND_TEXTURE_WIDTH			(350)	// テクスチャサイズ
-#define MIND_TEXTURE_HEIGHT			(20)	// 
+#define MIND_TEXTURE_WIDTH			(350.0f)	// テクスチャサイズ
+#define MIND_TEXTURE_HEIGHT			(20.0f)	// 
 #define	MIND_X						(HP_X)			// テクスチャ座標
-#define MIND_Y						(HP_Y+40)
+#define MIND_Y						(HP_Y+40.0f)
 
-#define ITEM_BOX_TEXTURE_WIDTH		(40)	// テクスチャサイズ
-#define ITEM_BOX_TEXTURE_HEIGHT		(35)	// 
-#define	ITEM_BOX_X					(SCREEN_WIDTH/2 - 50)			// テクスチャ座標
-#define ITEM_BOX_Y					(SCREEN_HEIGHT-40)
+#define ITEM_BOX_TEXTURE_WIDTH		(40.0f)	// テクスチャサイズ
+#define ITEM_BOX_TEXTURE_HEIGHT		(35.0f)	// 
+#define	ITEM_BOX_X					(WIDTH * 0.45f)		// テクスチャ座標
+#define ITEM_BOX_Y					(HEIGHT-40.0f)
 
-#define MATCH_X						(50)
-#define MATCH_Y						(SCREEN_HEIGHT-80)
+#define MATCH_X						(50.0f)
+#define MATCH_Y						(HEIGHT-80.0f)
 
-#define MATCH_TEXTURE_WIDTH			(40*2)
-#define MATCH_TEXTURE_HEIGHT		(20*2)
-#define MATCH_NUM_TEXTURE_WIDTH		(25)	// テクスチャサイズ
-#define MATCH_NUM_TEXTURE_HEIGHT	(50)	// 
+#define MATCH_TEXTURE_WIDTH			(40.0f * 2.0f)
+#define MATCH_TEXTURE_HEIGHT		(20.0f * 2.0f)
+#define MATCH_NUM_TEXTURE_WIDTH		(25.0f)	// テクスチャサイズ
+#define MATCH_NUM_TEXTURE_HEIGHT	(50.0f)	// 
 
 #define MATCH_DIGIT					(2)			// 桁数
 
@@ -144,6 +146,7 @@ HRESULT InitInterface(void)
 		g_UI[i].tx = 0.0f;			// テクスチャの左上X座標
 		g_UI[i].ty = 0.0f;			// テクスチャの左上Y座標
 		g_UI[i].color = { 1.0f,1.0f,1.0f,1.0f };
+		g_UI[i].pos = { 0.0f, 0.0f, 0.0f };
 	}
 	//HPゲージ
 	g_UI[HP_BAR].pos = { HP_X , HP_Y , 0.0f };
@@ -189,16 +192,16 @@ HRESULT InitInterface(void)
 
 	//痛みエフェクト
 	g_UI[HURT].use = FALSE;
-	g_UI[HURT].pos = { SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0.0f };
-	g_UI[HURT].w = SCREEN_WIDTH;
-	g_UI[HURT].h = SCREEN_HEIGHT;
+	g_UI[HURT].pos = { WIDTH * 0.5f, HEIGHT * 0.5f, 0.0f };
+	g_UI[HURT].w = WIDTH;
+	g_UI[HURT].h = HEIGHT;
 	g_UI[HURT].color = { 0.3f,0.0f,0.0f,0.0f };
 
 	//Sanityエフェクト
 	g_UI[INSANE].use = FALSE;
-	g_UI[INSANE].pos = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f };
-	g_UI[INSANE].w = SCREEN_WIDTH;
-	g_UI[INSANE].h = SCREEN_HEIGHT;
+	g_UI[INSANE].pos = { WIDTH * 0.5f, HEIGHT * 0.5f, 0.0f };
+	g_UI[INSANE].w = WIDTH;
+	g_UI[INSANE].h = HEIGHT;
 	g_UI[INSANE].color = { 1.0f,0.0f,0.0f,0.0f };
 
 	//スタミナバー
@@ -223,7 +226,9 @@ HRESULT InitInterface(void)
 		g_ItemBox[i].th = 1.0f;		// テクスチャの高さ
 		g_ItemBox[i].tx = 0.0f;			// テクスチャの左上X座標
 		g_ItemBox[i].ty = 0.0f;			// テクスチャの左上Y座標
-		g_ItemBox[i].pos = { ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * i)*1.0f,ITEM_BOX_Y, 0.0f };
+		float x = (ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * (float)(i))*1.0f);
+		float y = (ITEM_BOX_Y);
+		g_ItemBox[i].pos = { x,y, 0.0f };
 		g_ItemBox[i].w = ITEM_BOX_TEXTURE_WIDTH;
 		g_ItemBox[i].h = ITEM_BOX_TEXTURE_HEIGHT;
 		g_ItemBox[i].color = { 1.0f,1.0f,1.0f,1.0f };
@@ -273,21 +278,21 @@ void UpdateInterface(void)
 	MATCH match = *GetMatch();
 
 	//HP 
-	g_UI[HP_RED].w = HP_TEXTURE_WIDTH * (player.life / HUNDRED);
-	g_UI[HP_RED].pos.x = HP_X - (HUNDRED - player.life)*DEVIATION_HP;
+	g_UI[HP_RED].w = (HP_TEXTURE_WIDTH * ((float)(player.life) / HUNDRED));
+	g_UI[HP_RED].pos.x = (HP_X - (HUNDRED - (float)(player.life))*DEVIATION_HP);
 
 	//スタミナ
-	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH * (player.stamina / HUNDRED);
-	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - player.stamina) * DEVIATION_STAM;
-	g_UI[STAM_BAR].color = { 1.0f - player.stamina / HUNDRED , player.stamina / HUNDRED , 0.0f,1.0f };
+	g_UI[STAM_BAR].w = STAM_TEXTURE_WIDTH * ((float)(player.stamina) / HUNDRED);
+	g_UI[STAM_BAR].pos.x = STAM_X - (HUNDRED - ((float)player.stamina)) * DEVIATION_STAM;
+	g_UI[STAM_BAR].color = { 1.0f - ((float)player.stamina) / HUNDRED , (float)(player.stamina) / HUNDRED , 0.0f,1.0f };
 
 	//ライター
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//小さくすれば、下に移動する
 
 	//Sanity
-	g_UI[MIND].w = MIND_TEXTURE_WIDTH * (player.sanity / HUNDRED);
-	g_UI[MIND].pos.x = MIND_X - (HUNDRED - player.sanity) * DEVIATION_MIND;
+	g_UI[MIND].w = MIND_TEXTURE_WIDTH * (((float)player.sanity) / HUNDRED);
+	g_UI[MIND].pos.x = MIND_X - (HUNDRED - (float)(player.sanity)) * DEVIATION_MIND;
 
 	//Sanity エフェクト
 	SanityCheck(player.sanity);
@@ -319,62 +324,6 @@ void UpdateInterface(void)
 //=============================================================================
 void DrawInterface(void)
 {
-	for (int i = 0; i < TEXTURE_MAX - 1; i++)
-	{
-		if (i == MATCH_NUM)																//マッチの数字を別で印刷
-			continue;
-		if (g_UI[i].use == FALSE)
-			continue;
-		if (i == HURT || i == INSANE)
-		{
-			SetBlendState(BLEND_MODE_ADD);
-		}
-		// 頂点バッファ設定
-		UINT stride = sizeof(VERTEX_3D);
-		UINT offset = 0;
-		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-		// マトリクス設定
-		SetWorldViewProjection2D();
-
-		// プリミティブトポロジ設定
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		// マテリアル設定
-		MATERIAL material;
-		ZeroMemory(&material, sizeof(material));
-		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		SetMaterial(material);
-
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[i].TexNo]);
-
-		// スコアの位置やテクスチャー座標を反映
-		float px = g_UI[i].pos.x;	// 表示位置X
-		float py = g_UI[i].pos.y;			// 表示位置Y
-		float pw = g_UI[i].w;				// 表示幅
-		float ph = g_UI[i].h;				// 表示高さ
-
-		float tw = g_UI[i].tw;		// テクスチャの幅
-		float th = g_UI[i].th;		// テクスチャの高さ
-		float tx = g_UI[i].tx;		// テクスチャの左上X座標
-		float ty = g_UI[i].ty;		// テクスチャの左上Y座標
-
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-			g_UI[i].color);
-
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-
-		if (i == HURT || i== INSANE)
-		{
-			SetBlendState(BLEND_MODE_NONE);
-		}
-	}
-
-	//マッチの数字
-
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
@@ -392,6 +341,55 @@ void DrawInterface(void)
 	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	SetMaterial(material);
 
+	float px = 0.0f;	// 表示位置X
+	float py = 0.0f;			// 表示位置Y
+	float pw = 0.0f;				// 表示幅
+	float ph = 0.0f;				// 表示高さ
+
+	float tw = 0.0f;		// テクスチャの幅
+	float th = 0.0f;		// テクスチャの高さ
+	float tx = 0.0f;		// テクスチャの左上X座標
+	float ty = 0.0f;		// テクスチャの左上Y座標
+
+	for (int i = 0; i < TEXTURE_MAX - 1; i++)
+	{
+		if (i == MATCH_NUM || i == 0)																//マッチの数字を別で印刷
+			continue;
+		if (g_UI[i].use == FALSE)
+			continue;
+		if (i == HURT || i == INSANE)
+		{
+			SetBlendState(BLEND_MODE_ADD);
+		}
+
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[i].TexNo]);
+
+		// スコアの位置やテクスチャー座標を反映
+		px = g_UI[i].pos.x;			// 表示位置X
+		py = g_UI[i].pos.y;			// 表示位置Y
+		pw = g_UI[i].w;				// 表示幅
+		ph = g_UI[i].h;				// 表示高さ
+
+		tw = g_UI[i].tw;		// テクスチャの幅
+		th = g_UI[i].th;		// テクスチャの高さ
+		tx = g_UI[i].tx;		// テクスチャの左上X座標
+		ty = g_UI[i].ty;		// テクスチャの左上Y座標
+
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			g_UI[i].color);
+
+		// ポリゴン描画
+		GetDeviceContext()->Draw(4, 0);
+
+		if (i == HURT || i== INSANE)
+		{
+			SetBlendState(BLEND_MODE_NONE);
+		}
+	}
+
+	//マッチの数字
 	// テクスチャ設定
 	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_UI[MATCH_NUM].TexNo]);
 
@@ -430,22 +428,6 @@ void DrawInterface(void)
 	{
 		if (g_ItemBox[i].use == FALSE)
 			continue;
-		// 頂点バッファ設定
-		UINT stride = sizeof(VERTEX_3D);
-		UINT offset = 0;
-		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-		// マトリクス設定
-		SetWorldViewProjection2D();
-
-		// プリミティブトポロジ設定
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		// マテリアル設定
-		MATERIAL material;
-		ZeroMemory(&material, sizeof(material));
-		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		SetMaterial(material);
 
 		// テクスチャ設定
 		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);

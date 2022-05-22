@@ -23,6 +23,8 @@
 #include "lighter.h"
 #include "check_game.h"
 #include "particle.h"
+#include "furniture.h"
+#include "tutorial.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -189,7 +191,7 @@ void UpdatePlayer(void)
 	HeartBeat();	//心音のセット
 	PlayerBreath(); //息遣いのセット
 	MeshWallHit(g_Player.pos, g_Player.size, old_x, old_z);
-
+	FunitureHit(old_x, old_z);
 	if (g_Player.atInvinc == TRUE)	//被ダメージによる無敵中にすることは？
 	{
 		IncibleEffect();
@@ -643,5 +645,18 @@ void BreathDicision(void)
 			g_BreathType = BREATH_HYPERPNEA;	//心音が危険なら過呼吸に
 		else
 			g_BreathType = BREATH_NON;			//それ以外の時は鳴らさない
+	}
+}
+
+void FunitureHit(float x, float z)
+{
+	FURNITURE *fur = GetFurniture();
+	for (int i = 0; i < MAX_FURNITURE; i++)
+	{
+		if (CollisionBC(g_Player.pos, fur[i].pos, g_Player.size, fur[i].size))
+		{
+			g_Player.pos.x = x;
+			g_Player.pos.z = z;
+		}
 	}
 }

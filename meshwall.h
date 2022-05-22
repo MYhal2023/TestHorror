@@ -43,3 +43,4 @@ void InitFieldMeshWall(void);
 XMFLOAT3 GetMeshWallStPosition(int i);
 XMFLOAT3 GetMeshWallEdPosition(int i);
 int GetMeshWallNum(void);
+int GetCeilingWallNum(void);

@@ -43,6 +43,7 @@ enum STAGE
 // プロトタイプ宣言
 //*****************************************************************************
 HRESULT InitGame(void);
+void InitSystem(void);
 void InitStage(int g_PlayStage);
 void InitDebugStage(void);
 void InitFastStage(void);

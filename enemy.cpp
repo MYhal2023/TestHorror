@@ -26,8 +26,8 @@
 #define	ENEMY_TEXMAG	(0.08f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
-#define ENEMY_SIGHT		(300.0f)		//エネミーの視力
-#define	ENEMY_SPEED		(0.75f)			// エネミーの移動スピード
+#define ENEMY_SIGHT		(400.0f)		//エネミーの視力
+#define	ENEMY_SPEED		(1.0f)			// エネミーの移動スピード
 
 
 //*****************************************************************************
@@ -202,7 +202,7 @@ void UpdateEnemy(void)
 	//エネミーのセットを行える
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_G))
-		SetEnemy(XMFLOAT3(0.0f, 0.0f, -0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		SetEnemy(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
 
 #endif
 

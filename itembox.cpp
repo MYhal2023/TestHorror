@@ -213,26 +213,27 @@ void UpdateItembox(void)
 //=============================================================================
 void DrawItembox(void)
 {
+	// 頂点バッファ設定
+	UINT stride = sizeof(VERTEX_3D);
+	UINT offset = 0;
+	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+	// マトリクス設定
+	SetWorldViewProjection2D();
+
+	// プリミティブトポロジ設定
+	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// マテリアル設定
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
 		if (g_Box[i].use == FALSE)
 			continue;
-		// 頂点バッファ設定
-		UINT stride = sizeof(VERTEX_3D);
-		UINT offset = 0;
-		GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-		// マトリクス設定
-		SetWorldViewProjection2D();
-
-		// プリミティブトポロジ設定
-		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		// マテリアル設定
-		MATERIAL material;
-		ZeroMemory(&material, sizeof(material));
-		material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		SetMaterial(material);
 
 		// テクスチャ設定
 		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Box[i].TexNo]);
@@ -257,23 +258,6 @@ void DrawItembox(void)
 	}
 
 	//選択ボックス
-
-	// 頂点バッファ設定
-	UINT stride = sizeof(VERTEX_3D);
-	UINT offset = 0;
-	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-	// マトリクス設定
-	SetWorldViewProjection2D();
-
-	// プリミティブトポロジ設定
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	// マテリアル設定
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	SetMaterial(material);
 
 	// テクスチャ設定
 	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Selectbox.TexNo]);

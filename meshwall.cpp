@@ -22,7 +22,7 @@
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
-struct MESH_WALL
+typedef struct
 {
 	ID3D11Buffer	*vertexBuffer;	// 頂点バッファ
 	ID3D11Buffer	*indexBuffer;	// インデックスバッファ
@@ -36,7 +36,7 @@ struct MESH_WALL
 	int				nNumPolygon;				// 総ポリゴン数
 	float			fBlockSizeX, fBlockSizeY;	// ブロックサイズ
 	int				texNo;						//使用するテクスチャの指定
-};
+} MESH_WALL;
 
 //*****************************************************************************
 // グローバル変数
@@ -46,6 +46,7 @@ static int							g_TexNo;		// テクスチャ番号
 
 static MESH_WALL g_aMeshWall[MAX_MESH_WALL];		// メッシュ壁ワーク
 static int g_nNumMeshWall = 0;						// メッシュ壁の数
+static int g_CeilingWall = 0;						// 天井に使用したメッシュ壁
 
 static char* g_TextureName[TEXTURE_MAX] = {
 	"data/TEXTURE/wall_001.png",
@@ -207,6 +208,8 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 		GetDeviceContext()->Unmap(pMesh->indexBuffer, 0);
 	}
 
+	if (pMesh->rot.x == XM_PI * 0.5f && pMesh->rot.z == XM_PI * 0.5f)
+		g_CeilingWall = g_nNumMeshWall - 1;
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -251,7 +254,7 @@ void UninitMeshWall(void)
 
 	//読み込み数をリセットする
 	g_nNumMeshWall = 0;
-
+	g_CeilingWall = 0;
 	g_Load = FALSE;
 }
 
@@ -276,17 +279,17 @@ void DrawMeshWall(void)
 	for(nCntMeshField = 0; nCntMeshField < g_nNumMeshWall; nCntMeshField++)
 	{
 		pMesh = &g_aMeshWall[nCntMeshField];
-
+		
 		// 頂点バッファ設定
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
 		GetDeviceContext()->IASetVertexBuffers(0, 1, &pMesh->vertexBuffer, &stride, &offset);
 
-		// インデックスバッファ設定
-		GetDeviceContext()->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R16_UINT, 0);
-
 		// プリミティブトポロジ設定
 		GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		// インデックスバッファ設定
+		GetDeviceContext()->IASetIndexBuffer(pMesh->indexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 		// マテリアル設定
 		SetMaterial(pMesh->material);
@@ -442,4 +445,9 @@ XMFLOAT3 GetMeshWallEdPosition(int i)
 int GetMeshWallNum(void)
 {
 	return g_nNumMeshWall;
+}
+
+int GetCeilingWallNum(void)
+{
+	return g_CeilingWall;
 }

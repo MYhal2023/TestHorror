@@ -57,7 +57,7 @@ char	g_DebugStr[2048] = WINDOW_NAME;		// デバッグ文字表示用
 
 #endif
 
-int	g_Mode = MODE_GAME;					// 起動時の画面を設定
+int	g_Mode = MODE_TITLE;					// 起動時の画面を設定
 
 
 //=============================================================================
@@ -128,7 +128,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			if(msg.message == WM_QUIT)
-			{// PostQuitMessage()が呼ばれたらループ終了
+			{// PostQuitMessage();//が呼ばれたらループ終了
 				break;
 			}
 			else
@@ -361,6 +361,7 @@ void Draw(void)
 
 		// ライティングを無効
 		SetLightEnable(FALSE);
+		SetRenderer();		//通常描画
 
 		DrawTitle();
 
@@ -380,7 +381,6 @@ void Draw(void)
 		SetViewPortType(TYPE_FULL_SCREEN);
 		SetRenderer();		//通常描画
 		DrawGame();
-		break;
 		break;
 
 	case MODE_RESULT:		// リザルト画面の描画
@@ -476,6 +476,7 @@ void SetMode(int mode)
 
 		// ゲーム終了時の処理
 	case MODE_MAX:
+		PostQuitMessage(0);
 		break;
 	}
 }
