@@ -119,6 +119,7 @@ void UninitMatch(void)
 		g_VertexBuffer = NULL;
 	}
 
+	UnloadModel(&g_Match.model);
 
 	g_Load = FALSE;
 }
