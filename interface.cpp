@@ -305,28 +305,6 @@ void UpdateInterface(void)
 
 	GaugeAnimation();
 	HurtAnimation();
-	for (int i = 0; i < ITEM_MAX; i++)
-	{
-		if (i >= g_ItemMax)
-		{
-			g_ItemBox[i].use = FALSE;
-		}
-		else
-		{
-			g_ItemBox[i].use = TRUE;
-		}
-		g_ItemBox[i].TexNo = ITEM_BOX;
-		g_ItemBox[i].tw = 1.0f;		// テクスチャの幅
-		g_ItemBox[i].th = 1.0f;		// テクスチャの高さ
-		g_ItemBox[i].tx = 0.0f;			// テクスチャの左上X座標
-		g_ItemBox[i].ty = 0.0f;			// テクスチャの左上Y座標
-		float x = ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * (float)(i));
-		float y = ITEM_BOX_Y;
-		g_ItemBox[i].pos = { x , y, 0.0f };
-		g_ItemBox[i].w = ITEM_BOX_TEXTURE_WIDTH;
-		g_ItemBox[i].h = ITEM_BOX_TEXTURE_HEIGHT;
-		g_ItemBox[i].color = { 1.0f,1.0f,1.0f,1.0f };
-	}
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 	if (GetKeyboardTrigger(DIK_K))
