@@ -49,11 +49,11 @@
 
 #define ITEM_BOX_TEXTURE_WIDTH		(40.0f)	// テクスチャサイズ
 #define ITEM_BOX_TEXTURE_HEIGHT		(35.0f)	// 
-#define	ITEM_BOX_X					(WIDTH * 0.45f)		// テクスチャ座標
-#define ITEM_BOX_Y					(HEIGHT-40.0f)
+#define	ITEM_BOX_X					(432.0f)		// テクスチャ座標
+#define ITEM_BOX_Y					(500.0f)
 
 #define MATCH_X						(50.0f)
-#define MATCH_Y						(HEIGHT-80.0f)
+#define MATCH_Y						(460.0f)
 
 #define MATCH_TEXTURE_WIDTH			(40.0f * 2.0f)
 #define MATCH_TEXTURE_HEIGHT		(20.0f * 2.0f)
@@ -98,7 +98,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 };
 
 
-static UI_ELEMENT	g_UI[TEXTURE_MAX];
+static UI_ELEMENT	g_UI[TEXTURE_MAX - 1];
 static UI_ELEMENT	g_ItemBox[ITEM_MAX];
 
 static BOOL						g_Load = FALSE;
@@ -226,9 +226,9 @@ HRESULT InitInterface(void)
 		g_ItemBox[i].th = 1.0f;		// テクスチャの高さ
 		g_ItemBox[i].tx = 0.0f;			// テクスチャの左上X座標
 		g_ItemBox[i].ty = 0.0f;			// テクスチャの左上Y座標
-		float x = (ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * (float)(i))*1.0f);
-		float y = (ITEM_BOX_Y);
-		g_ItemBox[i].pos = { x,y, 0.0f };
+		float x = ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * (float)(i));
+		float y = ITEM_BOX_Y;
+		g_ItemBox[i].pos = { x , y, 0.0f };
 		g_ItemBox[i].w = ITEM_BOX_TEXTURE_WIDTH;
 		g_ItemBox[i].h = ITEM_BOX_TEXTURE_HEIGHT;
 		g_ItemBox[i].color = { 1.0f,1.0f,1.0f,1.0f };
@@ -236,7 +236,10 @@ HRESULT InitInterface(void)
 
 
 	// 初期化
-
+	g_ItemMax = ITEM_MIN;
+	g_match = 0;
+	g_time = 0;
+	g_hurt_time = 0;
 
 
 	g_Load = TRUE;
@@ -302,6 +305,28 @@ void UpdateInterface(void)
 
 	GaugeAnimation();
 	HurtAnimation();
+	for (int i = 0; i < ITEM_MAX; i++)
+	{
+		if (i >= g_ItemMax)
+		{
+			g_ItemBox[i].use = FALSE;
+		}
+		else
+		{
+			g_ItemBox[i].use = TRUE;
+		}
+		g_ItemBox[i].TexNo = ITEM_BOX;
+		g_ItemBox[i].tw = 1.0f;		// テクスチャの幅
+		g_ItemBox[i].th = 1.0f;		// テクスチャの高さ
+		g_ItemBox[i].tx = 0.0f;			// テクスチャの左上X座標
+		g_ItemBox[i].ty = 0.0f;			// テクスチャの左上Y座標
+		float x = ITEM_BOX_X + (ITEM_BOX_TEXTURE_WIDTH * (float)(i));
+		float y = ITEM_BOX_Y;
+		g_ItemBox[i].pos = { x , y, 0.0f };
+		g_ItemBox[i].w = ITEM_BOX_TEXTURE_WIDTH;
+		g_ItemBox[i].h = ITEM_BOX_TEXTURE_HEIGHT;
+		g_ItemBox[i].color = { 1.0f,1.0f,1.0f,1.0f };
+	}
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 	if (GetKeyboardTrigger(DIK_K))
@@ -424,16 +449,11 @@ void DrawInterface(void)
 
 
 	//アイテムボックス
-	for (int i = 0; i < ITEM_MAX; i++)
+	for (int i = 0; i < g_ItemMax; i++)
 	{
-		if (g_ItemBox[i].use == FALSE)
-			continue;
-
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);
 
 		// スコアの位置やテクスチャー座標を反映
-		float px = g_ItemBox[i].pos.x;	// 表示位置X
+		float px = g_ItemBox[i].pos.x;			// 表示位置X
 		float py = g_ItemBox[i].pos.y;			// 表示位置Y
 		float pw = g_ItemBox[i].w;				// 表示幅
 		float ph = g_ItemBox[i].h;				// 表示高さ
@@ -442,6 +462,9 @@ void DrawInterface(void)
 		float th = g_ItemBox[i].th;		// テクスチャの高さ
 		float tx = g_ItemBox[i].tx;		// テクスチャの左上X座標
 		float ty = g_ItemBox[i].ty;		// テクスチャの左上Y座標
+
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);
 
 		// １枚のポリゴンの頂点とテクスチャ座標を設定
 		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
