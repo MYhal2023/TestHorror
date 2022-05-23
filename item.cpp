@@ -16,6 +16,8 @@
 // マクロ定義
 //*****************************************************************************
 #define	MODEL_KEY			"data/MODEL/key.obj"		// 読み込むモデル名
+#define	MODEL_MATCH			"data/MODEL/matchibox.obj"		// 読み込むモデル名
+#define	MODEL_LIGHTER		"data/MODEL/lighter.obj"		// 読み込むモデル名
 
 //*****************************************************************************
 // グローバル変数
@@ -47,6 +49,20 @@ HRESULT InitItem(void)
 			g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
 			g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
 			break;
+		case 2:
+			g_Item[i].type = ITEM_MATCH;
+			g_Item[i].pos = { 0.0f, 5.0f, 80.0f };				// モデルの位置
+			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+			g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+			g_Item[i].size = SIZE_MATCH;							// 当たり判定の大きさ
+			break;
+		case 3:
+			g_Item[i].type = ITEM_LIGHTER;
+			g_Item[i].pos = { 0.0f, 5.0f, 100.0f };				// モデルの位置
+			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+			g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+			g_Item[i].size = SIZE_LIGHTER;							// 当たり判定の大きさ
+			break;
 		}
 		//アイテムタイプに基づいたモデルの紐づけ
 		switch (g_Item[i].type)
@@ -54,6 +70,13 @@ HRESULT InitItem(void)
 		case ITEM_KEY:
 			LoadModel(MODEL_KEY, &g_Item[i].model);
 			break;
+		case ITEM_MATCH:
+			LoadModel(MODEL_MATCH, &g_Item[i].model);
+			break;
+		case ITEM_LIGHTER:
+			LoadModel(MODEL_LIGHTER, &g_Item[i].model);
+			break;
+
 		case MAXTYPE_ITEM:
 			break;
 		}
@@ -154,6 +177,16 @@ void CollisionItem(XMFLOAT3 pos, float size)
 		{
 		case ITEM_KEY:
 			AddItembox(KEY);
+			g_Item[i].drop = FALSE;
+			PlaySound(SOUND_LABEL_SE_GetItem);
+			break;
+		case ITEM_MATCH:
+			AddItembox(MATCH_ITEM);
+			g_Item[i].drop = FALSE;
+			PlaySound(SOUND_LABEL_SE_GetItem);
+			break;
+		case ITEM_LIGHTER:
+			AddItembox(LIGHTER_ITEM);
 			g_Item[i].drop = FALSE;
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
