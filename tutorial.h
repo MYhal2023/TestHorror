@@ -25,8 +25,17 @@
 
 #define TOILET_SHIFT_X			(400.0f)	// トイレを部屋の壁からどれだけ離すか
 #define TOILET_SHIFT_Z			(-50.0f)	// トイレを部屋の壁からどれだけ離すか
+
+#define STAIRS_SHIFT_Y			(45.0f)		//奥の階段をどれだけスライドさせるか
 #define STAIRS_SHIFT_Z			(50.0f)		//階段をどれだけスライドさせるか
+#define UPSTAIRS_SHIFT_Z		(75.0f)		//奥の階段をどれだけスライドさせるか
 #define STAIRS_SIZE_XZ			(250.0f)	//階段横の壁
+
+//////////////////1F//////////////////
+#define CLEARSTAGEWALL_SIZE_Y		(100.0f)
+#define CLEARSTAGEWALL_SIZE_X		(250.0f)
+#define CLEARSTAGEWALL_SIZE_Z		(1000.0f)
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
