@@ -114,7 +114,6 @@ void InitSystem(void)
 	InitParticle();
 	InitGame_over();
 
-	ResetMeshWall();
 }
 //ステージ別の初期化処理
 void InitStage(int stageNum)
