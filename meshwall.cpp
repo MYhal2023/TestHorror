@@ -51,7 +51,7 @@ static int g_CeilingWall = 0;
 static char* g_TextureName[TEXTURE_MAX] = {
 	"data/TEXTURE/wall_001.png",
 	"data/TEXTURE/wall_002.png",
-	"data/TEXTURE/wall_101.png",
+	"data/TEXTURE/wall101.jpg",
 };
 
 static BOOL							g_Load = FALSE;

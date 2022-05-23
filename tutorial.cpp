@@ -1,7 +1,7 @@
-//=============================================================================
+Ôªø//=============================================================================
 //
-// É`ÉÖÅ[ÉgÉäÉAÉãèàóù [tutorial.cpp]
-// Author : ëùìc óEìl
+// „ÉÅ„É•„Éº„Éà„É™„Ç¢„É´Âá¶ÁêÜ [tutorial.cpp]
+// Author : Â¢óÁî∞ ÂãáÊñó
 //
 //=============================================================================
 #include "main.h"
@@ -11,62 +11,73 @@
 #include "furniture.h"
 void InitSetTutorial(void)
 {
-	//É}ÉbÉvÇÃè∞
+	//„Éû„ÉÉ„Éó„ÅÆÂ∫ä
 	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), (int)(TUTORIALWALL_SIZE_XZ / FLOOR_BLOCK_SIZE) + 1, (int)(TUTORIALWALL_SIZE_XZ / FLOOR_BLOCK_SIZE) + 5, FLOOR_BLOCK_SIZE, FLOOR_BLOCK_SIZE, GROUND);
-	//É}ÉbÉvÇÃìVà‰
+	//„Éû„ÉÉ„Éó„ÅÆÂ§©‰∫ï
 	InitMeshWall(XMFLOAT3(TUTORIALWALL_SIZE_XZ*0.5f, TUTORIALWALL_SIZE_Y, 0.0f), XMFLOAT3(XM_PI*0.5f, 0.0f, XM_PI*0.5f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, TUTORIALWALL_SIZE_XZ, TUTORIALWALL_SIZE_XZ, WALL_GRAY);
-	//É}ÉbÉvÇÃï«(î‡ÇÃÇ†ÇÈñ )
+	InitMeshWall(XMFLOAT3(DOOR_SIZE*0.5f, TUTORIALWALL_SIZE_Y, TUTORIALWALL_SIZE_XZ*0.5f+ STAIRS_SIZE_XZ*0.5f), XMFLOAT3(XM_PI*0.5f, 0.0f, XM_PI*0.5f),
+		XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), WALL_XZ, WALL_Y, STAIRS_SIZE_XZ, DOOR_SIZE, WALL_GRAY);
+
+	//„Éû„ÉÉ„Éó„ÅÆÂ£Å(Êââ„ÅÆ„ÅÇ„ÇãÈù¢)
 	InitMeshWall(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.25f + DOOR_SIZE * 0.25f, 1.0f, TUTORIALWALL_SIZE_XZ * 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, TUTORIALWALL_SIZE_XZ*0.5f - DOOR_SIZE * 0.5f, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(-TUTORIALWALL_SIZE_XZ * 0.25f - DOOR_SIZE * 0.25f, 1.0f, TUTORIALWALL_SIZE_XZ * 0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, TUTORIALWALL_SIZE_XZ*0.5f - DOOR_SIZE * 0.5f, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 
-	//É}ÉbÉvÇÃï«(ç∂âE)
+	//„Éû„ÉÉ„Éó„ÅÆÂ£Å(Â∑¶Âè≥)
 	InitMeshWall(XMFLOAT3(-TUTORIALWALL_SIZE_XZ * 0.5f, 1.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), ROOM, WALL_Y, TUTORIALWALL_SIZE_XZ / ROOM, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.5f, 1.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), ROOM, WALL_Y, TUTORIALWALL_SIZE_XZ / ROOM, TUTORIALWALL_SIZE_Y, WALL_BLACK);
-	//É}ÉbÉvÇÃï«(î‡ÇÃÇ»Ç¢ñ )
+	//„Éû„ÉÉ„Éó„ÅÆÂ£Å(Êââ„ÅÆ„Å™„ÅÑÈù¢)
 	InitMeshWall(XMFLOAT3(0.0f, 1.0f, -TUTORIALWALL_SIZE_XZ * 0.5f), XMFLOAT3(0.0f, XM_PI, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, TUTORIALWALL_SIZE_XZ, TUTORIALWALL_SIZE_Y, WALL_BLACK);
-	//äKíiÇÃê›íu
+	//ÈöéÊÆµ„Å®Âë®„Çä„ÅÆÂ£Å„ÅÆË®≠ÁΩÆ„ÅÆË®≠ÁΩÆ
 	InitMeshWall(XMFLOAT3(-DOOR_SIZE * 0.5f, 1.0f, TUTORIALWALL_SIZE_XZ*0.5f + STAIRS_SIZE_XZ * 0.5f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, STAIRS_SIZE_XZ, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(DOOR_SIZE*0.5f, 1.0f, TUTORIALWALL_SIZE_XZ*0.5f + STAIRS_SIZE_XZ * 0.5f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, STAIRS_SIZE_XZ, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(0.0f, 1.0f, TUTORIALWALL_SIZE_XZ*0.5f + STAIRS_SIZE_XZ), XMFLOAT3(0.0f, 0.0f, 0.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, DOOR_SIZE, TUTORIALWALL_SIZE_Y, WALL_BLACK);
-
 	SetFurniture(XMFLOAT3(0.0f, 0.0f, TUTORIALWALL_SIZE_XZ*0.5f + STAIRS_SHIFT_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), STAIRS);
+	SetFurniture(XMFLOAT3(0.0f, 0.0f+ STAIRS_SHIFT_Y, TUTORIALWALL_SIZE_XZ*0.5f + STAIRS_SHIFT_Z+ UPSTAIRS_SHIFT_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), STAIRS);
+
+	//Ë†üÁá≠„ÅÆË®≠ÁΩÆ
 	SetFurniture(XMFLOAT3(DOOR_SIZE*0.6f, 0.0f, TUTORIALWALL_SIZE_XZ*0.5f - CANDLE_SCL * 0.75f), XMFLOAT3(0.0f, 0.0f, 0.0f), CANDLE);
+	//„Éâ„Ç¢„ÅÆË®≠ÁΩÆ
+	SetFurniture(XMFLOAT3(-DOOR_SIZE*0.5f, 0.0f, TUTORIALWALL_SIZE_XZ*0.5f), XMFLOAT3(0.0f, 0.0f, 0.0f), CAGE);
+	SetFurniture(XMFLOAT3(TUTORIALWALL_SIZE_XZ*0.5f- PRISONSIDE_SIZE_XZ, 0.0f, -TUTORIALWALL_SIZE_XZ*0.5f+ DOOR_SIZE), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f), CAGE);
 
 	float room = TUTORIALWALL_SIZE_XZ / ROOM;
 
 	for (int i = 0; i < ROOM; i++)
 	{
-		//òSâÆÇÃï«(ê≥ñ )
+		//Áâ¢Â±ã„ÅÆÂ£Å(Ê≠£Èù¢)
 		InitMeshWall(XMFLOAT3(-TUTORIALWALL_SIZE_XZ * 0.5f + PRISONSIDE_SIZE_XZ, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) - (DOOR_SIZE*0.5f)), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
 			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, room - DOOR_SIZE, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 		InitMeshWall(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.5f - PRISONSIDE_SIZE_XZ, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) + (DOOR_SIZE*0.5f)), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
 			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, room - DOOR_SIZE, TUTORIALWALL_SIZE_Y, WALL_BLACK);
-		//ïîâÆÇÃÉIÉuÉWÉFÉNÉgê›íu
+		//ÈÉ®Â±ã„ÅÆ„Ç™„Éñ„Ç∏„Çß„ÇØ„ÉàË®≠ÁΩÆ
 		SetFurniture(XMFLOAT3(-TUTORIALWALL_SIZE_XZ * 0.5f + PRISONSIDE_SIZE_XZ - BED_SHIFT_X, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) - (DOOR_SIZE*0.5f) + BED_SHIFT_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), BED);
 		SetFurniture(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.5f - PRISONSIDE_SIZE_XZ + BED_SHIFT_X, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) + (DOOR_SIZE*0.5f) - BED_SHIFT_Z), XMFLOAT3(0.0f, -XM_PI, 0.0f), BED);
 		SetFurniture(XMFLOAT3(-TUTORIALWALL_SIZE_XZ * 0.5f + PRISONSIDE_SIZE_XZ - TOILET_SHIFT_X, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) - (DOOR_SIZE*0.5f) + TOILET_SHIFT_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), TOILET);
 		SetFurniture(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.5f - PRISONSIDE_SIZE_XZ + TOILET_SHIFT_X, 1.0f, room * i + room * 0.5f - (TUTORIALWALL_SIZE_XZ * 0.5f) + (DOOR_SIZE*0.5f) - TOILET_SHIFT_Z), XMFLOAT3(0.0f, -XM_PI, 0.0f), TOILET);
 
-		if (i == 0)continue;//ïîâÆÇÃêîÇÊÇËédêÿÇËÇÃêîÇÃï˚Ç™àÍÇ¬è≠Ç»Ç¢ÇΩÇﬂ
-		//òSâÆÇÃï«(édêÿÇË)
+		if (i == 0)continue;//ÈÉ®Â±ã„ÅÆÊï∞„Çà„Çä‰ªïÂàá„Çä„ÅÆÊï∞„ÅÆÊñπ„Åå‰∏Ä„Å§Â∞ë„Å™„ÅÑ„Åü„ÇÅ
+		//Áâ¢Â±ã„ÅÆÂ£Å(‰ªïÂàá„Çä)
 		InitMeshWall(XMFLOAT3(TUTORIALWALL_SIZE_XZ * 0.5f - PRISONSIDE_SIZE_XZ * 0.5f, 1.0f, room * i - (TUTORIALWALL_SIZE_XZ * 0.5f)), XMFLOAT3(0.0f, 0.0f, 0.0f),
 			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, PRISONSIDE_SIZE_XZ, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 		InitMeshWall(XMFLOAT3(-(TUTORIALWALL_SIZE_XZ * 0.5f - PRISONSIDE_SIZE_XZ * 0.5f), 1.0f, room * i - (TUTORIALWALL_SIZE_XZ * 0.5f)), XMFLOAT3(0.0f, 0.0f, 0.0f),
 			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), WALL_XZ, WALL_Y, PRISONSIDE_SIZE_XZ, TUTORIALWALL_SIZE_Y, WALL_BLACK);
 
 	}
+
 }
 
 void InitSetClearStage(void)
 {
+	//„Éû„ÉÉ„Éó„ÅÆÂ∫ä
+	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), (int)(CLEARSTAGEWALL_SIZE_X / FLOOR_BLOCK_SIZE) + 1, (int)(CLEARSTAGEWALL_SIZE_Z / FLOOR_BLOCK_SIZE) + 5, FLOOR_BLOCK_SIZE, FLOOR_BLOCK_SIZE, GROUND);
 
 }

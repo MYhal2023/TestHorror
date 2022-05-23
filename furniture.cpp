@@ -16,6 +16,7 @@
 #define	MODEL_TOILET		"data/MODEL/toilet.obj"		//トイレのモデル
 #define	MODEL_CANDLE		"data/MODEL/Candlestick.obj"//燭台のモデル
 #define	MODEL_STAIRS		"data/MODEL/stairs.obj"		//階段のモデル
+#define	MODEL_CAGE			"data/MODEL/cage.obj"		//ケージのモデル
 
 
 //*****************************************************************************
@@ -28,14 +29,16 @@ static int obj;
 //*****************************************************************************
 HRESULT InitFurniture(void)
 {
+	obj = 0;
 	for (int i = 0; i < MAX_FURNITURE; i++)
 	{
-		g_Furniture[i].pos = {0.0f,0.0f,0.0f };
+		g_Furniture[i].pos = { 0.0f,0.0f,0.0f };
 		g_Furniture[i].rot = { 0.0f,0.0f,0.0f };
 		g_Furniture[i].scl = { 0.0f,0.0f,0.0f };
 		g_Furniture[i].use = FALSE;
 		g_Furniture[i].load = FALSE;
 		g_Furniture[i].size = 0;
+		g_Furniture[i].open = FALSE;
 	}
 	return S_OK;
 }
@@ -123,7 +126,7 @@ void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type)
 		g_Furniture[obj].use = TRUE;
 		break;
 	case TOILET:
-		g_Furniture[obj].scl = { TOILET_SCL, TOILET_SCL, TOILET_SCL };
+		g_Furniture[obj].scl = { TOILET_SCL, TOILET_SCL*1.1f, TOILET_SCL };
 		LoadModel(MODEL_TOILET, &g_Furniture[obj].model);
 		g_Furniture[obj].load = TRUE;
 		g_Furniture[obj].use = TRUE;
@@ -135,11 +138,18 @@ void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type)
 		g_Furniture[obj].use = TRUE;
 		break;
 	case STAIRS:
-		g_Furniture[obj].scl = { STAIRS_SCL, STAIRS_SCL, STAIRS_SCL };
+		g_Furniture[obj].scl = { STAIRS_SCL*1.5f, STAIRS_SCL*1.25f, STAIRS_SCL };
 		LoadModel(MODEL_STAIRS, &g_Furniture[obj].model);
 		g_Furniture[obj].load = TRUE;
 		g_Furniture[obj].use = TRUE;
 		break;
+	case CAGE:
+		g_Furniture[obj].scl = { CAGE_SCL*0.8, CAGE_SCL, CAGE_SCL };
+		LoadModel(MODEL_CAGE, &g_Furniture[obj].model);
+		g_Furniture[obj].load = TRUE;
+		g_Furniture[obj].use = TRUE;
+		break;
+
 	}
 	obj++;
 }
