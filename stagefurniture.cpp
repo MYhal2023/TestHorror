@@ -56,7 +56,7 @@
 static FURNITURE g_StageFurniture[MAX_STAGEFURNITURE];
 static ID3D11Buffer				*g_VertexBuffer = NULL;		// ’¸“_î•ñ
 static BOOL						g_Load = FALSE;
-int								g_furniture = 0;
+int								g_furniture;				//‰Æ‹ï‚Ì”‚ğ”‚¦‚é
 //*****************************************************************************
 // ‰Šú‰»ˆ—
 //*****************************************************************************
@@ -81,10 +81,10 @@ HRESULT InitFurnitureFirStage(void)
 		g_StageFurniture[i].rot		= { 0.0f,0.0f,0.0f };
 		g_StageFurniture[i].scl		= { 1.0f,1.0f,1.0f };
 		g_StageFurniture[i].use		= FALSE;
-		g_StageFurniture[i].load	= TRUE;
+		g_StageFurniture[i].load	= FALSE;
 
 	}
-
+	g_furniture = 0;
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -102,9 +102,13 @@ void UninitStageFurniture(void)
 	}
 	for (int i = 0; i < MAX_STAGEFURNITURE; i++)
 	{
+		if (g_StageFurniture[i].load = FALSE)
+			continue;
 		UnloadModel(&g_StageFurniture[i].model);
+		g_StageFurniture[i].load = FALSE;
 	}
 	g_Load = FALSE;
+	return;
 }
 //*****************************************************************************
 // XVˆ—
