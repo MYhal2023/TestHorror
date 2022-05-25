@@ -10,6 +10,7 @@
 #include "renderer.h"
 #include "player.h"
 #include "collision.h"
+#include "debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -92,8 +93,11 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 	// マテリアル情報の初期化
 	ZeroMemory(&pMesh->material, sizeof(pMesh->material));
 	pMesh->material.Diffuse = col;
+	if (pMesh->texNo == WALL_RAY)pMesh->material.Diffuse = { 1.0f, 1.0f, 1.0f, 0.5f };
 
 	pMesh->texNo = texNo;
+	if (pMesh->texNo == WALL_RAY)pMesh->texNo = WALL_GRAY;	//レイになってる場合は修正
+
 	// ポリゴン表示位置の中心座標を設定
 	pMesh->pos = pos;
 
@@ -278,7 +282,11 @@ void DrawMeshWall(void)
 	{
 		pMesh = &g_aMeshWall[nCntMeshField];
 
-		if (g_aMeshWall[nCntMeshField].use == FALSE)continue;
+		BOOL ans = FALSE;
+#ifdef _DEBUG
+		if (pMesh->texNo == WALL_RAY)ans = TRUE;
+#endif
+		if (g_aMeshWall[nCntMeshField].use == FALSE || ans == TRUE)continue;
 		// 頂点バッファ設定
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
