@@ -96,7 +96,6 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 	if (pMesh->texNo == WALL_RAY)pMesh->material.Diffuse = { 1.0f, 1.0f, 1.0f, 0.5f };
 
 	pMesh->texNo = texNo;
-	if (pMesh->texNo == WALL_RAY)pMesh->texNo = WALL_GRAY;	//レイになってる場合は修正
 
 	// ポリゴン表示位置の中心座標を設定
 	pMesh->pos = pos;

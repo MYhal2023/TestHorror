@@ -38,6 +38,7 @@
 #include "stage.h"
 #include "tutorial.h"
 #include "game_over.h"
+#include "text_texture.h"
 
 
 
@@ -113,6 +114,7 @@ void InitSystem(void)
 
 	InitParticle();
 	InitGame_over();
+	InitTexttex();
 
 }
 //ステージ別の初期化処理
@@ -205,6 +207,8 @@ void UninitGame(void)
 	// 影の終了処理
 	UninitShadow();
 	UninitGame_over();
+	UninitTexttex();
+
 }
 
 //=============================================================================
@@ -271,6 +275,8 @@ void UpdateGame(void)
 
 	//UI表示更新処理
 	UpdateInterface();
+
+	UpdateTexttex();
 
 	// ライフの更新処理
 	UpdateLife();
@@ -409,6 +415,8 @@ void DrawGame0(void)
 	////UI表示描画処理
 	DrawInterface();
 
+	DrawTexttex();
+
 	DrawGame_over();
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
@@ -477,6 +485,8 @@ void DrawFirstStageGame(void)
 
 	////UI表示描画処理
 	DrawInterface();
+
+	DrawTexttex();
 
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
