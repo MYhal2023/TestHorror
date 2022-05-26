@@ -98,7 +98,8 @@ void InitSetStage()
 	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 460.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//⑨
 	SetStageFurniture(DOOR, XMFLOAT3{ -235.0f,0.0f, 400.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });	//⑩
 
-
+	//ドアーの透明MeshWall
+	//InitMeshWall(XMFLOAT3{ -140.0f,0.0f,0.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);		//①
 
 	//ケージ
 	SetStageFurniture(CAGe, XMFLOAT3{ 403,0.0f,-320 }, XMFLOAT3{ 0.0f,0.0f,0.0f });
