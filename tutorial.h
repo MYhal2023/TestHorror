@@ -14,7 +14,7 @@
 #define	FLOOR_BLOCK_SIZE			(100.0f)		// 床ブロックサイズ
 
 
-#define	TUTORIALWALL_SIZE_Y		(100.0f)	// 横ブロックサイズ縦
+#define	TUTORIALWALL_SIZE_Y		(300.0f)	// 横ブロックサイズ縦
 #define	TUTORIALWALL_SIZE_XZ	(1000.0f)	// 横ブロックサイズ横
 #define	PRISONSIDE_SIZE_XZ		(450.0f)	// 横ブロックサイズ横
 #define DOOR_SIZE				(75.0f)		// 横ブロックサイズ横
@@ -33,8 +33,9 @@
 
 //////////////////1F//////////////////
 #define CLEARSTAGEWALL_SIZE_Y		(100.0f)
-#define CLEARSTAGEWALL_SIZE_X		(250.0f)
-#define CLEARSTAGEWALL_SIZE_Z		(1000.0f)
+#define CLEARSTAGEWALL_SIZE_X		(1000.0f)
+#define CLEARSTAGEWALL_SIZE_Z		(300.0f)
+#define CLEARSTAGE_DOOR				(75.0f)
 
 //*****************************************************************************
 // プロトタイプ宣言
