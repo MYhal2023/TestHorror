@@ -195,3 +195,4 @@ void CollisionItem(XMFLOAT3 pos, float size)
 		}
 	}
 }
+
