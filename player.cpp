@@ -34,6 +34,8 @@
 #define	VALUE_ROTATE		(XM_PI * 0.02f)					// 回転量
 
 #define PLAYER_SHADOW_SIZE	(1.0f)							// 影の大きさ
+#define PLAYER_SPAWN1_X		(-450.0f)						//FIRST_STAGE　スポーン値X
+#define PLAYER_SPAWN1_Z		(-550.0f)						//FIRST_STAGE　スポーン値Z
 #define PLAYER_OFFSET_Y		(20.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_OFFSET_Z		(-300.0f)							// プレイヤーの足元をあわせる
 #define PLAYER_LIFE			(100)								// プレイヤーのライフ
@@ -132,7 +134,7 @@ HRESULT InitPlayer(void)
 		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, PLAYER_OFFSET_Z };
 		break;
 	case FIRST_STAGE:
-		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, PLAYER_OFFSET_Z };
+		g_Player.pos = { PLAYER_SPAWN1_X, PLAYER_OFFSET_Y, PLAYER_SPAWN1_Z };
 		break;
 	}
 	return S_OK;

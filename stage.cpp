@@ -87,22 +87,35 @@ void InitSetStage()
 	InitMeshWall(XMFLOAT3(0.0f - ADJUST_X, WALL_SIZE_Y, 0.0f - ADJUST_Z), XMFLOAT3(XM_PI*0.5f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), (int)(FLOOR_X / FLOOR_BLOCK_SIZE), (int)(FLOOR_Z / FLOOR_BLOCK_SIZE), WALL_SIZE_XZ, WALL_SIZE_XZ, WALL_GRAY);
 
 	//ÉhÉAÅ[
-	SetStageFurniture(DOOR, XMFLOAT3{ -140.0f,0.0f,0.0f }, XMFLOAT3{ 0.0f,XM_PI*0.5f,0.0f });		//á@
-	SetStageFurniture(DOOR, XMFLOAT3{ -200.0f,0.0f,-340.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áA
-	SetStageFurniture(DOOR, XMFLOAT3{ 0.0f,0.0f,-210.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });				//áB
-	SetStageFurniture(DOOR, XMFLOAT3{ -160.0f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI*0.5f,0.0f });	//áC
-	SetStageFurniture(DOOR, XMFLOAT3{ -360.0f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI * 0.5f,0.0f });	//áD
-	SetStageFurniture(DOOR, XMFLOAT3{ 235.0f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI * 0.5f,0.0f });	//áE
-	SetStageFurniture(DOOR, XMFLOAT3{ 210.0f,0.0f, 0.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });		//áF
-	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 560.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áG
-	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 460.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áH
-	SetStageFurniture(DOOR, XMFLOAT3{ -235.0f,0.0f, 400.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });	//áI
+	SetStageFurniture(DOOR, XMFLOAT3{ -175.0f,0.0f,0.0f }, XMFLOAT3{ 0.0f,XM_PI*0.5f,0.0f });		//á@
+	SetStageFurniture(DOOR, XMFLOAT3{ -200.0f,0.0f,-375.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áA
+	SetStageFurniture(DOOR, XMFLOAT3{ 0.0f,0.0f,-250.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });				//áB
+	SetStageFurniture(DOOR, XMFLOAT3{ -125.0f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI*0.5f,0.0f });	//áC
+	SetStageFurniture(DOOR, XMFLOAT3{ -317.5f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI * 0.5f,0.0f });	//áD
+	SetStageFurniture(DOOR, XMFLOAT3{ 275.0f,0.0f,-100.0f }, XMFLOAT3{ 0.0f,-XM_PI * 0.5f,0.0f });	//áE
+	SetStageFurniture(DOOR, XMFLOAT3{ 175.0f,0.0f, 0.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });		//áF
+	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 525.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áG
+	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 425.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áH
+	SetStageFurniture(DOOR, XMFLOAT3{ -275.0f,0.0f, 400.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });	//áI
 
 	//ÉhÉAÅ[ÇÃìßñæMeshWall
-	//InitMeshWall(XMFLOAT3{ -140.0f,0.0f,0.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);		//á@
+	InitMeshWall(XMFLOAT3{ -137.5f,0.0f,0.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);					//á@
+	InitMeshWall(XMFLOAT3{ -200.0f,0.0f,-337.5f }, XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áA
+	InitMeshWall(XMFLOAT3{ 0.0f,0.0f,-217.5f }, XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áB
+	InitMeshWall(XMFLOAT3{ -157.5f,0.0f,-100.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);				//áC
+	InitMeshWall(XMFLOAT3{ -357.5f,0.0f,-100.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);				//áD
+	InitMeshWall(XMFLOAT3{ 242.5f,0.0f,-100.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);				//áE
+	InitMeshWall(XMFLOAT3{ 207.5f,0.0f,0.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);					//áF
+	InitMeshWall(XMFLOAT3{ 400.0f,0.0f,557.5f }, XMFLOAT3(0.0f, XM_PI * 0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áG
+	InitMeshWall(XMFLOAT3{ 400.0f,0.0f,457.5f }, XMFLOAT3(0.0f, XM_PI * 0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áH
+	InitMeshWall(XMFLOAT3{ -232.5f,0.0f,400.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);					//áI
+
 
 	//ÉPÅ[ÉW
 	SetStageFurniture(CAGe, XMFLOAT3{ 403,0.0f,-320 }, XMFLOAT3{ 0.0f,0.0f,0.0f });
+
+	//ÉPÅ[ÉWìñÇΩÇËîªíË
+	InitMeshWall(XMFLOAT3{ 450.0f,0.0f,-320.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 100.0f, WALL_SIZE_Y, WALL_RAY);					//áI
 
 	//ÉxÉbÉh
 	SetStageFurniture(BEd, XMFLOAT3{ -150.0f,0.0f,550.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });
