@@ -13,7 +13,7 @@
 #define CANDLE_SCL	(3.25f)
 #define STAIRS_SCL	(2.0f)
 #define CAGE_SCL	(1.0f)
-#define DOOR_SCL	(1.0f)
+#define DOOR_SCL	(2.2f)
 
 //*****************************************************************************
 // ç\ë¢ëÃíËã`
