@@ -17,7 +17,7 @@
 #define	MODEL_CANDLE		"data/MODEL/Candlestick.obj"//燭台のモデル
 #define	MODEL_STAIRS		"data/MODEL/stairs.obj"		//階段のモデル
 #define	MODEL_CAGE			"data/MODEL/cage.obj"		//ケージのモデル
-#define	MODEL_DOOR			"data/MODEL/door.obj"		//ケージのモデル
+#define	MODEL_DOOR			"data/MODEL/door.obj"		//ドアのモデル
 
 
 //*****************************************************************************
@@ -145,13 +145,13 @@ void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type)
 		g_Furniture[obj].use = TRUE;
 		break;
 	case CAGE:
-		g_Furniture[obj].scl = { CAGE_SCL*0.8, CAGE_SCL, CAGE_SCL };
+		g_Furniture[obj].scl = { CAGE_SCL*0.8f, CAGE_SCL, CAGE_SCL };
 		LoadModel(MODEL_CAGE, &g_Furniture[obj].model);
 		g_Furniture[obj].load = TRUE;
 		g_Furniture[obj].use = TRUE;
 		break;
 	case GOAL:
-		g_Furniture[obj].scl = { DOOR_SCL, DOOR_SCL, DOOR_SCL };
+		g_Furniture[obj].scl = { DOOR_SCL, DOOR_SCL*2.3f, DOOR_SCL*1.35f };
 		LoadModel(MODEL_DOOR, &g_Furniture[obj].model);
 		g_Furniture[obj].load = TRUE;
 		g_Furniture[obj].use = TRUE;
