@@ -39,6 +39,7 @@
 #include "tutorial.h"
 #include "game_over.h"
 #include "text_texture.h"
+#include "tutorial_text.h"
 
 
 
@@ -61,7 +62,7 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 
 static BOOL	g_bPause = TRUE;	// ポーズON/OFF
 static int	g_PlayMode = MAIN_GAME;
-static int	g_PlayStage = FIRST_STAGE;
+static int	g_PlayStage = PRISON_STAGE;
 static BOOL	g_PlayStageChange = FALSE;
 //=============================================================================
 // 初期化処理
@@ -117,7 +118,7 @@ void InitSystem(void)
 	InitParticle();
 	InitGame_over();
 	InitTexttex();
-
+	InitTutorialTex();
 }
 //ステージ別の初期化処理
 void InitStage(int stageNum)
@@ -210,7 +211,7 @@ void UninitGame(void)
 	UninitShadow();
 	UninitGame_over();
 	UninitTexttex();
-
+	UninitTutorialTex();
 }
 
 //=============================================================================
@@ -234,6 +235,9 @@ void UpdateGame(void)
 #endif
 	FADE fade = GetFade();
 	if (fade != FADE_NONE)return;
+
+	UpdateTutorialTex();
+	if (GetTutorialTex())return;	//更新を切る
 
 	UpdateGame_over();
 	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
@@ -427,6 +431,8 @@ void DrawGame0(void)
 
 	DrawTexttex();
 
+	DrawTutorialTex();
+
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
 	ans = MODE_PLANE;
@@ -535,9 +541,8 @@ void DrawGame(void)
 	// プレイヤー視点
 	pos = GetPlayer()->pos;
 	//pos = GetEnemy()->pos;	//デバッグ用
-	SetCameraAT(pos);
-	SetCamera();
-
+		SetCameraAT(pos);
+		SetCamera();
 	switch(g_ViewPortType_Game)
 	{
 	case TYPE_FULL_SCREEN:
@@ -585,6 +590,13 @@ void CheckModeChange(void)
 {
 	PLAYER *player = GetPlayer();
 	if (!g_PlayStageChange && g_PlayStage == PRISON_STAGE && player->pos.z >= 520.0f)
+	{
+		g_PlayStage++;
+		g_PlayStageChange = TRUE;
+		SetFade(FADE_OUT, MODE_GAME);
+	}
+	if (!g_PlayStageChange && g_PlayStage == FIRST_STAGE && 
+		player->pos.z <= -330.0f && player->pos.x >= 405.0f)
 	{
 		g_PlayStage++;
 		g_PlayStageChange = TRUE;

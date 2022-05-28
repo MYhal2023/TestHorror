@@ -171,6 +171,7 @@
     <ClCompile Include="time.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="tutorial.cpp" />
+    <ClCompile Include="tutorial_text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="amadeus.h" />
@@ -210,6 +211,7 @@
     <ClInclude Include="time.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="tutorial.h" />
+    <ClInclude Include="tutorial_text.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
