@@ -46,3 +46,4 @@ XMFLOAT3 GetMeshWallEdPosition(int i);
 int GetMeshWallNum(void);
 int GetCeilingWallNum(void);
 void ResetMeshWall(void);
+void DeleteMeshWall(int i);

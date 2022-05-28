@@ -16,6 +16,7 @@
 #include "amadeus.h"
 #include "game.h"
 #include "light.h"
+#include "meshwall.h"
 
 
 //*****************************************************************************
@@ -23,11 +24,12 @@
 //*****************************************************************************
 #define TEXTURE_MAX			(3)			// テクスチャの数
 
-#define	ENEMY_TEXMAG	(0.08f)							// 元画像に対する倍率
+#define	ENEMY_TEXMAG	(0.10f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define ENEMY_SIGHT		(400.0f)		//エネミーの視力
 #define	ENEMY_SPEED		(1.0f)			// エネミーの移動スピード
+#define	ENEMY_MEMORY	(180)			// エネミーの記憶力
 
 
 //*****************************************************************************
@@ -57,8 +59,17 @@ static char *g_TextureName[TEXTURE_MAX] =
 
 static BOOL							g_Load = FALSE;
 
+//1Fのデフォルトスポーン
 static INTERPOLATION_DATA move_tbl[] = {	// pos, rot, scl, frame
-	{ XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 60 },
+	{ XMFLOAT3(50.0f, 0.0f, -50.0f), XMFLOAT3(0.0f, XM_PI * 0.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 360 },
+	{ XMFLOAT3(50.0f, 0.0f, 350.0f), XMFLOAT3(0.0f, XM_PI * 0.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 20 },
+	{ XMFLOAT3(50.0f, 0.0f, 350.0f), XMFLOAT3(0.0f, -XM_PI * 0.5f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 360 },
+	{ XMFLOAT3(-450.0f, 0.0f, 350.0f), XMFLOAT3(0.0f, -XM_PI * 0.5f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 20 },
+	{ XMFLOAT3(-450.0f, 0.0f, 350.0f), XMFLOAT3(0.0f, -XM_PI * 1.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 360 },
+	{ XMFLOAT3(-450.0f, 0.0f, -50.0f), XMFLOAT3(0.0f, -XM_PI * 1.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 20 },
+	{ XMFLOAT3(-450.0f, 0.0f, -50.0f), XMFLOAT3(0.0f, -XM_PI * 1.5f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 360 },
+	{ XMFLOAT3(50.0f, 0.0f, -50.0f), XMFLOAT3(0.0f, -XM_PI * 1.5f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 20 },
+	{ XMFLOAT3(50.0f, 0.0f, -50.0f), XMFLOAT3(0.0f, -XM_PI * 2.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), 360 },
 };
 
 //=============================================================================
@@ -94,6 +105,7 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].fHeight = ENEMY_HEIGHT;
 		g_Enemy[i].use = FALSE;
 		g_Enemy[i].texNo = 0;
+		g_Enemy[i].memory = 0;
 
 		g_Enemy[i].move_time = 0.0f;	// 線形補間用のタイマーをクリア
 		g_Enemy[i].tbl_adr = NULL;		// 再生するアニメデータの先頭アドレスをセット
@@ -105,6 +117,14 @@ HRESULT InitEnemy(void)
 	g_Enemy[0].tbl_adr = move_tbl;		// 再生するアニメデータの先頭アドレスをセット
 	g_Enemy[0].tbl_size = sizeof(move_tbl) / sizeof(INTERPOLATION_DATA);	// 再生するアニメデータのレコード数をセット
 
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		break;
+	case FIRST_STAGE:
+		SetEnemy(XMFLOAT3(50.0f, 0.0f, -60.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		break;
+	}
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -165,6 +185,10 @@ void UpdateEnemy(void)
 		float diffuse = FloatClamp(1.0f - (lenSq + 0.01f) / line, 0.0f, 1.0f);
 		float alpha = 1.0f;
 		if (diffuse <= 0.1f)alpha = diffuse;
+
+#ifdef _DEBUG
+		alpha = 1.0f;
+#endif
 		g_Enemy[i].material.Diffuse = { diffuse, diffuse, diffuse, alpha };
 
 		//エネミーのステート処理
@@ -387,11 +411,25 @@ int StateCheck(int i)
 {
 	PLAYER *player = GetPlayer();
 	int ans = Patrol;			//デフォルトは巡回モード
-	//プレイヤーを視界に捉えたか
+	if (g_Enemy[i].memory > 0)
+	{
+		g_Enemy[i].memory--;
+		return Chase;
+	}
+
+	XMFLOAT3 pos = { player->pos.x, 0.0f, player->pos.z };
+	for (int k = 0; k < GetMeshWallNum(); k++)
+	{
+		//壁越しは視界に捉えられない
+		if (CheckCrossLine(g_Enemy[i].pos, pos, GetMeshWallStPosition(k), GetMeshWallEdPosition(k)))
+			return ans;
+	}
+	//プレイヤーを視界に捉えたか、プレイヤーが当たったかで判断
 	if (Visibility(g_Enemy[i].pos, player->pos, g_Enemy[i].rot.y, ENEMY_SIGHT) == TRUE ||
 		 CollisionBC(player->pos, g_Enemy[i].pos, player->size, g_Enemy[i].fWidth) == TRUE)
 	{
 		ans = Chase;	//追跡開始
+		g_Enemy[i].memory = ENEMY_MEMORY;
 	}
 
 	return ans;

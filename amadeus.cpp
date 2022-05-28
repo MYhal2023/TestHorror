@@ -164,7 +164,7 @@ XMVECTOR TacticalPointSystem(int i)	//ípˆÊ’u‰ğÍƒVƒXƒeƒ€B”z—ñ”Ô†‚ğ‚Á‚Ä‚­‚é
 
 			//ƒEƒFƒCƒ|ƒCƒ“ƒg•]‰¿ƒtƒF[ƒY
 			if (g_WayPoint[a][b].use == TRUE)
-				g_WayPoint[a][b].value = ValueWayPoint(g_WayPoint[a][b].pos, 0.0f, i);
+				g_WayPoint[a][b].value = ValueWayPoint(g_WayPoint[a][b].pos, enemy[i].pos, 0.0f, i);
 
 			////ƒfƒoƒbƒOA•ª‚©‚è‚â‚·‚¢‚æ‚¤‚ÉFŠo‚ğ•Ï‚¦‚é
 			//if (g_WayPoint[a][b].use == TRUE)
@@ -247,10 +247,20 @@ BOOL FilterWayPoint(XMFLOAT3 pos, XMFLOAT3 pos2, int k)		//ƒEƒFƒCƒ|ƒCƒ“ƒgA©g‚
 
 //ƒEƒFƒCƒ|ƒCƒ“ƒg‚ğ•]‰¿‚·‚éŠÖ”B©g‚Ì”z—ñ”Ô†‚à‚Á‚Ä‚­‚é
 //ˆø”1:ƒEƒFƒCƒ|ƒCƒ“ƒgÀ•WAˆø”2:Å‰‚É‚ ‚é•]‰¿’lAˆø”3:”z—ñ”Ô†
-float ValueWayPoint(XMFLOAT3 pos, float value, int k)
+float ValueWayPoint(XMFLOAT3 pos, XMFLOAT3 pos2, float value, int k)
 {
 	PLAYER *player = GetPlayer();
 	ENEMY *enemy = GetEnemy();
+	//N“ü•s‰Â‚ÌêŠ‚ğíœ
+	for (int i = 0; i < GetMeshWallNum(); i++)
+	{
+		if (i == GetCeilingWallNum())continue;
+		if (CheckCrossLine(pos2, pos, GetMeshWallStPosition(i), GetMeshWallEdPosition(i)) == TRUE)
+		{
+			return value;
+		}
+	}
+
 
 	XMVECTOR disP = XMLoadFloat3(&player->pos) - XMLoadFloat3(&pos);
 	disP = XMVector3Length(disP);				//‹——£‚ğ2æ

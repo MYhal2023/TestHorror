@@ -44,9 +44,9 @@
 #define STANDBY_MOVE_FRAME			((STANDBYMATCH_POS_Y-DEFAULTMATCH_POS_Y)/STANDBYTIME)//構える時の1フレームあたりの移動量
 #define MATCH_NUM					(10)			// マッチの本数(初期)
 
-#define MATCH_SLOW					(300)
-#define MATCH_MIDDLE				(600)
-#define MATCH_FAST					(100)
+#define MATCH_SLOW					(800)
+#define MATCH_MIDDLE				(1200)
+#define MATCH_FAST					(500)
 //#define	MODEL_???			"data/MODEL/???"		// 読み込むモデル名
 
 //*****************************************************************************
@@ -211,7 +211,8 @@ void StandbyMatch(void)
 	
 	//マッチが燃えていない時の処理
 	//マッチを構える条件
-	if (IsButtonPressed(0, BUTTON_L)&&(0 < g_Match.num) )
+	if (!GetCameraPos())return;
+	if (IsButtonPressed(0, BUTTON_L)&&(0 < g_Match.num) && ReturnSelect() == MATCH_ITEM)
 	{
 		g_Match.Out = TRUE;
 		//構えきるまでの時間

@@ -10,9 +10,9 @@
 // マクロ定義
 //*****************************************************************************
 #define MAX_ITEM (4)	//使うアイテムの数
-#define SIZE_KEY (8)	//鍵の当たり判定の大きさ
-#define SIZE_MATCH (10)	//鍵の当たり判定の大きさ
-#define SIZE_LIGHTER (10)	//鍵の当たり判定の大きさ
+#define SIZE_KEY (15)	//鍵の当たり判定の大きさ
+#define SIZE_MATCH (25)	//鍵の当たり判定の大きさ
+#define SIZE_LIGHTER (25)	//鍵の当たり判定の大きさ
 
 //*****************************************************************************
 // 構造体定義
@@ -48,3 +48,5 @@ void UninitItem(void);
 void UpdateItem(void);
 void DrawItem(void);
 void CollisionItem(XMFLOAT3 pos, float size);
+BOOL CheckDoorKey(int i);
+MODEL_ITEM *GetItem(void);

@@ -12,6 +12,11 @@
 #include "collision.h"
 #include "itembox.h"
 #include "sound.h"
+#include "text_texture.h"
+#include "furniture.h"
+#include "enemy.h"
+#include "match.h"
+#include "stagefurniture.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -30,63 +35,157 @@ static BOOL				g_Load = FALSE;
 //*****************************************************************************
 HRESULT InitItem(void)
 {
-	for (int i = 0; i < MAX_ITEM; i++)
+	//まずは全配列を初期化
+	for(int i = 0; i < MAX_ITEM; i++)
 	{
-		//まずはアイテムをタイプ分け
-		switch (i)
-		{
-		case 0:
-			g_Item[i].type = ITEM_KEY;
-			g_Item[i].pos = { 0.0f, 20.0f, 150.0f };				// モデルの位置
-			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
-			g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
-			g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
-			break;
-		case 1:
-			g_Item[i].type = ITEM_KEY;
-			g_Item[i].pos = { 0.0f, 20.0f, 50.0f };				// モデルの位置
-			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
-			g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
-			g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
-			break;
-		case 2:
-			g_Item[i].type = ITEM_MATCH;
-			g_Item[i].pos = { 0.0f, 5.0f, 80.0f };				// モデルの位置
-			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
-			g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
-			g_Item[i].size = SIZE_MATCH;							// 当たり判定の大きさ
-			break;
-		case 3:
-			g_Item[i].type = ITEM_LIGHTER;
-			g_Item[i].pos = { 0.0f, 5.0f, 100.0f };				// モデルの位置
-			g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
-			g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
-			g_Item[i].size = SIZE_LIGHTER;							// 当たり判定の大きさ
-			break;
-		}
-		//アイテムタイプに基づいたモデルの紐づけ
-		switch (g_Item[i].type)
-		{
-		case ITEM_KEY:
-			LoadModel(MODEL_KEY, &g_Item[i].model);
-			break;
-		case ITEM_MATCH:
-			LoadModel(MODEL_MATCH, &g_Item[i].model);
-			break;
-		case ITEM_LIGHTER:
-			LoadModel(MODEL_LIGHTER, &g_Item[i].model);
-			break;
+		g_Item[i].pos = {0.0f, 0.0f, 0.0f};				// モデルの位置
+		g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+		g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
+		g_Item[i].use = FALSE;
+		g_Item[i].load = FALSE;
+		g_Item[i].drop = TRUE;				//アイテムが取得状態か(TRUEで落ちている、FALSEで拾われている)
+		g_Item[i].size = 0.0f;				// 当たり判定の大きさ
+		g_Item[i].type = NULL;				//アイテムの種類
+		g_Item[i].ID = 99;					//鍵のみに使用。このIDとドアのIDが一致していれば使用可能になる
 
-		case MAXTYPE_ITEM:
-			break;
-		}
-		g_Item[i].load = TRUE;
-		g_Item[i].use = TRUE;
-		g_Item[i].drop = TRUE;
-		g_Item[i].ID = i;
-
-		GetModelDiffuse(&g_Item[i].model, &g_Item[i].diffuse[0]);
 	}
+
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		for (int i = 0; i < MAX_ITEM; i++)
+		{
+			//まずはアイテムをタイプ分け
+			switch (i)
+			{
+			case 0:
+				g_Item[i].type = ITEM_KEY;								//1
+				g_Item[i].pos = { 60.0f, 40.0f, -350.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.5f, 0.5f, 0.5f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
+				g_Item[i].ID = i;
+				break;
+			case 1:
+				g_Item[i].type = ITEM_KEY;							//2
+				g_Item[i].pos = { -500.0f, 40.0f, -400.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.5f, 0.5f,0.5f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
+				g_Item[i].ID = i;
+				break;
+			case 2:
+				g_Item[i].type = ITEM_MATCH;
+				g_Item[i].pos = { -445.0f, 25.0f, -465.0f };				// モデルの位置
+				g_Item[i].rot = { XM_PI * 0.0f, 0.0f, XM_PI * 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_MATCH;							// 当たり判定の大きさ
+				break;
+			case 3:
+				g_Item[i].type = ITEM_LIGHTER;
+				g_Item[i].pos = { 450.0f, 5.0f, -330.0f };				// モデルの位置
+				g_Item[i].rot = { XM_PI * 0.0f, 0.0f, XM_PI * 0.5f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_LIGHTER;							// 当たり判定の大きさ
+				break;
+			}
+			//アイテムタイプに基づいたモデルの紐づけ
+			switch (g_Item[i].type)
+			{
+			case ITEM_KEY:
+				LoadModel(MODEL_KEY, &g_Item[i].model);
+				break;
+			case ITEM_MATCH:
+				LoadModel(MODEL_MATCH, &g_Item[i].model);
+				break;
+			case ITEM_LIGHTER:
+				LoadModel(MODEL_LIGHTER, &g_Item[i].model);
+				break;
+
+			case MAXTYPE_ITEM:
+				break;
+			}
+			g_Item[i].load = TRUE;
+			g_Item[i].use = TRUE;
+			g_Item[i].drop = TRUE;
+
+			GetModelDiffuse(&g_Item[i].model, &g_Item[i].diffuse[0]);
+		}
+		break;
+	case FIRST_STAGE:
+		for (int i = 0; i < MAX_ITEM; i++)
+		{
+			g_Item[i].ID = 0;
+			//まずはアイテムをタイプ分け
+			switch (i)
+			{
+			case 0:
+				g_Item[i].type = ITEM_KEY;
+				g_Item[i].pos = { -300.0f, 20.0f, -450.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
+				g_Item[i].ID = 100;
+				break;
+			case 1:
+				g_Item[i].type = ITEM_KEY;
+				g_Item[i].pos = { 220.0f, 20.0f, 550.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 1.0f, 1.0f, 1.0f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
+				g_Item[i].ID = 1;
+				break;
+			case 2:
+				g_Item[i].type = ITEM_MATCH;
+				g_Item[i].pos = { -100.0f, 5.0f, 200.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_MATCH;							// 当たり判定の大きさ
+				break;
+			case 3:
+				g_Item[i].type = ITEM_MATCH;
+				g_Item[i].pos = { 100.0f, 5.0f, 500.0f };				// モデルの位置
+				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+				g_Item[i].size = SIZE_MATCH;							// 当たり判定の大きさ
+				break;
+			}
+			//アイテムタイプに基づいたモデルの紐づけ
+			switch (g_Item[i].type)
+			{
+			case ITEM_KEY:
+				LoadModel(MODEL_KEY, &g_Item[i].model);
+				break;
+			case ITEM_MATCH:
+				LoadModel(MODEL_MATCH, &g_Item[i].model);
+				break;
+			case ITEM_LIGHTER:
+				LoadModel(MODEL_LIGHTER, &g_Item[i].model);
+				break;
+
+			case MAXTYPE_ITEM:
+				break;
+			}
+			g_Item[i].load = TRUE;
+			g_Item[i].use = TRUE;
+			g_Item[i].drop = TRUE;
+
+			GetModelDiffuse(&g_Item[i].model, &g_Item[i].diffuse[0]);
+		}
+		break;
+	case 	CLEAR_STAGE:
+	case	MAX_STAGE:
+	default:
+		for (int i = 0; i < MAX_ITEM; i++)
+		{
+			if (g_Item[i].use == TRUE)
+			{
+				g_Item[i].use = FALSE;
+			}
+		}
+		break;
+	}
+
 	return S_OK;
 }
 
@@ -168,6 +267,7 @@ void DrawItem(void)
 //落ちているアイテムとの当たり判定
 void CollisionItem(XMFLOAT3 pos, float size)
 {
+	MATCH *match = GetMatch();
 	for (int i = 0; i < MAX_ITEM; i++)
 	{
 		if (!g_Item[i].use || !g_Item[i].drop)continue;
@@ -178,16 +278,19 @@ void CollisionItem(XMFLOAT3 pos, float size)
 		case ITEM_KEY:
 			AddItembox(KEY);
 			g_Item[i].drop = FALSE;
+			SetTexture(TEXT_TAKE_KEY);
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case ITEM_MATCH:
-			AddItembox(MATCH_ITEM);
+			match->num++;
 			g_Item[i].drop = FALSE;
+			SetTexture(TEXT_TAKE_MATCH);
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case ITEM_LIGHTER:
 			AddItembox(LIGHTER_ITEM);
 			g_Item[i].drop = FALSE;
+			SetTexture(TEXT_TAKE_LIGHTER);
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case MAXTYPE_ITEM:
@@ -196,3 +299,37 @@ void CollisionItem(XMFLOAT3 pos, float size)
 	}
 }
 
+//プレイヤーがドアに近づいた時に使う関数。開ける時にTRUE、そうでない時はFALSEを返す
+//第一引数にはドアのIDを取る
+BOOL CheckDoorKey(int i)
+{
+	FURNITURE *fur = GetFurniture();
+	STAGEFURNITURE *sfur = GetStageFurniture();
+	BOOL ans = FALSE;
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		for (int k = 0; k < MAX_ITEM; k++)
+		{
+			if (g_Item[k].type != ITEM_KEY || g_Item[k].drop == TRUE)continue;
+
+			if (fur[i].ID == g_Item[k].ID)ans = TRUE;
+			if (g_Item[k].ID == 0)SetEnemy(XMFLOAT3(0.0f, 0.0f, 100.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		}
+		break;
+	case FIRST_STAGE:
+		for (int k = 0; k < MAX_ITEM; k++)
+		{
+			if (g_Item[k].type != ITEM_KEY || g_Item[k].drop == TRUE)continue;
+
+			if (i == g_Item[k].ID)ans = TRUE;
+		}
+		break;
+	}
+	return ans;
+}
+
+MODEL_ITEM *GetItem(void)
+{
+	return &g_Item[0];
+}

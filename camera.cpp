@@ -11,6 +11,7 @@
 #include "player.h"
 #include "time.h"
 #include "debugproc.h"
+#include "match.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -42,13 +43,14 @@ static CAMERA			g_Cam;		// カメラデータ
 static int				g_ViewPortType = TYPE_FULL_SCREEN;
 
 static float			g_WalkCamera;	//1fあたりのカメラの変化量
-static float			g_;
+static float			g_CamPosY;
 static int				g_Prevrun;
 static float			g_CamBetweenpos;
 static float			g_CamInt;
 static XMFLOAT3			g_oldpos;
 static XMFLOAT3			g_oldat;
-
+static BOOL				g_PosYTrigger = FALSE;
+static BOOL				g_PosYSwitch = TRUE;
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -74,7 +76,15 @@ void InitCamera(void)
 	g_ViewPortType = TYPE_FULL_SCREEN;
 
 	g_CamBetweenpos = 0.0f;
-
+	g_CamPosY = 10.0f;
+	g_PosYTrigger = TRUE;
+	g_PosYSwitch = FALSE;
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		g_Cam.rot = { 0.0f, XM_PI * 1.0f, 0.0f };
+		break;
+	}
 }
 
 
@@ -117,6 +127,7 @@ void UpdateCamera(void)
 		g_Cam.at.x = g_Cam.pos.x + sinf(g_Cam.rot.y) * g_Cam.len;
 		g_Cam.at.z = g_Cam.pos.z + cosf(g_Cam.rot.y) * g_Cam.len;
 	}
+
 
 	if (g_Cam.tbl_adr != NULL)
 	{
@@ -284,12 +295,12 @@ void SetCameraAT(XMFLOAT3 pos)
 	pos.y += g_Cam.atPos.y;
 	pos.z += g_Cam.atPos.z;
 	// カメラの注視点をセット
-	g_Cam.at = pos;
+	g_Cam.at = { pos.x,pos.y + g_CamPosY,pos.z };
 
 	// カメラの視点をカメラのY軸回転に対応させている
 	g_Cam.pos.x = g_Cam.at.x - sinf(g_Cam.rot.y) * g_Cam.len;
 	g_Cam.pos.z = g_Cam.at.z - cosf(g_Cam.rot.y) * g_Cam.len;
-	g_Cam.pos.y = pos.y;
+	g_Cam.pos.y = pos.y + g_CamPosY;
 
 
 	//走ってる時の画面の揺れ
@@ -329,5 +340,47 @@ void CameraBetween(void)
 	//g_Cam.at.x = (g_oldat.x * g_CamBetweenpos + g_Cam.at.x * (1.0f - g_CamBetweenpos));
 	g_Cam.at.y = (g_oldat.y * g_CamBetweenpos + g_Cam.at.y * (1.0f - g_CamBetweenpos));
 	//g_Cam.at.z = (g_oldat.z * g_CamBetweenpos + g_Cam.at.z * (1.0f - g_CamBetweenpos));
+
+}
+
+BOOL GetCameraPos(void)
+{
+	return g_PosYTrigger;
+}
+
+void SetChangeCamera(void)
+{
+	PLAYER *player = GetPlayer();
+	MATCH *match = GetMatch();
+	if (CheckLightOn() == TRUE || match->Out)return;
+	if (GetKeyboardTrigger(DIK_C) || IsButtonTriggered(0, BUTTON_R))
+	{
+		//g_PosYTrigger == TRUE ? g_PosYTrigger = FALSE : g_PosYTrigger = TRUE;
+		g_PosYSwitch = TRUE;
+	}
+	if (g_PosYSwitch)
+	{
+		player->spd = 0.0f;
+		if (g_PosYTrigger)
+		{
+			const float minLine = -20.0f;
+			g_CamPosY -= 1.0f;
+			if (g_CamPosY <= minLine) {
+				g_CamPosY = minLine;
+				g_PosYTrigger = FALSE;
+				g_PosYSwitch = FALSE;
+			}
+		}
+		else
+		{
+			const float maxLine = 10.0f;
+			g_CamPosY += 1.0f;
+			if (g_CamPosY >= maxLine) {
+				g_CamPosY = maxLine;
+				g_PosYTrigger = TRUE;
+				g_PosYSwitch = FALSE;
+			}
+		}
+	}
 
 }

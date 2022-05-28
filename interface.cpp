@@ -21,8 +21,8 @@
 // マクロ定義
 //*****************************************************************************
 #define TEXTURE_MAX					(12)				// テクスチャの数
-#define WIDTH						(960.0f)
-#define HEIGHT						(540.0f)
+#define WIDTH						(1920.0f)
+#define HEIGHT						(1080.0f)
 
 #define PLAYER_HURT_FRAME			(120)			// プレイヤー無敵フレーム
 
@@ -37,23 +37,23 @@
 #define OIL_X						(WIDTH-50.0f)	// テクスチャ座標
 #define OIL_Y						(HEIGHT-100.0f)					// 
 
-#define STAM_TEXTURE_WIDTH			(300.0f)	// テクスチャサイズ
-#define STAM_TEXTURE_HEIGHT			(10.0f)	// 
-#define	STAM_X						(HP_X)			// テクスチャ座標
-#define STAM_Y						(HP_Y+20.0f)
+#define STAM_TEXTURE_WIDTH			(WIDTH * 0.8f)	// テクスチャサイズ
+#define STAM_TEXTURE_HEIGHT			(7.0f)	// 
+#define	STAM_X						(WIDTH * 0.5f)			// テクスチャ座標
+#define STAM_Y						(21.0f)
 
-#define MIND_TEXTURE_WIDTH			(350.0f)	// テクスチャサイズ
-#define MIND_TEXTURE_HEIGHT			(20.0f)	// 
+#define MIND_TEXTURE_WIDTH			(700)	// テクスチャサイズ
+#define MIND_TEXTURE_HEIGHT			(40.0f)	// 
 #define	MIND_X						(HP_X)			// テクスチャ座標
 #define MIND_Y						(HP_Y+40.0f)
 
-#define ITEM_BOX_TEXTURE_WIDTH		(40.0f)	// テクスチャサイズ
-#define ITEM_BOX_TEXTURE_HEIGHT		(35.0f)	// 
-#define	ITEM_BOX_X					(432.0f)		// テクスチャ座標
-#define ITEM_BOX_Y					(500.0f)
+#define ITEM_BOX_TEXTURE_WIDTH		(80.0f)	// テクスチャサイズ
+#define ITEM_BOX_TEXTURE_HEIGHT		(70.0f)	// 
+#define	ITEM_BOX_X					(864.0f)		// テクスチャ座標
+#define ITEM_BOX_Y					(1000.0f)
 
-#define MATCH_X						(50.0f)
-#define MATCH_Y						(460.0f)
+#define MATCH_X						(1700.0f)
+#define MATCH_Y						(980.0f)
 
 #define MATCH_TEXTURE_WIDTH			(40.0f * 2.0f)
 #define MATCH_TEXTURE_HEIGHT		(20.0f * 2.0f)
@@ -86,7 +86,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbarred.png",
 	"data/TEXTURE/hpbar.png",
-	"data/TEXTURE/stamina1.png",				//後で追加してくださいね
+	"data/TEXTURE/stamina1.png",				
 	"data/TEXTURE/oilbarred.png",
 	"data/TEXTURE/oilbar.png",
 	"data/TEXTURE/number16x32.png",
@@ -198,11 +198,11 @@ HRESULT InitInterface(void)
 	g_UI[HURT].color = { 0.3f,0.0f,0.0f,0.0f };
 
 	//Sanityエフェクト
-	g_UI[INSANE].use = FALSE;
+	g_UI[INSANE].use = TRUE;
 	g_UI[INSANE].pos = { WIDTH * 0.5f, HEIGHT * 0.5f, 0.0f };
 	g_UI[INSANE].w = WIDTH;
 	g_UI[INSANE].h = HEIGHT;
-	g_UI[INSANE].color = { 1.0f,0.0f,0.0f,0.0f };
+	g_UI[INSANE].color = { 0.1f,0.0f,0.0f,0.0f };
 
 	//スタミナバー
 	g_UI[STAM_BAR].pos = { STAM_X , STAM_Y , 0.0f };
@@ -210,6 +210,11 @@ HRESULT InitInterface(void)
 	g_UI[STAM_BAR].h = STAM_TEXTURE_HEIGHT;
 	g_UI[STAM_BAR].color = { 0.0f,1.0f,0.0f,1.0f };
 
+	const float mag = 0.15f;
+	g_UI[MIND].pos = { WIDTH * 0.10f, HEIGHT * 0.88f, 0.0f };
+	g_UI[MIND].w = 1300 * mag;
+	g_UI[MIND].h = 1300 * mag;
+	g_UI[MIND].color = { 1.0f,1.0f,1.0f,1.0f };
 
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
@@ -293,10 +298,9 @@ void UpdateInterface(void)
 	g_UI[OIL_RED].h = OIL_TEXTURE_HEIGHT * (lighter.oil / HUNDRED);				//オイルが少なくなって、ゲージも小さくなる
 	g_UI[OIL_RED].pos.y = OIL_Y + (HUNDRED - lighter.oil)*DEVIATION_OIL;			//小さくすれば、下に移動する
 
-	//Sanity
-	g_UI[MIND].w = MIND_TEXTURE_WIDTH * (((float)player.sanity) / HUNDRED);
-	g_UI[MIND].pos.x = MIND_X - (HUNDRED - (float)(player.sanity)) * DEVIATION_MIND;
-
+	const int buffer = 25;
+	g_UI[MIND].color.y = FloatClamp((((float)((player.sanity - 20) / (float)(player.sanityMax)))), 0.0f, 1.0f);
+	g_UI[MIND].color.z = FloatClamp((((float)((player.sanity - 20) / (float)(player.sanityMax)))), 0.0f, 1.0f);
 	//Sanity エフェクト
 	SanityCheck(player.sanity);
 
@@ -354,8 +358,35 @@ void DrawInterface(void)
 	float tx = 0.0f;		// テクスチャの左上X座標
 	float ty = 0.0f;		// テクスチャの左上Y座標
 
+		//アイテムボックス
+	for (int i = 0; i < g_ItemMax; i++)
+	{
+
+		// スコアの位置やテクスチャー座標を反映
+		float px = g_ItemBox[i].pos.x;			// 表示位置X
+		float py = g_ItemBox[i].pos.y;			// 表示位置Y
+		float pw = g_ItemBox[i].w;				// 表示幅
+		float ph = g_ItemBox[i].h;				// 表示高さ
+
+		float tw = g_ItemBox[i].tw;		// テクスチャの幅
+		float th = g_ItemBox[i].th;		// テクスチャの高さ
+		float tx = g_ItemBox[i].tx;		// テクスチャの左上X座標
+		float ty = g_ItemBox[i].ty;		// テクスチャの左上Y座標
+
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);
+
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+			g_ItemBox[i].color);
+
+		// ポリゴン描画
+		GetDeviceContext()->Draw(4, 0);
+	}
+
 	for (int i = 0; i < TEXTURE_MAX - 1; i++)
 	{
+		if (i == HP_BAR || i == HP_RED_BG || i == HP_RED)continue;
 		if (i == MATCH_NUM || i == 0)																//マッチの数字を別で印刷
 			continue;
 		if (g_UI[i].use == FALSE)
@@ -426,31 +457,6 @@ void DrawInterface(void)
 	}
 
 
-	//アイテムボックス
-	for (int i = 0; i < g_ItemMax; i++)
-	{
-
-		// スコアの位置やテクスチャー座標を反映
-		float px = g_ItemBox[i].pos.x;			// 表示位置X
-		float py = g_ItemBox[i].pos.y;			// 表示位置Y
-		float pw = g_ItemBox[i].w;				// 表示幅
-		float ph = g_ItemBox[i].h;				// 表示高さ
-
-		float tw = g_ItemBox[i].tw;		// テクスチャの幅
-		float th = g_ItemBox[i].th;		// テクスチャの高さ
-		float tx = g_ItemBox[i].tx;		// テクスチャの左上X座標
-		float ty = g_ItemBox[i].ty;		// テクスチャの左上Y座標
-
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_ItemBox[i].TexNo]);
-
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteColor(g_VertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-			g_ItemBox[i].color);
-
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
 }
 
 //=============================================================================
@@ -543,9 +549,9 @@ void HurtAnimation()
 //Sanity エフェクト
 void SanityCheck(int sanity)
 {
-	if (sanity > 75) { g_UI[INSANE].color.w = 0.25f; };
-	if (sanity > 50 && sanity < 75) { g_UI[INSANE].color.w = 0.5f; };
-	if (sanity > 25 && sanity < 50) { g_UI[INSANE].color.w = 0.75f; };
-	if (sanity < 25) { g_UI[INSANE].color.w = 0.89f; };
+	if (sanity > 75) { g_UI[INSANE].color.w = 0.0f; };
+	if (sanity > 50 && sanity < 75) { g_UI[INSANE].color.w = 0.2f; };
+	if (sanity > 25 && sanity < 50) { g_UI[INSANE].color.w = 0.4f; };
+	if (sanity < 25) { g_UI[INSANE].color.w = 0.5f; };
 	return;
 }

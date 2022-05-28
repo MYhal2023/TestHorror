@@ -43,6 +43,7 @@ typedef struct
 	int			shadowIdx;		// 影ID
 	int			texNo;
 	int			state;			//ステートベースAIに使用
+	int			memory;
 	BOOL		use;			// 使用しているかどうか
 
 	INTERPOLATION_DATA	*tbl_adr;			// アニメデータのテーブル先頭アドレス

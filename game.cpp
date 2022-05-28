@@ -62,6 +62,7 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 static BOOL	g_bPause = TRUE;	// ポーズON/OFF
 static int	g_PlayMode = MAIN_GAME;
 static int	g_PlayStage = PRISON_STAGE;
+static BOOL	g_PlayStageChange = FALSE;
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -69,6 +70,7 @@ HRESULT InitGame(void)
 {
 	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 	InitSystem();
+	g_PlayStageChange = FALSE;
 	switch (GetMode())
 	{
 	case MODE_TITLE:
@@ -230,6 +232,9 @@ void UpdateGame(void)
 
 
 #endif
+	FADE fade = GetFade();
+	if (fade != FADE_NONE)return;
+
 	UpdateGame_over();
 	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
@@ -302,6 +307,9 @@ void UpdateFirstGame(void)
 
 
 #endif
+	FADE fade = GetFade();
+	if (fade != FADE_NONE)return;
+
 	UpdateGame_over();
 	if (CheckGameover() == TRUE)return;	//ゲームオーバーなら更新しない
 
@@ -347,6 +355,8 @@ void UpdateFirstGame(void)
 
 	//UI表示更新処理
 	UpdateInterface();
+
+	UpdateTexttex();
 
 	// ライフの更新処理
 	UpdateLife();
@@ -417,7 +427,6 @@ void DrawGame0(void)
 
 	DrawTexttex();
 
-	DrawGame_over();
 	//シェーダー管理
 	//シェーダーを元に戻す。ポストエフェクトはここまで
 	ans = MODE_PLANE;
@@ -474,9 +483,6 @@ void DrawFirstStageGame(void)
 	// ライティングを無効
 	SetLightEnable(FALSE);
 
-
-	//// スコアの描画処理
-	//DrawScore();
 
 	// ライフの描画処理
 	DrawLife();
@@ -577,7 +583,13 @@ void DrawGame(void)
 
 void CheckModeChange(void)
 {
-
+	PLAYER *player = GetPlayer();
+	if (!g_PlayStageChange && g_PlayStage == PRISON_STAGE && player->pos.z >= 520.0f)
+	{
+		g_PlayStage++;
+		g_PlayStageChange = TRUE;
+		SetFade(FADE_OUT, MODE_GAME);
+	}
 }
 
 void SetPlayMode(int playMode)

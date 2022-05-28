@@ -21,7 +21,7 @@
 
 #define TEXTURE_WIDTH_LOGO			(480)			// ロゴサイズ
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
-#define	ENEMY_TEXMAG	(0.05f)							// 元画像に対する倍率
+#define	ENEMY_TEXMAG	(0.10f)							// 元画像に対する倍率
 #define	ENEMY_WIDTH		(650.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define	ENEMY_HEIGHT	(812.0f * ENEMY_TEXMAG)			// 頂点サイズ
 #define ENEMY_SPOWN	(330)
@@ -94,8 +94,8 @@ HRESULT InitGame_over(void)
 	g_Pos = XMFLOAT3(g_w / 2, g_h / 2, 0.0f);
 	g_Ew = ENEMY_WIDTH;
 	g_Eh = ENEMY_HEIGHT;
-	g_Tw = 947.0f * 0.5f;
-	g_Th = 400.0f * 0.5f;
+	g_Tw = 947.0f * 1.0f;
+	g_Th = 400.0f * 1.0f;
 	g_EPos = XMFLOAT3(g_w / 2, g_h / 2, 0.0f);
 	g_TexNo = 0;
 
@@ -172,7 +172,7 @@ void UpdateGame_over(void)
 		}
 		else if (g_Count == 220)
 		{
-			SetFade(FADE_OUT, MODE_TITLE);	//文字が出たらモードリセット
+			SetFade(FADE_OUT, MODE_GAME);	//文字が出たらモードリセット
 		}
 		g_Count++;
 		break;

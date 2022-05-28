@@ -25,6 +25,11 @@
 #include "particle.h"
 #include "furniture.h"
 #include "tutorial.h"
+#include "item.h"
+#include "itembox.h"
+#include "enemy.h"
+#include "stagefurniture.h"
+#include "text_texture.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -99,6 +104,9 @@ HRESULT InitPlayer(void)
 	g_Player.life = PLAYER_LIFE;
 	g_Player.lifeMax = g_Player.life;
 	g_Player.stamina = PLAYER_STAMINA;
+#ifdef _DEBUG
+	g_Player.stamina = 5000;
+#endif
 	g_Player.staminaMax = g_Player.stamina;
 	g_Player.staminaInt = PLAYER_STAMINA_INT;
 	g_Player.sanity = PLAYER_SANITY;
@@ -131,7 +139,7 @@ HRESULT InitPlayer(void)
 	switch (GetPlayStage())
 	{
 	case PRISON_STAGE:
-		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, PLAYER_OFFSET_Z };
+		g_Player.pos = { -350.0f, PLAYER_OFFSET_Y, -280.0f };
 		break;
 	case FIRST_STAGE:
 		g_Player.pos = { PLAYER_SPAWN1_X, PLAYER_OFFSET_Y, PLAYER_SPAWN1_Z };
@@ -170,8 +178,9 @@ void UpdatePlayer(void)
 	PlayerMoveControl();	//プレイヤーの移動操作	
 	PlayerDashControl();	//ダッシュ操作
 	PlayerDashProcess();	//ダッシュの処理
+	SetChangeCamera();
 	PlayerMoveSE();
-
+	if (!GetCameraPos())g_Player.spd *= 0.5f;
 	// Key入力があったら移動処理する
 	if (g_Player.spd > 0.0f)
 	{
@@ -193,7 +202,8 @@ void UpdatePlayer(void)
 	HeartBeat();	//心音のセット
 	PlayerBreath(); //息遣いのセット
 	MeshWallHit(g_Player.pos, g_Player.size, old_x, old_z);
-	FunitureHit(old_x, old_z);
+	FunitureHit();
+	PlayerLighterControl();
 	if (g_Player.atInvinc == TRUE)	//被ダメージによる無敵中にすることは？
 	{
 		IncibleEffect();
@@ -411,6 +421,12 @@ void PlayerMoveControl(void)
 
 void PlayerMoveSE(void)
 {
+	if (!GetCameraPos())
+	{
+		SetSourceVolume(SOUND_LABEL_SE_Dash, 0.0f);
+		SetSourceVolume(SOUND_LABEL_SE_Walk_sound, 0.0f);
+		return;
+	}
 	//SEをどう鳴らすかは速度とWalkIntervalで判定。鳴らさない場合は変数ごとリセット
 	if (g_Player.spd >= VALUE_MOVE && g_Player.WalkInterval == 0 && g_Player.spd < VALUE_DASH_MOVE)
 	{
@@ -461,7 +477,7 @@ void PlayerDashControl(void)
 		g_Player.staminaInt = 0;
 	}
 	//ダッシュ不可状態の場合、スタミナが最大値になったらダッシュ可能になる
-	if (g_Player.batdash != TRUE && g_Player.stamina < g_Player.staminaMax)
+	if (g_Player.batdash != TRUE && g_Player.stamina < g_Player.staminaMax || !GetCameraPos())
 		return;
 	else if (g_Player.batdash != TRUE && g_Player.stamina >= g_Player.staminaMax)
 		g_Player.batdash = TRUE;
@@ -474,11 +490,13 @@ void PlayerDashControl(void)
 
 void PlayerLighterControl(void)
 {
-	if (GetKeyboardTrigger(DIK_L))
+	if (ReturnSelect() != LIGHTER_ITEM || (!GetCameraPos()))return;
+
+	if (GetKeyboardPress(DIK_L) || (IsButtonPressed(0, BUTTON_L) && IsButtonPressed(0, BUTTON_A)))
 	{
 		SetLighterOn(TRUE);
 	}
-	if (GetKeyboardTrigger(DIK_J))
+	else if (!GetKeyboardPress(DIK_L) || (!IsButtonPressed(0, BUTTON_L) || !IsButtonPressed(0, BUTTON_A)))
 	{
 		SetLighterOn(FALSE);
 	}
@@ -650,15 +668,71 @@ void BreathDicision(void)
 	}
 }
 
-void FunitureHit(float x, float z)
+void FunitureHit(void)
 {
-	FURNITURE *fur = GetFurniture();
-	for (int i = 0; i < MAX_FURNITURE; i++)
+	if ((GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(0, DIK_X)))
 	{
-		if (CollisionBC(g_Player.pos, fur[i].pos, g_Player.size, fur[i].size))
+		MODEL_ITEM *item = GetItem();
+		FURNITURE *fur = GetFurniture();
+		STAGEFURNITURE *sfur = GetStageFurniture();
+		switch (GetPlayStage())
 		{
-			g_Player.pos.x = x;
-			g_Player.pos.z = z;
+		case PRISON_STAGE:
+			if (ReturnSelect() != KEY)return;
+			for (int i = 0; i < MAX_FURNITURE; i++)
+			{
+				if (fur[i].use == FALSE)continue;
+				if (CollisionBC(g_Player.pos, fur[i].pos, g_Player.size, fur[i].size) &&
+					CheckDoorKey(i))
+				{
+					fur[i].use = FALSE;
+					UseItemSelect();
+					PlaySound(SOUND_LABEL_SE_Door_Open);
+					SetTexture(TEXT_USE_KEY);
+					break;
+				}
+			}
+			break;
+		case FIRST_STAGE:
+			for (int i = 0; i < MAX_STAGEFURNITURE; i++)
+			{
+				if (sfur[i].ID == 99 || sfur[i].use == FALSE)continue;	//IDが99の場合はドアではないため次へ
+
+				if (sfur[i].ID == 100 && CollisionBC(g_Player.pos, sfur[i].pos, g_Player.size, sfur[i].size) &&
+					CheckDoorKey(sfur[i].ID) && (ReturnSelect() == KEY))
+				{
+					sfur[i].use = FALSE;
+					DeleteMeshWall(50);
+					UseItemSelect();
+					PlaySound(SOUND_LABEL_SE_Door_Open);
+					SetTexture(TEXT_USE_KEY);
+					break;
+				}
+				else if (sfur[i].ID != 100 && CollisionBC(g_Player.pos, sfur[i].pos, g_Player.size, sfur[i].size))
+				{
+					if (sfur[i].ID == 1)//鍵付きドア
+					{
+						if (CheckDoorKey(sfur[i].ID) && (ReturnSelect() == KEY))
+						{
+							sfur[i].use = FALSE;
+							DeleteMeshWall(40 + sfur[i].ID);
+							UseItemSelect();
+							PlaySound(SOUND_LABEL_SE_Door_Open);
+							SetTexture(TEXT_USE_KEY);
+							break;
+						}
+						PlaySound(SOUND_LABEL_SE_Door_Close);
+						SetTexture(TEXT_NEED_KEY);
+					}
+					else {
+						sfur[i].use = FALSE;
+						DeleteMeshWall(40 + sfur[i].ID);
+						PlaySound(SOUND_LABEL_SE_Door_Open);
+						break;
+					}
+				}
+			}
+			break;
 		}
 	}
 }

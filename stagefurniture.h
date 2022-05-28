@@ -31,8 +31,7 @@ typedef struct
 	DX11_MODEL			model;				// ƒ‚ƒfƒ‹î•ñ
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// ƒ‚ƒfƒ‹‚ÌF
 	float				size;				// “–‚½‚è”»’è‚Ì‘å‚«‚³
-	int					type;
-
+	int					ID;
 } STAGEFURNITURE;
 
 //*****************************************************************************
@@ -43,3 +42,4 @@ void UninitStageFurniture(void);
 void UpdateStageFurniture(void);
 void DrawStageFurniture(void);
 void SetStageFurniture(int type, XMFLOAT3 pos, XMFLOAT3 rot);
+STAGEFURNITURE *GetStageFurniture(void);

@@ -30,6 +30,7 @@ typedef struct
 	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
 	float				size;				// 当たり判定の大きさ
 	BOOL				open;
+	int					ID;					// ドアに使うID
 } FURNITURE;
 
 enum
