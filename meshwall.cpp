@@ -255,7 +255,7 @@ void UninitMeshWall(void)
 		}
 	}
 
-
+	ResetMeshWall();
 	//読み込み数をリセットする
 	g_nNumMeshWall = 0;
 	g_CeilingWall = 0;
@@ -338,6 +338,7 @@ void DrawMeshWall(void)
 void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 {
 	MESH_WALL *pMesh;
+	int count = 0;
 	for (int i = 0; i < g_nNumMeshWall; i++)
 	{
 		pMesh = &g_aMeshWall[i];
@@ -348,6 +349,8 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 		float rotatez = sinf(pMesh->rot.y);
 		float width = pMesh->fBlockSizeX * fabsf(rotatew) * pMesh->nNumBlockX;
 		float thickness = pMesh->fBlockSizeX * fabsf(rotatez) * pMesh->nNumBlockX;
+		if (width >= pMesh->fBlockSizeX)width += 10.0f;
+		if (thickness >= pMesh->fBlockSizeX)thickness += 10.0f;
 
 		//壁とプレイヤーの当たり判定。BBで行うため、y座標は現状考慮していない。
 		if (CollisionBB(pos, size, size, pMesh->pos, width, thickness) == TRUE
@@ -355,13 +358,16 @@ void MeshWallHit(XMFLOAT3 pos, float size, float old_x, float old_z)
 		{
 			PLAYER *player = GetPlayer();
 			//操作感を上げるために、片方の座標のみを元に戻す
-			if (width < pMesh->fBlockSizeX)
+			if (width < pMesh->fBlockSizeX) {
 				player->pos.x = old_x;
-			else if (thickness < pMesh->fBlockSizeX)
+				count++;
+			}
+			else if (thickness < pMesh->fBlockSizeX) {
 				player->pos.z = old_z;
-
+				count++;
+			}
 			//両方の座標が戻っているならこれ以上の走査は必要ない
-			if (player->pos.x == old_x && player->pos.z == old_z)
+			if (count >= 2)
 				return;
 		}
 	}
@@ -489,4 +495,67 @@ void ResetMeshWall(void)
 void DeleteMeshWall(int i)
 {
 	g_aMeshWall[i].use = FALSE;
+}
+
+void SetToiletWall(XMFLOAT3 pos)
+{
+	int x = -1;
+	int z = -1;
+	const float set = 15.0f;
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z - set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x - set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z + set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x + set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+}
+
+void SetBedWall(XMFLOAT3 pos, float rot)
+{
+	int x = -1;
+	int z = -1;
+	const float set = 30.0f;
+	if (rot == 0.0f)
+	{
+		InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z - set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+		InitMeshWall(XMFLOAT3(pos.x - set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+		InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z + set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+		InitMeshWall(XMFLOAT3(pos.x + set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	}
+}
+
+void SetTableWall(XMFLOAT3 pos)
+{
+	int x = -1;
+	int z = -1;
+	const float set = 30.0f;
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z - set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x - set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z + set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x + set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+}
+
+void SetWashletWall(XMFLOAT3 pos)
+{
+	int x = -1;
+	int z = -1;
+	const float set = 10.0f;
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z - set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x - set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x, pos.y, pos.z + set), XMFLOAT3(0.0f, XM_PI*0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
+	InitMeshWall(XMFLOAT3(pos.x + set, pos.y, pos.z), XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		1, 1, set * 2.0f, set * 2.0f, WALL_RAY);
 }
