@@ -55,8 +55,8 @@ void InitLight(void)
 	g_Light[0].Position = XMFLOAT3(500.0f, 500.0f, 500.0f);
 	g_Light[0].Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
 	float diffuse = 0.1f;
-	if (GetPlayStage() == CLEAR_STAGE)diffuse = 0.8f;
 	g_Light[0].Diffuse = XMFLOAT4(diffuse, diffuse, diffuse, 1.0f);
+	if (GetPlayStage() == CLEAR_STAGE)g_Light[0].Diffuse = XMFLOAT4(0.5f, 0.1f, 0.1f, 1.0f);
 	g_Light[0].Type = LIGHT_TYPE_DIRECTIONAL;					// ï¿çsåıåπ
 	g_Light[0].Enable = TRUE;									// Ç±ÇÃÉâÉCÉgÇON
 	SetLight(0, &g_Light[0]);									// Ç±ÇÍÇ≈ê›íËÇµÇƒÇ¢ÇÈ

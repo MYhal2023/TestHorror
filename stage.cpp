@@ -121,18 +121,20 @@ void InitSetStage()
 
 	//ベッド
 	SetStageFurniture(BEd, XMFLOAT3{ -150.0f,0.0f,550.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });
+	SetBedWall(XMFLOAT3( -150.0f,0.0f,550.0f ), 0.0f);
 
 	//トイレ
 	SetStageFurniture(TOILEt, XMFLOAT3{ ADJUST_X - 280.0f,0.0f,ADJUST_Z - 50.0f }, XMFLOAT3{ 0.0f,XM_PI*0.5f,0.0f });
-
+	SetToiletWall(XMFLOAT3{ ADJUST_X - 280.0f,0.0f,ADJUST_Z - 50.0f });
 	//テーブル
 	SetStageFurniture(TABLE, XMFLOAT3{ 250.0f,0.0f,150.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });
+	SetTableWall(XMFLOAT3{ 250.0f,0.0f,150.0f });
 
 	//洗面所
-	SetStageFurniture(WASHLET, XMFLOAT3{ -400.0f,0.0f,550.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });
+	SetStageFurniture(WASHLET, XMFLOAT3{ -360.0f,0.0f,600.0f }, XMFLOAT3{ 0.0f,XM_PI*0.5,0.0f });
 	SetStageFurniture(WASHLET, XMFLOAT3{ 370.0f,0.0f,-500.0f }, XMFLOAT3{ 0.0f,-XM_PI*0.5,0.0f });
-
-
+	SetWashletWall(XMFLOAT3{ -360.0f,0.0f,590.0f });
+	SetWashletWall(XMFLOAT3{ 370.0f,0.0f,-500.0f });
 	//階段
 	SetStageFurniture(STAIRs, XMFLOAT3{ 450.0f,1.0f, -350.0f }, XMFLOAT3{ 0.0f,XM_PI,0.0f });
 	SetStageFurniture(STAIRs, XMFLOAT3{ 450.0f,45.0f,-430.0f }, XMFLOAT3{ 0.0f,XM_PI,0.0f });

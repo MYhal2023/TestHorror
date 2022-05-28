@@ -47,3 +47,7 @@ int GetMeshWallNum(void);
 int GetCeilingWallNum(void);
 void ResetMeshWall(void);
 void DeleteMeshWall(int i);
+void SetToiletWall(XMFLOAT3 pos);
+void SetBedWall(XMFLOAT3 pos, float rot);
+void SetTableWall(XMFLOAT3 pos);
+void SetWashletWall(XMFLOAT3 pos);

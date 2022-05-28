@@ -105,8 +105,15 @@ HRESULT InitMatch(void)
 	g_Match.TexNo = 0;
 	g_Match.StandbyTime = 0;
 	g_Match.AblazeTime = 0;
-	g_Match.num = MATCH_NUM;
-
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		g_Match.num = 0;
+		break;
+	case FIRST_STAGE:
+		g_Match.num = MATCH_NUM;
+		break;
+	}
 	g_Matchbox.pos = { 0.0f, 0.0f, 0.0f };
 	g_Matchbox.rot = { 0.0f, 0.0f, 0.0f };
 	g_Matchbox.scl = { MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f };

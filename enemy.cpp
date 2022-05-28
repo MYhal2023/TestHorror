@@ -99,7 +99,7 @@ HRESULT InitEnemy(void)
 
 		g_Enemy[i].pos = { 0.0f, 0.0f, 0.0f };
 		g_Enemy[i].rot = { 0.0f, 0.0f, 0.0f };
-		g_Enemy[i].scl = { 1.0f, 1.0f, 1.0f };
+		g_Enemy[i].scl = { 1.1f, 1.1f, 1.1f };
 		g_Enemy[i].spd = ENEMY_SPEED;
 		g_Enemy[i].fWidth = ENEMY_WIDTH;
 		g_Enemy[i].fHeight = ENEMY_HEIGHT;
@@ -123,6 +123,15 @@ HRESULT InitEnemy(void)
 		break;
 	case FIRST_STAGE:
 		SetEnemy(XMFLOAT3(50.0f, 0.0f, -60.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		break;
+	case CLEAR_STAGE:
+		for (int k = 0; k < MAX_ENEMY; k++)
+		{
+			if(k <= 9)
+			SetEnemy(XMFLOAT3(100.0f, 0.0f, -350.0f + k * 80.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+			else
+			SetEnemy(XMFLOAT3(-100.0f, 0.0f, -350.0f + (k - 10) * 80.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+		}
 		break;
 	}
 	g_Load = TRUE;
@@ -165,6 +174,16 @@ void UpdateEnemy(void)
 	{
 		if (g_Enemy[i].use != TRUE)	//使われてないエネミーは処理をスキップ
 			continue;
+
+		if (GetPlayStage() == CLEAR_STAGE) {
+			PLAYER *player = GetPlayer();
+			float vecX = player->pos.x - g_Enemy[i].pos.x;
+			float vecZ = player->pos.z - g_Enemy[i].pos.z;
+			//角度を算出し変更
+			float angle = atan2f(vecX, vecZ);
+			g_Enemy[i].rot.y = angle;
+			continue;
+		}
 
 		PLAYER *player = GetPlayer();
 		LIGHT *light = GetLightData(1);

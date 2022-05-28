@@ -18,6 +18,7 @@
 #include "match.h"
 #include "stagefurniture.h"
 #include "tutorial_text.h"
+#include "meshwall.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -61,7 +62,7 @@ HRESULT InitItem(void)
 			{
 			case 0:
 				g_Item[i].type = ITEM_KEY;								//1
-				g_Item[i].pos = { 60.0f, 40.0f, -350.0f };				// モデルの位置
+				g_Item[i].pos = { 495.0f, 40.0f, -410.0f };				// モデルの位置
 				g_Item[i].rot = { 0.0f, 0.0f, 0.0f };				// モデルの向き(回転)
 				g_Item[i].scl = { 0.5f, 0.5f, 0.5f };				// モデルの大きさ(スケール)
 				g_Item[i].size = SIZE_KEY;							// 当たり判定の大きさ
@@ -84,9 +85,9 @@ HRESULT InitItem(void)
 				break;
 			case 3:
 				g_Item[i].type = ITEM_LIGHTER;
-				g_Item[i].pos = { 450.0f, 5.0f, -330.0f };				// モデルの位置
-				g_Item[i].rot = { XM_PI * 0.0f, 0.0f, XM_PI * 0.5f };				// モデルの向き(回転)
-				g_Item[i].scl = { 0.2f, 0.2f, 0.2f };				// モデルの大きさ(スケール)
+				g_Item[i].pos = { 415.0f, 22.0f, -460.0f };				// モデルの位置
+				g_Item[i].rot = { XM_PI * 0.0f,  XM_PI * 0.25f, XM_PI * 0.5f };				// モデルの向き(回転)
+				g_Item[i].scl = { 0.3f, 0.3f, 0.3f };				// モデルの大きさ(スケール)
 				g_Item[i].size = SIZE_LIGHTER;							// 当たり判定の大きさ
 				break;
 			}
@@ -319,7 +320,14 @@ BOOL CheckDoorKey(int i)
 			if (g_Item[k].type != ITEM_KEY || g_Item[k].drop == TRUE)continue;
 
 			if (fur[i].ID == g_Item[k].ID)ans = TRUE;
-			if (g_Item[k].ID == 0)SetEnemy(XMFLOAT3(0.0f, 0.0f, 100.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+			if (g_Item[k].ID == 0) {
+				SetEnemy(XMFLOAT3(0.0f, 0.0f, 100.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+				DeleteMeshWall(10);
+			}
+			else if (g_Item[k].ID == 1)
+			{
+				DeleteMeshWall(11);
+			}
 		}
 		break;
 	case FIRST_STAGE:
