@@ -62,7 +62,7 @@ void UpdateEnemy(void);
 void DrawEnemy(void);
 
 int SetEnemy(XMFLOAT3 pos, XMFLOAT3 rot);
-
+void ResetEnemy(void);
 ENEMY *GetEnemy(void);
 void EnemyAngleTex(int i);
 int StateCheck(int i);

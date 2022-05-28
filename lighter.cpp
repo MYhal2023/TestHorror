@@ -18,15 +18,16 @@
 #include "game.h"
 #include "itembox.h"
 #include "debugproc.h"
+#include "match.h"
 
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
 #define	MODEL_LIGHTER		"data/MODEL/lighter.obj"			// “Ç‚İ‚Şƒ‚ƒfƒ‹–¼
 
-#define DISTANCE_X					(25.0f)
-#define DISTANCE_Y					(20.0f)
-#define DISTANCE_Z					(25.0f)
+#define DISTANCE_X					(28.0f)
+#define DISTANCE_Y					(16.0f)
+#define DISTANCE_Z					(28.0f)
 
 #define NO_USE_Y						(25.0f)
 
@@ -58,7 +59,7 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static int						g_TexNo;					// ƒeƒNƒXƒ`ƒƒ”Ô†
 static LIGHTER					g_Lighter;					
-
+static FIRE						g_Fire;
 static BOOL						g_Load = FALSE;
 
 
@@ -70,6 +71,7 @@ HRESULT InitLighter(void)
 	ID3D11Device *pDevice = GetDevice();
 
 	LoadModel(MODEL_LIGHTER, &g_Lighter.model);
+	LoadModel(MODEL_FIRE, &g_Fire.model);
 
 	// ’¸“_ƒoƒbƒtƒ@¶¬
 	D3D11_BUFFER_DESC bd;
@@ -93,6 +95,12 @@ HRESULT InitLighter(void)
 	g_Lighter.oil = LIGHTER_OIL_MAX;
 	g_Lighter.out = FALSE;
 
+	g_Fire.pos = { 0.0f, 0.0f, 0.0f };
+	g_Fire.rot = { 0.0f, 0.0f, 0.0f };
+	const float fscl = 0.15f;
+	g_Fire.scl = { fscl, fscl, fscl };
+	g_Fire.use = TRUE;
+
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -111,6 +119,7 @@ void UninitLighter(void)
 	}
 
 	UnloadModel(&g_Lighter.model);
+	UnloadModel(&g_Fire.model);
 
 	g_Load = FALSE;
 }
@@ -187,8 +196,11 @@ void DrawLighter(void)
 	// ƒ‚ƒfƒ‹•`‰æ
 	DrawModel(&g_Lighter.model);
 
+	DrawMFire();
+
 	// ƒJƒŠƒ“ƒOİ’è‚ğ–ß‚·
 	SetCullingMode(CULL_MODE_BACK);
+
 }
 
 
@@ -276,5 +288,47 @@ void MoveLighter()
 
 	g_Lighter.rot.y = camera.rot.y + XM_PI * 0.5f;
 
+	const float firepos = 11.5f;
+	const float dist = 28.0f;
+	g_Fire.pos.x = camera.pos.x + sinf(camera.rot.y + XM_PI * 0.090f)*dist;
+	g_Fire.pos.z = camera.pos.z + cosf(camera.rot.y + XM_PI * 0.090f)*dist;
+	g_Fire.pos.y = g_Lighter.pos.y + firepos;
+	g_Fire.rot.y = camera.rot.y + XM_PI * 0.0f;
+}
+
+void DrawMFire(void)
+{
+	if (!g_Lighter.out) return;
+
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+
+	// ƒJƒŠƒ“ƒO–³Œø
+	SetCullingMode(CULL_MODE_NONE);
+
+	// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ì‰Šú‰»
+	mtxWorld = XMMatrixIdentity();
+
+	// ƒXƒP[ƒ‹‚ğ”½‰f
+	mtxScl = XMMatrixScaling(g_Fire.scl.x, g_Fire.scl.y, g_Fire.scl.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+
+	// ‰ñ“]‚ğ”½‰f
+	mtxRot = XMMatrixRotationRollPitchYaw(g_Fire.rot.x, g_Fire.rot.y, g_Fire.rot.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+
+	// ˆÚ“®‚ğ”½‰f
+	mtxTranslate = XMMatrixTranslation(g_Fire.pos.x, g_Fire.pos.y, g_Fire.pos.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+
+	// ƒ[ƒ‹ƒhƒ}ƒgƒŠƒbƒNƒX‚Ìİ’è
+	SetWorldMatrix(&mtxWorld);
+
+	XMStoreFloat4x4(&g_Fire.mtxWorld, mtxWorld);
+
+	// ƒ‚ƒfƒ‹•`‰æ
+	DrawModel(&g_Fire.model);
+
+	// ƒJƒŠƒ“ƒOİ’è‚ğ–ß‚·
+	SetCullingMode(CULL_MODE_BACK);
 
 }

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// スコア処理 [score.h]
+// マッチ処理 [match.h]
 // Author : 
 //
 //=============================================================================
@@ -16,7 +16,7 @@
 #define SCORE_SAVE			(10)		// スコアの保存数
 
 #define MATCH_MOVE			(0.8f)		//マッチの速さ
-
+#define	MODEL_FIRE	"data/MODEL/fire.obj"			// 読み込むモデル名
 
 struct MATCH
 {
@@ -37,6 +37,26 @@ struct MATCH
 
 };
 
+struct MATCHBOX
+{
+	DX11_MODEL			model;				// モデル情報
+	XMFLOAT4X4			mtxWorld;			// ワールドマトリックス
+	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
+	XMFLOAT3			pos;					// ポリゴンの座標
+	XMFLOAT3			rot;				// モデルの向き(回転)
+	XMFLOAT3			scl;				// モデルの大きさ(スケール)
+	BOOL				use;
+};
+struct FIRE
+{
+	DX11_MODEL			model;				// モデル情報
+	XMFLOAT4X4			mtxWorld;			// ワールドマトリックス
+	XMFLOAT4			diffuse[MODEL_MAX_MATERIAL];	// モデルの色
+	XMFLOAT3			pos;					// ポリゴンの座標
+	XMFLOAT3			rot;				// モデルの向き(回転)
+	XMFLOAT3			scl;				// モデルの大きさ(スケール)
+	BOOL				use;
+};
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -45,8 +65,11 @@ HRESULT InitMatch(void);
 void UninitMatch(void);
 void UpdateMatch(void);
 void DrawMatch(void);
+void DrawMatchStick(void);
+void DrawMatchbox(void);
+void DrawFire(void);
 void MoveMatch(void);
-
+void MoveMatchbox(void);
 void StandbyMatch(void);
 void SetMatchForce(int force);
 MATCH *GetMatch(void);

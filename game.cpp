@@ -61,7 +61,7 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 
 static BOOL	g_bPause = TRUE;	// É|Å[ÉYON/OFF
 static int	g_PlayMode = MAIN_GAME;
-static int	g_PlayStage = PRISON_STAGE;
+static int	g_PlayStage = FIRST_STAGE;
 static BOOL	g_PlayStageChange = FALSE;
 //=============================================================================
 // èâä˙âªèàóù
