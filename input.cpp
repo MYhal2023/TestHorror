@@ -622,6 +622,30 @@ void UpdatePad(void)
 		//* Ｍボタン
 		if ( dijs.rgbButtons[9] & 0x80 )	padState[i] |= BUTTON_M;
 
+		if (dijs.rgdwPOV[0] != 0xFFFFFFFF)
+		{
+			// 有効
+			float rad = XMConvertToRadians((dijs.rgdwPOV[0] / 100.0f));
+			float x = sinf(rad);
+			float y = cosf(rad);
+			if (x < -0.01f)
+			{
+				padState[i] |= RGDW_LEFT;
+			}
+			else if (x > 0.01f)
+			{
+				padState[i] |= RGDW_RIGHT;
+			}
+
+			if (y > 0.01f)
+			{
+				padState[i] |= RGDW_UP;
+			}
+			else if (y < -0.01f)
+			{
+				padState[i] |= RGDW_DOWN;
+			}
+		}
 		// Trigger設定
 		padTrigger[i] = ((lastPadState ^ padState[i])	// 前回と違っていて
 						& padState[i]);					// しかも今ONのやつ

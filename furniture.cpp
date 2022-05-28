@@ -25,12 +25,14 @@
 //*****************************************************************************
 static FURNITURE g_Furniture[MAX_FURNITURE];
 static int obj;
+static int id;
 //*****************************************************************************
 // 初期化処理
 //*****************************************************************************
 HRESULT InitFurniture(void)
 {
 	obj = 0;
+	id = 0;
 	for (int i = 0; i < MAX_FURNITURE; i++)
 	{
 		g_Furniture[i].pos = { 0.0f,0.0f,0.0f };
@@ -39,6 +41,7 @@ HRESULT InitFurniture(void)
 		g_Furniture[i].use = FALSE;
 		g_Furniture[i].load = FALSE;
 		g_Furniture[i].size = 0;
+		g_Furniture[i].ID = MAX_FURNITURE + 1;		//絶対に合致しないようにいれとく
 		g_Furniture[i].open = FALSE;
 	}
 	return S_OK;
@@ -61,6 +64,7 @@ void UninitFurniture(void)
 		}
 	}
 	obj = 0;
+	id = 0;
 }
 //*****************************************************************************
 // 更新処理
@@ -81,7 +85,7 @@ void DrawFurniture(void)
 
 	for (int i = 0; i < MAX_FURNITURE; i++)
 	{
-		if (g_Furniture[i].use == false) continue;
+		if (g_Furniture[i].use == FALSE) continue;
 
 		// ワールドマトリックスの初期化
 		mtxWorld = XMMatrixIdentity();
@@ -149,6 +153,9 @@ void SetFurniture(XMFLOAT3 pos, XMFLOAT3 rot, int type)
 		LoadModel(MODEL_CAGE, &g_Furniture[obj].model);
 		g_Furniture[obj].load = TRUE;
 		g_Furniture[obj].use = TRUE;
+		g_Furniture[obj].ID = id;
+		g_Furniture[obj].size = 50.0f;
+		id++;
 		break;
 	case GOAL:
 		g_Furniture[obj].scl = { DOOR_SCL, DOOR_SCL*2.3f, DOOR_SCL*1.35f };

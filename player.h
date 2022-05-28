@@ -107,9 +107,10 @@ void PlayerMoveControl(void);
 void PlayerMoveSE(void);
 void PlayerDashControl(void);
 void PlayerDashProcess(void);
+void PlayerLighterControl(void);
 
 void HeartBeat(void);
 void BeatTypeDecision(void);
 void PlayerBreath(void);
 void BreathDicision(void);
-void FunitureHit(float x, float z);
+void FunitureHit(void);

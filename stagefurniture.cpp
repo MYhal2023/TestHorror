@@ -53,10 +53,11 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static FURNITURE g_StageFurniture[MAX_STAGEFURNITURE];
+static STAGEFURNITURE g_StageFurniture[MAX_STAGEFURNITURE];
 static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static BOOL						g_Load = FALSE;
-int								g_furniture;				//家具の数を数える
+static int						g_furniture;				//家具の数を数える
+static int						sid;
 //*****************************************************************************
 // 初期化処理
 //*****************************************************************************
@@ -81,10 +82,12 @@ HRESULT InitFurnitureFirStage(void)
 		g_StageFurniture[i].rot		= { 0.0f,0.0f,0.0f };
 		g_StageFurniture[i].scl		= { 1.0f,1.0f,1.0f };
 		g_StageFurniture[i].use		= FALSE;
-		g_StageFurniture[i].load	= FALSE;
-
+		g_StageFurniture[i].load = FALSE;
+		g_StageFurniture[i].ID = 99;
+		g_StageFurniture[i].size = 0;
 	}
 	g_furniture = 0;
+	sid = 0;
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -107,6 +110,7 @@ void UninitStageFurniture(void)
 		UnloadModel(&g_StageFurniture[i].model);
 		g_StageFurniture[i].load = FALSE;
 	}
+	sid = 0;
 	g_Load = FALSE;
 	return;
 }
@@ -179,6 +183,9 @@ void SetStageFurniture(int type, XMFLOAT3 pos, XMFLOAT3 rot)
 		g_StageFurniture[g_furniture].scl.z = DOOR_SCALE_Z;
 		g_StageFurniture[g_furniture].load = TRUE;
 		g_StageFurniture[g_furniture].use = TRUE;
+		g_StageFurniture[g_furniture].ID = sid;
+		g_StageFurniture[g_furniture].size = 50.0f;
+		sid++;
 		break;
 	case TOILEt:
 		LoadModel(MODEL_TOILET, &g_StageFurniture[g_furniture].model);
@@ -219,6 +226,8 @@ void SetStageFurniture(int type, XMFLOAT3 pos, XMFLOAT3 rot)
 		g_StageFurniture[g_furniture].scl.z = CAGE_SCALE_Z;
 		g_StageFurniture[g_furniture].load = TRUE;
 		g_StageFurniture[g_furniture].use = TRUE;
+		g_StageFurniture[g_furniture].ID = 100;
+		g_StageFurniture[g_furniture].size = 50.0f;
 		break;
 	case BEd:
 		LoadModel(MODEL_BED, &g_StageFurniture[g_furniture].model);
@@ -230,4 +239,9 @@ void SetStageFurniture(int type, XMFLOAT3 pos, XMFLOAT3 rot)
 		break;
 	}
 	g_furniture++;
+}
+
+STAGEFURNITURE *GetStageFurniture(void)
+{
+	return &g_StageFurniture[0];
 }

@@ -123,8 +123,8 @@ HRESULT InitItembox(void)
 
 	g_Selectbox.use = TRUE;
 	g_Selectbox.TexNo = EMPTY;
-	g_Selectbox.w = ITEM_TEXTURE_WIDTH;
-	g_Selectbox.h = ITEM_TEXTURE_HEIGHT;
+	g_Selectbox.w = ITEM_TEXTURE_WIDTH * 1.8f;
+	g_Selectbox.h = ITEM_TEXTURE_HEIGHT * 1.8f;
 	g_Selectbox.tw = 1.0f;		// テクスチャの幅
 	g_Selectbox.th = 1.0f;		// テクスチャの高さ
 	g_Selectbox.tx = 0.0f;			// テクスチャの左上X座標
@@ -139,7 +139,17 @@ HRESULT InitItembox(void)
 	g_Select = 0;
 	// 初期化
 
+	switch (GetPlayStage())
+	{
+	case PRISON_STAGE:
+		AddItembox(MATCH_ITEM);
+		break;
+	case FIRST_STAGE:
+		AddItembox(MATCH_ITEM);
+		AddItembox(LIGHTER_ITEM);
+		break;
 
+	}
 
 	g_Load = TRUE;
 	return S_OK;
@@ -199,11 +209,6 @@ void UpdateItembox(void)
 	{
 		AddItembox(g_Item[RANDOM_ITEM_2].TexNo);
 	}
-	if (GetKeyboardTrigger(DIK_N))
-	{
-		UseItemSelect();
-	}
-
 #endif
 
 }
@@ -232,7 +237,7 @@ void DrawItembox(void)
 
 	for (int i = 0; i < ITEM_MAX; i++)
 	{
-		if (g_Box[i].use == FALSE)
+		if (g_Box[i].use == FALSE || g_Box[i].TexNo == EMPTY)
 			continue;
 
 		// テクスチャ設定
@@ -324,12 +329,12 @@ void IncreaseItembox(int n)
 
 void MoveSelect()		//C→		A←
 {
-	if (IsButtonTriggered(0, BUTTON_C) && g_Select < g_items - 1)
+	if ((GetKeyboardTrigger(DIK_RIGHT) || IsButtonTriggered(0, RGDW_RIGHT)) && g_Select < g_items - 1)
 	{
 		g_Select++;
 		g_Selectbox.pos.x = g_Box[g_Select].pos.x;
 	}
-	if (IsButtonTriggered(0, BUTTON_A) && g_Select > 0)
+	if ((GetKeyboardTrigger(DIK_LEFT) || IsButtonTriggered(0, RGDW_LEFT)) && g_Select > 0)
 	{
 		g_Select--;
 		g_Selectbox.pos.x = g_Box[g_Select].pos.x;

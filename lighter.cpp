@@ -36,8 +36,6 @@
 #define TEXTURE_HEIGHT				(200)	// 
 #define TEXTURE_MAX					(1)		// テクスチャの数
 
-#define SCREEN_WIDTH	(960)			// ウインドウの幅
-#define SCREEN_HEIGHT	(540)			// ウインドウの高さ
 #define SCREEN_CENTER_X	(SCREEN_WIDTH / 2)	// ウインドウの中心Ｘ座標
 #define SCREEN_CENTER_Y	(SCREEN_HEIGHT / 2)	// ウインドウの中心Ｙ座標
 
@@ -126,14 +124,14 @@ void UpdateLighter(void)
 
 #ifdef _DEBUG	// デバッグ情報を表示する
 
-	if (GetKeyboardTrigger(DIK_L))
-	{
-		SetLighterOn(TRUE);
-	}
-	if (GetKeyboardTrigger(DIK_J))
-	{
-		SetLighterOff();
-	}
+	//if (GetKeyboardTrigger(DIK_L))
+	//{
+	//	SetLighterOn(TRUE);
+	//}
+	//if (GetKeyboardTrigger(DIK_J))
+	//{
+	//	SetLighterOff();
+	//}
 	if (GetKeyboardTrigger(DIK_I))
 	{
 		AddOil(10.0f);
@@ -203,8 +201,7 @@ void SetLighterOn(BOOL flag)
 {
 	//CheckOil();
 	if (!g_Lighter.use)		return;
-	if (g_Lighter.out)		return;
-	PlaySound(SOUND_LABEL_SE_LighterON);		//
+	if(g_Lighter.out == FALSE && flag == TRUE)PlaySound(SOUND_LABEL_SE_LighterON);		//
 
 	g_Lighter.out = flag;
 }

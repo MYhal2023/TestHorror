@@ -62,6 +62,7 @@ void InitSetStage()
 	InitMeshWall(XMFLOAT3(600 - ADJUST_X, 1.0f, 750 - ADJUST_Z), XMFLOAT3(0.0f, XM_PI*0.5, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 300.0f, WALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(900 - ADJUST_X, 1.0f, 750 - ADJUST_Z), XMFLOAT3(0.0f, XM_PI*0.5, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 300.0f, WALL_SIZE_Y, WALL_BLACK);
 	InitMeshWall(XMFLOAT3(750 - ADJUST_X, 1.0f, 900 - ADJUST_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 300.0f, WALL_SIZE_Y, WALL_BLACK);
+	//25
 
 	//ïîâÆáD
 	InitMeshWall(XMFLOAT3(162.5f - ADJUST_X, 1.0f, 1000 - ADJUST_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 125.0f, WALL_SIZE_Y, WALL_BLACK);
@@ -85,6 +86,7 @@ void InitSetStage()
 	InitMeshWall(XMFLOAT3(FLOOR_X*0.5f - 100.0f - ADJUST_X, 1.0f, FLOOR_Z - 200.0f - ADJUST_Z), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 1000.0f, WALL_SIZE_Y, WALL_BLACK);
 
 	InitMeshWall(XMFLOAT3(0.0f - ADJUST_X, WALL_SIZE_Y, 0.0f - ADJUST_Z), XMFLOAT3(XM_PI*0.5f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), (int)(FLOOR_X / FLOOR_BLOCK_SIZE), (int)(FLOOR_Z / FLOOR_BLOCK_SIZE), WALL_SIZE_XZ, WALL_SIZE_XZ, WALL_GRAY);
+	//40
 
 	//ÉhÉAÅ[
 	SetStageFurniture(DOOR, XMFLOAT3{ -175.0f,0.0f,0.0f }, XMFLOAT3{ 0.0f,XM_PI*0.5f,0.0f });		//á@
@@ -98,7 +100,7 @@ void InitSetStage()
 	SetStageFurniture(DOOR, XMFLOAT3{ 400.0f,0.0f, 425.0f }, XMFLOAT3{ 0.0f,0.0f,0.0f });			//áH
 	SetStageFurniture(DOOR, XMFLOAT3{ -275.0f,0.0f, 400.0f }, XMFLOAT3{ 0.0f,XM_PI * 0.5f,0.0f });	//áI
 
-	//ÉhÉAÅ[ÇÃìßñæMeshWall
+	//ÉhÉAÅ[ÇÃìßñæMeshWall(40Å`49)
 	InitMeshWall(XMFLOAT3{ -137.5f,0.0f,0.0f }, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);					//á@
 	InitMeshWall(XMFLOAT3{ -200.0f,0.0f,-337.5f }, XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áA
 	InitMeshWall(XMFLOAT3{ 0.0f,0.0f,-217.5f }, XMFLOAT3(0.0f, XM_PI*0.5f, 0.0f), XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1, 1, 75.0f, WALL_SIZE_Y, WALL_RAY);			//áB

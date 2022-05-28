@@ -44,6 +44,7 @@ static int intStoL = SAN_TO_LIFE_INT;
 //*****************************************************************************
 void CheckGame(void)
 {
+	if (GetPlayStage() == CLEAR_STAGE)return;
 	PLAYER *player = GetPlayer();
 	//CheckLightOn();
 	if (playerInv > 0)playerInv--;
@@ -168,7 +169,7 @@ void CheckSan(void)
 	PLAYER *player = GetPlayer();
 	int f = player->sanity / SAN_TO_LIFE_DMG;
 	//SAN’l‚ª75%ˆÈ‰º‚Å”­Ç
-	if (f <= 2)
+	if (f <= 2 && CheckLightOn() == FALSE)
 	{
 		intStoL--;
 		if (intStoL > 0)return;

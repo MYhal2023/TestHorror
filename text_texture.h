@@ -11,7 +11,13 @@
 //*****************************************************************************
 enum TEXT_TEXTURE_NUM
 {
-
+	TEXT_CANT_KEY,
+	TEXT_FIRE_CANDLE,
+	TEXT_NEED_KEY,
+	TEXT_TAKE_KEY,
+	TEXT_TAKE_LIGHTER,
+	TEXT_TAKE_MATCH,
+	TEXT_USE_KEY,
 };
 
 struct TEXT_TEXTURE
@@ -31,3 +37,4 @@ HRESULT InitTexttex(void);
 void UninitTexttex(void);
 void UpdateTexttex(void);
 void DrawTexttex(void);
+void SetTexture(int i);

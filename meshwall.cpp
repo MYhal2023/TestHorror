@@ -211,6 +211,9 @@ HRESULT InitMeshWall(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT4 col,
 		GetDeviceContext()->Unmap(pMesh->indexBuffer, 0);
 	}
 
+	if (pMesh->rot.x == XM_PI * 0.5f || pMesh->rot.z == XM_PI * 0.5f)
+		g_CeilingWall = g_nNumMeshWall;
+
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -281,11 +284,12 @@ void DrawMeshWall(void)
 	{
 		pMesh = &g_aMeshWall[nCntMeshField];
 
-		BOOL ans = FALSE;
+		BOOL ans = TRUE;
+		if (pMesh->texNo == WALL_RAY)ans = FALSE;
 #ifdef _DEBUG
 		if (pMesh->texNo == WALL_RAY)ans = TRUE;
 #endif
-		if (g_aMeshWall[nCntMeshField].use == FALSE || ans == TRUE)continue;
+		if (g_aMeshWall[nCntMeshField].use == FALSE || ans == FALSE)continue;
 		// 頂点バッファ設定
 		UINT stride = sizeof(VERTEX_3D);
 		UINT offset = 0;
@@ -301,7 +305,10 @@ void DrawMeshWall(void)
 		SetMaterial(pMesh->material);
 
 		// テクスチャ設定
+		int oldTex = pMesh->texNo;
+		if (oldTex == WALL_RAY)pMesh->texNo = WALL_GRAY;
 		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[pMesh->texNo]);
+		if(oldTex == WALL_RAY)pMesh->texNo = oldTex;
 
 		XMMATRIX mtxRot, mtxTranslate, mtxWorld;
 
@@ -477,4 +484,9 @@ void ResetMeshWall(void)
 		g_aMeshWall[i].texNo = WALL_GRAY;						//使用するテクスチャの指定
 		g_aMeshWall[i].use = FALSE;
 	}
+}
+
+void DeleteMeshWall(int i)
+{
+	g_aMeshWall[i].use = FALSE;
 }

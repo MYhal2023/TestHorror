@@ -18,7 +18,7 @@
 #define DEBUG_FOG_ED (1100.0f)
 
 #define LIGHT_LINE_ON (300.0f)
-#define LIGHT_LINE_OFF (100.0f)
+#define LIGHT_LINE_OFF (150.0f)
 
 enum
 {

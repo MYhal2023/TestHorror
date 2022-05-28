@@ -34,7 +34,7 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TITLE_TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TITLE_TEXTURE_MAX] = {
-	"data/TEXTURE/result001.jpg",
+	"data/TEXTURE/title.png",
 	"data/TEXTURE/cursol.png",
 	"data/TEXTURE/endgame.png",
 	"data/TEXTURE/newgame.png",
@@ -83,8 +83,8 @@ HRESULT InitTitle(void)
 		//g_Title[i].h = TEXTURE_HEIGHT;
 		//g_Title[i].pos = XMFLOAT3(g_Title[i].w / 2, g_Title[i].h / 2, 0.0f);
 		g_Title[i].texNo = i;
-		const float mag = 0.1f;
-		const float Cmag = 0.04f;
+		const float mag = 0.2f;
+		const float Cmag = 0.08f;
 		switch (i)	//ここでテクスチャ毎に座標と大きさを指定
 		{
 		case TITLE_BG:
@@ -191,14 +191,14 @@ void UpdateTitle(void)
 		&& g_Title[TITLE_CURSOL].pos.y > g_Title[TITLE_NEW].pos.y + 1.0f)//float値操作により誤差が生じるため、余剰を設ける
 	{
 		PlaySound(SOUND_LABEL_SE_Cursol_Move);
-		g_Title[TITLE_CURSOL].pos.y -= 540.0f * TEXTURE_HEIGHT_PER;
+		g_Title[TITLE_CURSOL].pos.y -= 1080.0f * TEXTURE_HEIGHT_PER;
 	}
 	else if ((GetKeyboardTrigger(DIK_DOWN) ||
 		IsButtonTriggered(0, BUTTON_DOWN))
 		&& g_Title[TITLE_CURSOL].pos.y < g_Title[TITLE_END].pos.y)
 	{
 		PlaySound(SOUND_LABEL_SE_Cursol_Move);
-		g_Title[TITLE_CURSOL].pos.y += 540.0f * TEXTURE_HEIGHT_PER;
+		g_Title[TITLE_CURSOL].pos.y += 1080.0f * TEXTURE_HEIGHT_PER;
 	}
 
 

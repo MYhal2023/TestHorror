@@ -21,7 +21,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX					(12)				// テクスチャの数
+#define TEXTURE_MAX					(7)				// テクスチャの数
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -34,7 +34,13 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/hpbarred.png",
+	"data/TEXTURE/t_can_t_ues_key.png",
+	"data/TEXTURE/t_fire_candlestick.png",
+	"data/TEXTURE/t_need_key.png",
+	"data/TEXTURE/t_take_key.png",
+	"data/TEXTURE/t_take_lighter.png",
+	"data/TEXTURE/t_take_matchi.png",
+	"data/TEXTURE/t_use_key.png",
 };
 static BOOL						g_Load = FALSE;
 static TEXT_TEXTURE				g_Texttex[TEXTURE_MAX];
@@ -67,6 +73,7 @@ HRESULT InitTexttex(void)
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
+	const float mag = 0.25f;
 	for (int i = 0; i < TEXTURE_MAX; i++)
 	{
 		g_Texttex[i].use = FALSE;
@@ -77,10 +84,42 @@ HRESULT InitTexttex(void)
 		g_Texttex[i].th = 1.0f;
 		g_Texttex[i].tx = 0.0f;
 		g_Texttex[i].ty = 0.0f;		// 幅と高さ、テクスチャ座標
-		g_Texttex[i].pos = {SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.75f, 0.0f};						// ポリゴンの位置
+		g_Texttex[i].pos = {SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.8f, 0.0f};						// ポリゴンの位置
 		g_Texttex[i].color = { 1.0f, 1.0f, 1.0f, 0.0f };						//色
 		g_Texttex[i].time = 0;					
-		g_Texttex[i].timeMax = 180;				
+		g_Texttex[i].timeMax = 210;		
+
+		switch (i)
+		{
+		case TEXT_CANT_KEY:
+			g_Texttex[i].w = 1770 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_FIRE_CANDLE:
+			g_Texttex[i].w = 1240 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_NEED_KEY:
+			g_Texttex[i].w = 965 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_TAKE_KEY: 
+			g_Texttex[i].w = 1185 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_TAKE_LIGHTER:
+			g_Texttex[i].w = 1500 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_TAKE_MATCH:
+			g_Texttex[i].w = 1355 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		case TEXT_USE_KEY:
+			g_Texttex[i].w = 875 * mag;
+			g_Texttex[i].h = 250 * mag;
+			break;
+		}
 	}
 
 	// 初期化
@@ -120,7 +159,7 @@ void UpdateTexttex(void)
 	{
 		if (g_Texttex[i].use != TRUE)continue;
 
-		const float fade = 0.04f;
+		const float fade = 1.0f;
 		if (g_Texttex[i].color.w < 1.0f && g_Texttex[i].time < g_Texttex[i].timeMax)
 		{//表示開始
 			g_Texttex[i].color.w += fade;
@@ -163,6 +202,7 @@ void DrawTexttex(void)
 	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	SetMaterial(material);
 
+	SetAlphaTestEnable(TRUE);
 	float px = 0.0f;	// 表示位置X
 	float py = 0.0f;			// 表示位置Y
 	float pw = 0.0f;				// 表示幅
@@ -198,10 +238,27 @@ void DrawTexttex(void)
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
 	}
+	SetAlphaTestEnable(FALSE);
+
 }
 
 void SetTexture(int i)
 {
+	for (int k = 0; k < TEXTURE_MAX; k++)
+	{
+		if (g_Texttex[k].use)
+		{
+			g_Texttex[k].use = FALSE;
+			g_Texttex[k].color.w = 0.0f;
+			g_Texttex[k].time = 0;
+			break;
+		}
+	}
+
 	if (g_Texttex[i].use != TRUE)
+	{
 		g_Texttex[i].use = TRUE;
+		g_Texttex[i].color.w = 0.0f;
+		g_Texttex[i].time = 0;
+	}
 }

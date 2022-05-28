@@ -41,6 +41,6 @@ void UninitAmadeus(void);
 BOOL Visibility(XMFLOAT3 pos1, XMFLOAT3 pos2, float rot, float dist);
 XMVECTOR TacticalPointSystem(int i);
 BOOL FilterWayPoint(XMFLOAT3 pos, XMFLOAT3 pos2, int k);
-float ValueWayPoint(XMFLOAT3 pos, float value, int k);
+float ValueWayPoint(XMFLOAT3 pos, XMFLOAT3 pos2, float value, int k);
 void ValueCoefficient(int k);
 float TacticalSuperiority(XMFLOAT3 pos1, XMFLOAT3 pos2, int k);
