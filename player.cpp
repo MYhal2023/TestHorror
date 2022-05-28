@@ -144,6 +144,9 @@ HRESULT InitPlayer(void)
 	case FIRST_STAGE:
 		g_Player.pos = { PLAYER_SPAWN1_X, PLAYER_OFFSET_Y, PLAYER_SPAWN1_Z };
 		break;
+	case CLEAR_STAGE:
+		g_Player.pos = { 0.0f, PLAYER_OFFSET_Y, -450.0f };
+		break;
 	}
 	return S_OK;
 }

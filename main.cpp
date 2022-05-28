@@ -27,6 +27,7 @@
 #include "result.h"
 #include "fade.h"
 #include "title.h"
+#include "tutorial_text.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -297,6 +298,7 @@ void Update(void)
 	UpdateLight();
 
 	// カメラ更新
+	if (!GetTutorialTex())
 	UpdateCamera();
 
 

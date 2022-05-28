@@ -12,6 +12,7 @@
 #include "time.h"
 #include "debugproc.h"
 #include "match.h"
+#include "tutorial_text.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -83,6 +84,12 @@ void InitCamera(void)
 	{
 	case PRISON_STAGE:
 		g_Cam.rot = { 0.0f, XM_PI * 1.0f, 0.0f };
+		break;
+	case FIRST_STAGE:
+		g_Cam.rot = { 0.0f, 0.0f, 0.0f };
+		break;
+	case CLEAR_STAGE:
+		g_Cam.rot = { 0.0f, 0.0f, 0.0f };
 		break;
 	}
 }
@@ -284,6 +291,7 @@ int GetViewPortType(void)
 // カメラの視点と注視点をセット
 void SetCameraAT(XMFLOAT3 pos)
 {
+	if (GetTutorialTex())return;
 	PLAYER *player = GetPlayer();
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_X))

@@ -227,7 +227,7 @@ void SetStageFurniture(int type, XMFLOAT3 pos, XMFLOAT3 rot)
 		g_StageFurniture[g_furniture].load = TRUE;
 		g_StageFurniture[g_furniture].use = TRUE;
 		g_StageFurniture[g_furniture].ID = 100;
-		g_StageFurniture[g_furniture].size = 50.0f;
+		g_StageFurniture[g_furniture].size = 100.0f;
 		break;
 	case BEd:
 		LoadModel(MODEL_BED, &g_StageFurniture[g_furniture].model);

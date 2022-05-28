@@ -17,6 +17,7 @@
 #include "enemy.h"
 #include "match.h"
 #include "stagefurniture.h"
+#include "tutorial_text.h"
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
@@ -285,12 +286,16 @@ void CollisionItem(XMFLOAT3 pos, float size)
 			match->num++;
 			g_Item[i].drop = FALSE;
 			SetTexture(TEXT_TAKE_MATCH);
+			if (GetPlayStage() == PRISON_STAGE)
+				SetTutorialTexture(TUTORIAL_MATCHI);
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case ITEM_LIGHTER:
 			AddItembox(LIGHTER_ITEM);
 			g_Item[i].drop = FALSE;
 			SetTexture(TEXT_TAKE_LIGHTER);
+			if (GetPlayStage() == PRISON_STAGE)
+				SetTutorialTexture(TUTORIAL_LIGHTER);
 			PlaySound(SOUND_LABEL_SE_GetItem);
 			break;
 		case MAXTYPE_ITEM:
