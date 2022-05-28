@@ -15,7 +15,7 @@
 #define LIGHTER_OIL_DIGIT		(2)				// 桁数
 #define LIGHTER_TIME			(1)			//減らすため、フレームの数	
 #define LIGHTER_OIL_REDUCE		(0.025f)			//減らせる量
-#define LIGHTER_MOVE			(0.8f)			//移動速さ
+#define LIGHTER_MOVE			(1.0f)			//移動速さ
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
@@ -48,5 +48,5 @@ void AddOil(float n);
 void CheckOil(void);
 void ReduceOil(void);
 void MoveLighter(void);
-
+void DrawMFire(void);
 LIGHTER *GetLighter(void);

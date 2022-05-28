@@ -326,48 +326,6 @@ PLAYER *GetPlayer(void)
 	return &g_Player;
 }
 
-//void SettingPlayer(void)
-//{
-//	// レイキャストして足元の高さを求める
-//	XMFLOAT3 normal = { 0.0f, 1.0f, 0.0f };				// ぶつかったポリゴンの法線ベクトル（向き）
-//	XMFLOAT3 hitPosition;								// 交点
-//	hitPosition.y = g_Player.pos.y - PLAYER_OFFSET_Y;	// 外れた時用に初期化しておく
-//	bool ans = RayHitField(g_Player.pos, &hitPosition, &normal);
-//	g_Player.pos.y = hitPosition.y + PLAYER_OFFSET_Y;
-//	//g_Player.pos.y = PLAYER_OFFSET_Y;
-//
-//
-//
-//	g_Player.spd *= 0.5f;
-//
-//
-////////////////////////////////////////////////////////////////////////
-//// 姿勢制御
-////////////////////////////////////////////////////////////////////////
-//
-//	XMVECTOR vx, nvx, up;
-//	XMVECTOR quat;
-//	float len, angle;
-//
-//	// ２つのベクトルの外積を取って任意の回転軸を求める
-//	g_Player.upVector = normal;
-//	up = { 0.0f, 1.0f, 0.0f, 0.0f };
-//	vx = XMVector3Cross(up, XMLoadFloat3(&g_Player.upVector));	//これが任意の軸
-//
-//	// 求めた回転軸からクォータニオンを作り出す
-//	nvx = XMVector3Length(vx);
-//	XMStoreFloat(&len, nvx);
-//	nvx = XMVector3Normalize(vx);
-//	angle = asinf(len);
-//	quat = XMQuaternionRotationNormal(nvx, angle);
-//
-//	// 前回のクォータニオンから今回のクォータニオンまでの回転を滑らかにする
-//	quat = XMQuaternionSlerp(XMLoadFloat4(&g_Player.quaternion), quat, 0.2f);		//第三引数は要はパーセンテージ。この場合1fに5%ずつ傾けさせてる
-//
-//	// 今回のクォータニオンの結果を保存する
-//	XMStoreFloat4(&g_Player.quaternion, quat);
-//
-//}
 
 void IncibleEffect(void)
 {
@@ -490,8 +448,11 @@ void PlayerDashControl(void)
 
 void PlayerLighterControl(void)
 {
-	if (ReturnSelect() != LIGHTER_ITEM || (!GetCameraPos()))return;
-
+	if (ReturnSelect() != LIGHTER_ITEM || (!GetCameraPos()))
+	{
+		SetLighterOn(FALSE);
+		return;
+	}
 	if (GetKeyboardPress(DIK_L) || (IsButtonPressed(0, BUTTON_L) && IsButtonPressed(0, BUTTON_A)))
 	{
 		SetLighterOn(TRUE);
@@ -670,7 +631,7 @@ void BreathDicision(void)
 
 void FunitureHit(void)
 {
-	if ((GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(0, DIK_X)))
+	if ((GetKeyboardTrigger(DIK_DOWN) || IsButtonTriggered(0, BUTTON_X)))
 	{
 		MODEL_ITEM *item = GetItem();
 		FURNITURE *fur = GetFurniture();

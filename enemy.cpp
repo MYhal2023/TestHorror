@@ -136,6 +136,7 @@ void UninitEnemy(void)
 {
 	if (g_Load == FALSE) return;
 
+	ResetEnemy();
 	for (int nCntTex = 0; nCntTex < TEXTURE_MAX; nCntTex++)
 	{
 		if (g_Texture[nCntTex] != NULL)
@@ -374,6 +375,13 @@ int SetEnemy(XMFLOAT3 pos, XMFLOAT3 rot)
 	return nIdxEnemy;
 }
 
+void ResetEnemy(void)
+{
+	for (int i = 0; i < MAX_ENEMY; i++)
+	{
+		g_Enemy[i].use = FALSE;
+	}
+}
 //=============================================================================
 // エネミーの取得
 //=============================================================================

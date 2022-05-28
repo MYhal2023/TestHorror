@@ -24,7 +24,7 @@
 //*****************************************************************************
 
 #define	MODEL_MATCH		"data/MODEL/match.obj"			// 読み込むモデル名
-
+#define	MODEL_MATCHBOX	"data/MODEL/matchibox.obj"			// 読み込むモデル名
 
 #define TEXTURE_WIDTH				(100)	// テクスチャサイズ
 #define TEXTURE_HEIGHT				(100)	// 
@@ -33,7 +33,7 @@
 #define DISTANCE_Y					(10.0f)
 #define DISTANCE_Z					(25.0f)
 
-#define NO_USE_Y					(25.0f)
+#define NO_USE_Y					(15.0f)
 
 #define MATCH_SCALE					(0.5f)
 
@@ -42,7 +42,7 @@
 #define STANDBYMATCH_POS_Y			(500.0f)	// スタンバイ時のマッチの場所(Y軸)
 #define STANDBYTIME					(10)		// マッチを構えるまでの時間
 #define STANDBY_MOVE_FRAME			((STANDBYMATCH_POS_Y-DEFAULTMATCH_POS_Y)/STANDBYTIME)//構える時の1フレームあたりの移動量
-#define MATCH_NUM					(10)			// マッチの本数(初期)
+#define MATCH_NUM					(3)			// マッチの本数(初期)
 
 #define MATCH_SLOW					(800)
 #define MATCH_MIDDLE				(1200)
@@ -64,7 +64,8 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;		// 頂点情報
 
 
 static MATCH						g_Match;
-
+static MATCHBOX						g_Matchbox;
+static FIRE							g_Fire;
 static BOOL						g_Load = FALSE;
 
 
@@ -76,6 +77,8 @@ HRESULT InitMatch(void)
 	ID3D11Device *pDevice = GetDevice();
 
 	LoadModel(MODEL_MATCH, &g_Match.model);
+	LoadModel(MODEL_MATCHBOX, &g_Matchbox.model);
+	LoadModel(MODEL_FIRE, &g_Fire.model);
 
 
 	// 頂点バッファ生成
@@ -101,7 +104,18 @@ HRESULT InitMatch(void)
 
 	g_Match.TexNo = 0;
 	g_Match.StandbyTime = 0;
+	g_Match.AblazeTime = 0;
 	g_Match.num = MATCH_NUM;
+
+	g_Matchbox.pos = { 0.0f, 0.0f, 0.0f };
+	g_Matchbox.rot = { 0.0f, 0.0f, 0.0f };
+	g_Matchbox.scl = { MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f };
+	g_Matchbox.use = FALSE;
+
+	g_Fire.pos = { 0.0f, 0.0f, 0.0f };
+	g_Fire.rot = { 0.0f, 0.0f, 0.0f };
+	g_Fire.scl = { MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f, MATCH_SCALE - 0.2f };
+	g_Fire.use = FALSE;
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -120,6 +134,8 @@ void UninitMatch(void)
 	}
 
 	UnloadModel(&g_Match.model);
+	UnloadModel(&g_Matchbox.model);
+	UnloadModel(&g_Fire.model);
 
 	g_Load = FALSE;
 }
@@ -131,7 +147,7 @@ void UpdateMatch(void)
 {
 
 	StandbyMatch();
-
+	MoveMatchbox();
 
 
 #ifdef _DEBUG	// デバッグ情報を表示する
@@ -157,12 +173,19 @@ void UpdateMatch(void)
 //=============================================================================
 void DrawMatch(void)
 {
+	DrawMatchStick();
+	DrawMatchbox();
+	DrawFire();
+}
+
+void DrawMatchStick(void)
+{
+	if (g_Match.Use == FALSE || g_Match.Pos.y <= GAME_Y_CAM - NO_USE_Y) return;
+
 	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 
 	// カリング無効
 	SetCullingMode(CULL_MODE_NONE);
-
-	if (g_Match.Use == FALSE || g_Match.Pos.y <= GAME_Y_CAM - NO_USE_Y) return;
 
 	// ワールドマトリックスの初期化
 	mtxWorld = XMMatrixIdentity();
@@ -187,10 +210,86 @@ void DrawMatch(void)
 	// モデル描画
 	DrawModel(&g_Match.model);
 
+
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
+
+}
+
+void DrawMatchbox(void)
+{
+	//マッチボックス
+
+	if (g_Matchbox.use == FALSE) return;
+
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
+
+	// ワールドマトリックスの初期化
+	mtxWorld = XMMatrixIdentity();
+
+	// スケールを反映
+	mtxScl = XMMatrixScaling(g_Matchbox.scl.x, g_Matchbox.scl.y, g_Matchbox.scl.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+
+	// 回転を反映
+	mtxRot = XMMatrixRotationRollPitchYaw(g_Matchbox.rot.x, g_Matchbox.rot.y, g_Matchbox.rot.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+
+	// 移動を反映
+	mtxTranslate = XMMatrixTranslation(g_Matchbox.pos.x, g_Matchbox.pos.y, g_Matchbox.pos.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+
+	// ワールドマトリックスの設定
+	SetWorldMatrix(&mtxWorld);
+
+	XMStoreFloat4x4(&g_Matchbox.mtxWorld, mtxWorld);
+
+	// モデル描画
+	DrawModel(&g_Matchbox.model);
+
 	// カリング設定を戻す
 	SetCullingMode(CULL_MODE_BACK);
 }
 
+void DrawFire(void)
+{
+	if (g_Match.AblazeTime <= 0) return;
+
+	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+
+	// カリング無効
+	SetCullingMode(CULL_MODE_NONE);
+
+	// ワールドマトリックスの初期化
+	mtxWorld = XMMatrixIdentity();
+
+	// スケールを反映
+	mtxScl = XMMatrixScaling(g_Fire.scl.x, g_Fire.scl.y, g_Fire.scl.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
+
+	// 回転を反映
+	mtxRot = XMMatrixRotationRollPitchYaw(g_Fire.rot.x, g_Fire.rot.y, g_Fire.rot.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
+
+	// 移動を反映
+	mtxTranslate = XMMatrixTranslation(g_Fire.pos.x, g_Fire.pos.y, g_Fire.pos.z);
+	mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
+
+	// ワールドマトリックスの設定
+	SetWorldMatrix(&mtxWorld);
+
+	XMStoreFloat4x4(&g_Fire.mtxWorld, mtxWorld);
+
+	// モデル描画
+	DrawModel(&g_Fire.model);
+
+	// カリング設定を戻す
+	SetCullingMode(CULL_MODE_BACK);
+
+}
 //
 void StandbyMatch(void)
 {
@@ -222,7 +321,12 @@ void StandbyMatch(void)
 			return;
 		}
 
-		if(IsButtonPressed(0, BUTTON_R)) SetForceState(TRUE);
+		if (IsButtonPressed(0, BUTTON_R)) {
+			SetForceState(TRUE);
+			CAMERA		camera = *GetCamera();
+			g_Match.Pos.x = camera.pos.x + sinf(camera.rot.y + XM_PI * -0.025f)*DISTANCE_X;
+			g_Match.Pos.z = camera.pos.z + cosf(camera.rot.y + XM_PI * -0.025f)*DISTANCE_Z;
+		}
 		else SetForceState(FALSE);
 
 		switch (IsButtonForce(0))
@@ -249,6 +353,7 @@ void StandbyMatch(void)
 	}
 	else
 	{
+		g_Match.Out = FALSE;
 		//おろし終わるまでの時間
 		if (0 < g_Match.StandbyTime)
 		{
@@ -268,15 +373,33 @@ void MoveMatch()
 	{
 		g_Match.Pos.y -= MATCH_MOVE;
 	}
-
-	if (g_Match.Out == TRUE && g_Match.Pos.y < camera.pos.y - DISTANCE_Y)
+	else if (g_Match.Out == TRUE && g_Match.Pos.y < camera.pos.y - DISTANCE_Y)
 	{
 		g_Match.Pos.y += MATCH_MOVE;
 	}
 
 	g_Match.rot.y = camera.rot.y + XM_PI * 0.5f;
+
+	const float firepos = 3.2f;
+	const float dist = 26.0f;
+	g_Fire.pos.x = camera.pos.x + sinf(camera.rot.y + XM_PI * 0.092f)*dist;
+	g_Fire.pos.z = camera.pos.z + cosf(camera.rot.y + XM_PI * 0.092f)*dist;
+	g_Fire.pos.y = g_Match.Pos.y + firepos;
+	g_Fire.rot.y = camera.rot.y + XM_PI * 0.0f;
+
 }
 
+void MoveMatchbox(void)
+{
+	(g_Match.Out == TRUE && g_Match.AblazeTime <= 0) ? g_Matchbox.use = TRUE : g_Matchbox.use = FALSE;
+
+	if (!g_Matchbox.use)return;
+	CAMERA		camera = *GetCamera();
+	g_Matchbox.pos.x = camera.pos.x + sinf(camera.rot.y - XM_PI * 0.1f)*DISTANCE_X;
+	g_Matchbox.pos.y = g_Match.Pos.y;
+	g_Matchbox.pos.z = camera.pos.z + cosf(camera.rot.y - XM_PI * 0.1f)*DISTANCE_Z;
+	g_Matchbox.rot.y = camera.rot.y + XM_PI * 0.0f;
+}
 
 void SetMatchForce(int force)
 {

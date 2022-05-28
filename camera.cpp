@@ -353,7 +353,7 @@ void SetChangeCamera(void)
 	PLAYER *player = GetPlayer();
 	MATCH *match = GetMatch();
 	if (CheckLightOn() == TRUE || match->Out)return;
-	if (GetKeyboardTrigger(DIK_C) || IsButtonTriggered(0, BUTTON_R))
+	if (GetKeyboardTrigger(DIK_C) || IsButtonTriggered(0, RGDW_DOWN))
 	{
 		//g_PosYTrigger == TRUE ? g_PosYTrigger = FALSE : g_PosYTrigger = TRUE;
 		g_PosYSwitch = TRUE;
