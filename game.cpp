@@ -62,7 +62,7 @@ static int	g_ViewPortType_Game = TYPE_FULL_SCREEN;
 
 static BOOL	g_bPause = TRUE;	// ƒ|[ƒYON/OFF
 static int	g_PlayMode = MAIN_GAME;
-static int	g_PlayStage = PRISON_STAGE;
+static int	g_PlayStage = CLEAR_STAGE;
 static BOOL	g_PlayStageChange = FALSE;
 //=============================================================================
 // ‰Šú‰»ˆ—
@@ -595,12 +595,19 @@ void CheckModeChange(void)
 		g_PlayStageChange = TRUE;
 		SetFade(FADE_OUT, MODE_GAME);
 	}
-	if (!g_PlayStageChange && g_PlayStage == FIRST_STAGE && 
+	else if (!g_PlayStageChange && g_PlayStage == FIRST_STAGE && 
 		player->pos.z <= -330.0f && player->pos.x >= 405.0f)
 	{
 		g_PlayStage++;
 		g_PlayStageChange = TRUE;
 		SetFade(FADE_OUT, MODE_GAME);
+	}
+	else if (!g_PlayStageChange && g_PlayStage == CLEAR_STAGE
+		&& player->pos.z >= 450.0f)
+	{
+		g_PlayStageChange = TRUE;
+		g_PlayStage = 0;
+		SetFade(FADE_OUT, MODE_TITLE);
 	}
 }
 
